@@ -23,7 +23,7 @@ internal class RuntimeContext(
         val postLoginRedirectUri: String
 ) {
 
-    val environment = Environment(contextPath)
+    val environment = Environment()
 
     val httpClient = buildHttpClient()
     val metadata = fetchMetadata(httpClient, environment.idportenWellKnownUrl)
