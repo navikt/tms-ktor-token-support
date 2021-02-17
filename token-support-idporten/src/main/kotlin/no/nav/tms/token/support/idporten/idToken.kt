@@ -68,9 +68,9 @@ internal fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: 
 
 private fun getLoginUrl(contextPath: String): String {
     return if (contextPath.isBlank()) {
-        "oauth2/login"
+        "/oauth2/login"
     } else {
-        "$contextPath/oauth2/login"
+        "/$contextPath/oauth2/login"
     }
 }
 
