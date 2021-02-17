@@ -34,6 +34,19 @@ repositories {
     mavenLocal()
 }
 
+publishing {
+    repositories{
+        mavenLocal()
+    }
+
+    publications {
+        create<MavenPublication>("local") {
+            from(components["java"])
+        }
+    }
+}
+
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
