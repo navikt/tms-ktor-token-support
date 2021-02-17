@@ -19,7 +19,7 @@ internal class IdTokenAuthenticationProvider constructor(config: Configuration) 
     }
 }
 
-class AuthConfiguration(
+internal class AuthConfiguration(
         val contextPath: String,
         val tokenCookieName: String,
         val jwkProvider: JwkProvider,
@@ -59,7 +59,7 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String, con
     register(provider)
 }
 
-fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: String): (String) -> JWTVerifier? = {
+internal fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: String): (String) -> JWTVerifier? = {
     jwkProvider.get(JWT.decode(it).keyId).idTokenVerifier(
             clientId,
             issuer
