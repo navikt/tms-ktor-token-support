@@ -1,34 +1,17 @@
-package no.nav.tms.token.support.idporten
+package no.nav.tms.token.support.idporten.authentication
 
-import com.auth0.jwk.JwkProvider
-import com.auth0.jwt.JWT
-import com.auth0.jwt.interfaces.DecodedJWT
-import com.auth0.jwt.interfaces.JWTVerifier
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.request.*
 import io.ktor.response.*
+import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import org.slf4j.LoggerFactory
-
-internal class IdTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
-
-    internal class Configuration(name: String) : AuthenticationProvider.Configuration(name)
-
-    companion object {
-        fun build(name: String) = IdTokenAuthenticationProvider(Configuration(name))
-    }
-}
-
-internal class AuthConfiguration(
-        val contextPath: String,
-        val tokenCookieName: String,
-        val jwkProvider: JwkProvider,
-        val clientId: String,
-        val issuer: String
-)
 
 private val log = LoggerFactory.getLogger(IdTokenAuthenticationProvider::class.java)
 
+// This method configures an authenticator which checks if an end user has hit an authenticated endpoint
+// with a valid token cookie. If the user is missing the token cookie, or the provided token is invalid, we redirect
+// the user to the endpoint 'oauth2/login', where the user will be prompted to log in through idporten
 internal fun Authentication.Configuration.idToken(authenticatorName: String, configBuilder: () -> AuthConfiguration) {
 
     val config = configBuilder()
@@ -59,13 +42,6 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String, con
     register(provider)
 }
 
-internal fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: String): (String) -> JWTVerifier? = {
-    jwkProvider.get(JWT.decode(it).keyId).idTokenVerifier(
-            clientId,
-            issuer
-    )
-}
-
 private fun getLoginUrl(contextPath: String): String {
     return if (contextPath.isBlank()) {
         "/oauth2/login"
@@ -81,4 +57,12 @@ private fun AuthenticationContext.challengeAndRedirect(loginUrl: String) {
     }
 }
 
-internal data class IdTokenPrincipal(val decodedJWT: DecodedJWT) : Principal
+private class IdTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
+
+    class Configuration(name: String) : AuthenticationProvider.Configuration(name)
+
+    companion object {
+        fun build(name: String) = IdTokenAuthenticationProvider(Configuration(name))
+    }
+}
+

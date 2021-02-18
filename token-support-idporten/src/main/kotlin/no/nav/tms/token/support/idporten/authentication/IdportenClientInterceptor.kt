@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten
+package no.nav.tms.token.support.idporten.authentication
 
 import com.nimbusds.jose.JOSEObjectType
 import com.nimbusds.jose.JWSAlgorithm

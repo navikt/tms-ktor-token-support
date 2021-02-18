@@ -1,5 +1,6 @@
-package no.nav.tms.token.support.idporten
+package no.nav.tms.token.support.idporten.authentication.config
 
+import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -14,6 +15,9 @@ import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import no.nav.tms.token.support.idporten.authentication.IdportenClientInterceptor
+import no.nav.tms.token.support.idporten.authentication.OauthServerConfigurationMetadata
+import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder.buildHttpClient
 import java.net.URL
 import java.util.concurrent.TimeUnit
 
@@ -22,12 +26,12 @@ internal class RuntimeContext(
         val contextPath: String,
         val postLoginRedirectUri: String
 ) {
-
     val environment = Environment()
 
-    val httpClient = buildHttpClient()
+    private val httpClient = buildHttpClient()
     val metadata = fetchMetadata(httpClient, environment.idportenWellKnownUrl)
-    val idportenClientInterceptor = createIdPortenClientInterceptor(environment, metadata)
+
+    private val idportenClientInterceptor = createIdPortenClientInterceptor(environment, metadata)
     val oauth2ServerSettings = createOAuth2ServerSettings(environment, metadata, idportenClientInterceptor)
     val jwkProvider = createJwkProvider(metadata)
 }
@@ -53,7 +57,7 @@ private fun fetchMetadata(httpClient: HttpClient, idPortenUrl: String) = runBloc
     httpClient.getOAuthServerConfigurationMetadata(idPortenUrl)
 }
 
-private fun createJwkProvider(metadata: OauthServerConfigurationMetadata) = JwkProviderBuilder(URL(metadata.jwksUri))
+private fun createJwkProvider(metadata: OauthServerConfigurationMetadata): JwkProvider = JwkProviderBuilder(URL(metadata.jwksUri))
         .cached(10, 24, TimeUnit.HOURS)
         .rateLimited(10, 1, TimeUnit.MINUTES)
         .build()
@@ -63,28 +67,3 @@ private fun createIdPortenClientInterceptor(environment: Environment, metadata: 
         clientId = environment.idportenClientId,
         audience = metadata.issuer
 )
-
-private fun buildHttpClient(): HttpClient {
-    return HttpClient(Apache) {
-        install(JsonFeature) {
-            serializer = buildJsonSerializer()
-        }
-        install(HttpTimeout)
-    }
-}
-
-private fun buildJsonSerializer(): JacksonSerializer {
-    return JacksonSerializer {
-        registerKotlinModule()
-        registerModule(JavaTimeModule())
-        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-    }
-}
-
-private suspend fun HttpClient.getOAuthServerConfigurationMetadata(url: String): OauthServerConfigurationMetadata = withContext(Dispatchers.IO) {
-    request {
-        method = HttpMethod.Get
-        url(url)
-        accept(ContentType.Application.Json)
-    }
-}

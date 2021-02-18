@@ -3,21 +3,22 @@ package no.nav.tms.token.support.idporten.user
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.application.*
 import io.ktor.auth.*
-import no.nav.tms.token.support.idporten.IdTokenPrincipal
+import no.nav.tms.token.support.idporten.authentication.IdTokenPrincipal
 import java.time.Instant
 
+// This creates an IdportenUser based on user jwt claims
 object IdportenUserFactory {
 
     private val IDENT_CLAIM = "pid"
 
-    fun createNewAuthenticatedUser(call: ApplicationCall): IdportenUser {
+    fun createIdportenUser(call: ApplicationCall): IdportenUser {
         val principal = call.principal<IdTokenPrincipal>()
                 ?: throw Exception("Principal har ikke blitt satt for authentication context.")
 
-        return createNewAuthenticatedUser(principal)
+        return createIdportenUser(principal)
     }
 
-    private fun createNewAuthenticatedUser(principal: IdTokenPrincipal): IdportenUser {
+    private fun createIdportenUser(principal: IdTokenPrincipal): IdportenUser {
         val token = principal.decodedJWT
 
         val ident: String = token.getClaim(IDENT_CLAIM).asString()
@@ -27,7 +28,7 @@ object IdportenUserFactory {
                 token
             )
 
-        return IdportenUser(ident, loginLevel, token.token, expirationTime)
+        return IdportenUser(ident, loginLevel, expirationTime, token)
     }
 
     private fun extractLoginLevel(token: DecodedJWT): Int {

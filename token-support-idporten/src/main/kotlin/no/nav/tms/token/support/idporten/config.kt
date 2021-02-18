@@ -5,7 +5,15 @@ import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.routing.*
+import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
+import no.nav.tms.token.support.idporten.authentication.config.Idporten
+import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
+import no.nav.tms.token.support.idporten.authentication.loginApi
+import no.nav.tms.token.support.idporten.authentication.idToken
 
+
+// This method is responsible for wiring up all the necessary endpoints and registering the authenticators.
+// Users of this library should only have to make use of this method to enable idporten auth.
 fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -> Unit) {
     val config = IdportenAuthenticationConfig().apply(configure)
     val contextPath = environment.rootPath
@@ -20,14 +28,8 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     )
 
     install(Authentication) {
-        oauth(Idporten.authenticatorName) {
-            client = HttpClient(CIO)
-            providerLookup = { runtimeContext.oauth2ServerSettings }
-            urlProvider = { runtimeContext.environment.idportenRedirectUri }
-        }
-
-
-
+        // Register authenticator which redirects to internal oauth2/login endpoint if user does not have a valid token.
+        // This can apply to any number of endpoints.
         idToken(IdPortenCookieAuthenticator.name) {
             AuthConfiguration (
                     jwkProvider = runtimeContext.jwkProvider,
@@ -37,19 +39,31 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
                     issuer = runtimeContext.metadata.issuer
             )
         }
+
+        // Register authenticator which redirects user to idporten to perform login. This should only apply to endpoints
+        // 'oath2/login' and 'oath2/callback'
+        oauth(Idporten.authenticatorName) {
+            client = HttpClient(CIO)
+            providerLookup = { runtimeContext.oauth2ServerSettings }
+            urlProvider = { runtimeContext.environment.idportenRedirectUri }
+        }
+
     }
 
+    // Register endpoints 'oauth2/login' and 'oath2/callback'
     routing {
         loginApi(runtimeContext)
     }
 
 }
 
+// Configuration provided by library user. See readme for example of use
 class IdportenAuthenticationConfig (
     var postLoginRedirectUri: String = "",
     var tokenCookieName: String = ""
 )
 
+// Name of token authenticator. See README for example of use
 object IdPortenCookieAuthenticator {
     const val name = "idporten_cookie"
 }
