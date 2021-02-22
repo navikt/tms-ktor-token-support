@@ -26,6 +26,11 @@ dependencies {
     testImplementation(Junit.engine)
     testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
+    testImplementation(Ktor.clientMock)
+    testImplementation(Ktor.serverTestHost)
+    testImplementation(Kotest.runnerJunit)
+    testImplementation(Kotest.assertionsCore)
+    testImplementation(Kotest.extensions)
 }
 
 repositories {
