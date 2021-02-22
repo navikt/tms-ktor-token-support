@@ -27,14 +27,17 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String, con
                 if (decodedJWT != null) {
                     context.principal(IdTokenPrincipal(decodedJWT))
                 } else {
-                    log.info("Found invalid token: idToken")
+                    call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie)
+                    log.debug("Found invalid token: idToken")
                 }
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
-                log.error("Token verification failed: {}", message)
+                call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie)
+                log.debug("Token verification failed: {}", message)
+                context.challengeAndRedirect(getLoginUrl(config.contextPath))
             }
         } else {
-            log.info("Couldn't find token.")
+            log.debug("Couldn't find cookie ${config.tokenCookieName}.")
             call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = config.contextPath)
             context.challengeAndRedirect(getLoginUrl(config.contextPath))
         }

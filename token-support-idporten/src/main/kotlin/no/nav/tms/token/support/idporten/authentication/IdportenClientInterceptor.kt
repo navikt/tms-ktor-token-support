@@ -43,9 +43,6 @@ internal class IdportenClientInterceptor(privateJwk: String, private val clientI
         }
 
         body = TextContent(urlParameters.build().formUrlEncode(), ContentType.Application.FormUrlEncoded)
-
-
-        log.info("Calling ${url.encodedPath}. Param body: ${(body as TextContent).text}")
     }
 
     private fun clientAssertion(clientId: String, audience: String, rsaKey: RSAKey): String {
