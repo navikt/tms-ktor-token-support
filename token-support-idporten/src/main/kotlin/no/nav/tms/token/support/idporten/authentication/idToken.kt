@@ -29,6 +29,7 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String, con
                 } else {
                     call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie)
                     log.debug("Found invalid token: idToken")
+                    context.challengeAndRedirect(getLoginUrl(config.contextPath))
                 }
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
