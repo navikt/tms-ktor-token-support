@@ -27,20 +27,19 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String, con
                 if (decodedJWT != null) {
                     context.principal(IdTokenPrincipal(decodedJWT))
                 } else {
-                    call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie)
                     log.debug("Found invalid token: idToken")
-                    context.challengeAndRedirect(getLoginUrl(config.contextPath))
+                    call.response.cookies.appendExpired(config.tokenCookieName)
+                    context.challengeAndRedirect(config.contextPath)
                 }
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
-                call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie)
                 log.debug("Token verification failed: {}", message)
-                context.challengeAndRedirect(getLoginUrl(config.contextPath))
+                call.response.cookies.appendExpired(config.tokenCookieName)
+                context.challengeAndRedirect(config.contextPath)
             }
         } else {
             log.debug("Couldn't find cookie ${config.tokenCookieName}.")
-            call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = config.contextPath)
-            context.challengeAndRedirect(getLoginUrl(config.contextPath))
+            context.challengeAndRedirect(config.contextPath)
         }
     }
     register(provider)
@@ -54,9 +53,11 @@ private fun getLoginUrl(contextPath: String): String {
     }
 }
 
-private fun AuthenticationContext.challengeAndRedirect(loginUrl: String) {
+private fun AuthenticationContext.challengeAndRedirect(contextPath: String) {
+    call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = contextPath)
+
     challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
-        call.respondRedirect(loginUrl)
+        call.respondRedirect(getLoginUrl(contextPath))
         it.complete()
     }
 }
