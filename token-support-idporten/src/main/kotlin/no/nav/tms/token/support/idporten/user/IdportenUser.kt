@@ -1,6 +1,5 @@
 package no.nav.tms.token.support.idporten.user
 
-import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
 import java.time.Instant
 import java.time.temporal.ChronoUnit

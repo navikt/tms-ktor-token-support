@@ -8,8 +8,8 @@ import io.ktor.routing.*
 import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
-import no.nav.tms.token.support.idporten.authentication.loginApi
 import no.nav.tms.token.support.idporten.authentication.idToken
+import no.nav.tms.token.support.idporten.authentication.loginApi
 
 
 // This method is responsible for wiring up all the necessary endpoints and registering the authenticators.

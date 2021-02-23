@@ -12,7 +12,6 @@ import io.ktor.client.request.*
 import io.ktor.content.*
 import io.ktor.http.*
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
 import java.time.Instant
 import java.util.*
 

@@ -2,19 +2,10 @@ package no.nav.tms.token.support.idporten.authentication.config
 
 import com.auth0.jwk.JwkProvider
 import com.auth0.jwk.JwkProviderBuilder
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.auth.*
 import io.ktor.client.*
-import io.ktor.client.engine.apache.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.request.*
 import io.ktor.http.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import no.nav.tms.token.support.idporten.authentication.IdportenClientInterceptor
 import no.nav.tms.token.support.idporten.authentication.OauthServerConfigurationMetadata
 import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder.buildHttpClient

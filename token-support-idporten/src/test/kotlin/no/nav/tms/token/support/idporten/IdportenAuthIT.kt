@@ -12,7 +12,6 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder
 import org.amshove.kluent.`should be equal to`
-import org.amshove.kluent.`should be in`
 import org.amshove.kluent.`should contain`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
