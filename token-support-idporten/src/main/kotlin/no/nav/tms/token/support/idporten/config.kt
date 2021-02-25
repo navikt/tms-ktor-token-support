@@ -19,7 +19,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     val contextPath = environment.rootPath
     val cookieName = config.tokenCookieName
 
-    val authenticatorName = getAuthenticatorName(config.setAsDefaultAuthenticator)
+    val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
     require(cookieName.isNotBlank()) { "Navn på token-cookie må spesifiseres." }
 
@@ -72,7 +72,7 @@ private fun getAuthenticatorName(isDefault: Boolean): String? {
 class IdportenAuthenticationConfig {
     var tokenCookieName: String = ""
     var postLoginRedirectUri: String = ""
-    var setAsDefaultAuthenticator: Boolean = false
+    var setAsDefault: Boolean = false
     var secureCookie: Boolean = true
 }
 

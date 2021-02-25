@@ -104,7 +104,7 @@ internal class IdportenAuthIT {
 
         installIdPortenAuth {
             tokenCookieName = "my_token"
-            setAsDefaultAuthenticator = true
+            setAsDefault = true
         }
 
         routing {
