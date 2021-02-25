@@ -15,7 +15,8 @@ import java.util.concurrent.TimeUnit
 internal class RuntimeContext(
         val tokenCookieName: String,
         val contextPath: String,
-        val postLoginRedirectUri: String
+        val postLoginRedirectUri: String,
+        val secureCookie: Boolean
 ) {
     val environment = Environment()
 

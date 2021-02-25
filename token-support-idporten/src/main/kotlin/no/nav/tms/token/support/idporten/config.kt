@@ -19,18 +19,21 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     val contextPath = environment.rootPath
     val cookieName = config.tokenCookieName
 
+    val authenticatorName = getAuthenticatorName(config.setAsDefaultAuthenticator)
+
     require(cookieName.isNotBlank()) { "Navn på token-cookie må spesifiseres." }
 
     val runtimeContext = RuntimeContext(
             tokenCookieName = cookieName,
             contextPath = contextPath,
-            postLoginRedirectUri = config.postLoginRedirectUri
+            postLoginRedirectUri = config.postLoginRedirectUri,
+            secureCookie = config.secureCookie
     )
 
     install(Authentication) {
         // Register authenticator which redirects to internal oauth2/login endpoint if user does not have a valid token.
         // This can apply to any number of endpoints.
-        idToken(IdPortenCookieAuthenticator.name) {
+        idToken(authenticatorName) {
             AuthConfiguration (
                     jwkProvider = runtimeContext.jwkProvider,
                     contextPath = contextPath,
@@ -57,11 +60,21 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
 }
 
+private fun getAuthenticatorName(isDefault: Boolean): String? {
+    return if (isDefault) {
+        null
+    } else {
+        IdPortenCookieAuthenticator.name
+    }
+}
+
 // Configuration provided by library user. See readme for example of use
-class IdportenAuthenticationConfig (
-    var postLoginRedirectUri: String = "",
+class IdportenAuthenticationConfig {
     var tokenCookieName: String = ""
-)
+    var postLoginRedirectUri: String = ""
+    var setAsDefaultAuthenticator: Boolean = false
+    var secureCookie: Boolean = true
+}
 
 // Name of token authenticator. See README for example of use
 object IdPortenCookieAuthenticator {

@@ -12,7 +12,7 @@ private val log = LoggerFactory.getLogger(IdTokenAuthenticationProvider::class.j
 // This method configures an authenticator which checks if an end user has hit an authenticated endpoint
 // with a valid token cookie. If the user is missing the token cookie, or the provided token is invalid, we redirect
 // the user to the endpoint 'oauth2/login', where the user will be prompted to log in through idporten
-internal fun Authentication.Configuration.idToken(authenticatorName: String, configBuilder: () -> AuthConfiguration) {
+internal fun Authentication.Configuration.idToken(authenticatorName: String?, configBuilder: () -> AuthConfiguration) {
 
     val config = configBuilder()
     val provider = IdTokenAuthenticationProvider.build(authenticatorName)
@@ -64,10 +64,10 @@ private fun AuthenticationContext.challengeAndRedirect(contextPath: String) {
 
 private class IdTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
 
-    class Configuration(name: String) : AuthenticationProvider.Configuration(name)
+    class Configuration(name: String?) : AuthenticationProvider.Configuration(name)
 
     companion object {
-        fun build(name: String) = IdTokenAuthenticationProvider(Configuration(name))
+        fun build(name: String?) = IdTokenAuthenticationProvider(Configuration(name))
     }
 }
 

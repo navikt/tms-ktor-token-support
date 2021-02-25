@@ -27,13 +27,23 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
             when (val decodedJWT = settings.verify(principal, runtimeContext)) {
                 null -> call.respond(HttpStatusCode.InternalServerError, "Fant ikke ${Idporten.responseToken} i tokenrespons")
                 else -> {
-                    call.response.cookies.append(runtimeContext.tokenCookieName, decodedJWT.token, path = "/${runtimeContext.contextPath}")
+                    call.setTokenCookie(decodedJWT.token, runtimeContext)
                     call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie, path = "/${runtimeContext.contextPath}")
                     call.respondRedirect(call.request.cookies[Idporten.postLoginRedirectCookie] ?: runtimeContext.postLoginRedirectUri)
                 }
             }
         }
     }
+}
+
+private fun ApplicationCall.setTokenCookie(token: String, runtimeContext: RuntimeContext) {
+    response.cookies.append(
+            name = runtimeContext.tokenCookieName,
+            value = token,
+            secure = runtimeContext.secureCookie,
+            httpOnly = true,
+            path = "/${runtimeContext.contextPath}"
+    )
 }
 
 private fun OAuthServerSettings.OAuth2ServerSettings.verify(tokenResponse: OAuthAccessTokenResponse.OAuth2?, runtimeContext: RuntimeContext): DecodedJWT? =

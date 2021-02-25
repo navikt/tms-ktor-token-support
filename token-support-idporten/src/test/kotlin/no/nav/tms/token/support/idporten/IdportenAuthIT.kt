@@ -75,6 +75,16 @@ internal class IdportenAuthIT {
         redirect `should contain` idportenMetadata.authorizationEndpoint
     }
 
+    @Test
+    fun `Can set authenticator as default and expect same result`()
+            = withTestApplication<Unit>({ testApiWithDefault() }) {
+
+        val redirect = handleRequest(HttpMethod.Get, "/test")
+                .response.headers["Location"]
+
+        redirect `should be equal to` "/oauth2/login"
+    }
+
     private fun Application.testApi() = withEnvironment(envVars) {
 
         installIdPortenAuth {
@@ -83,6 +93,22 @@ internal class IdportenAuthIT {
 
         routing {
             authenticate(IdPortenCookieAuthenticator.name) {
+                get("/test") {
+                    call.respond(HttpStatusCode.OK)
+                }
+            }
+        }
+    }
+
+    private fun Application.testApiWithDefault() = withEnvironment(envVars) {
+
+        installIdPortenAuth {
+            tokenCookieName = "my_token"
+            setAsDefaultAuthenticator = true
+        }
+
+        routing {
+            authenticate {
                 get("/test") {
                     call.respond(HttpStatusCode.OK)
                 }
