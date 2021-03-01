@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.features.*
 import io.ktor.routing.*
 import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
@@ -29,6 +30,8 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             postLoginRedirectUri = config.postLoginRedirectUri,
             secureCookie = config.secureCookie
     )
+
+    installXForwardedHeaderSupportIfMissing()
 
     install(Authentication) {
         // Register authenticator which redirects to internal oauth2/login endpoint if user does not have a valid token.
@@ -58,6 +61,12 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
         loginApi(runtimeContext)
     }
 
+}
+
+private fun Application.installXForwardedHeaderSupportIfMissing() {
+    if (featureOrNull(XForwardedHeaderSupport) == null) {
+        install(XForwardedHeaderSupport)
+    }
 }
 
 private fun getAuthenticatorName(isDefault: Boolean): String? {
