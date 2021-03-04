@@ -1,6 +1,6 @@
 # token-support-idporten
 
-Dette biblioteket en måte for en ktor app å autentisere en bruker mot idporten.
+Dette biblioteket tilbyr en måte for en ktor app å autentisere en bruker mot idporten.
 
 ## Oppsett
 

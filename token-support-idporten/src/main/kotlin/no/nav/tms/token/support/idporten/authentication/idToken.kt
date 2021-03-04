@@ -54,7 +54,7 @@ private fun getLoginUrl(contextPath: String): String {
 }
 
 private fun AuthenticationContext.challengeAndRedirect(contextPath: String) {
-    call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = contextPath)
+    call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = "/$contextPath")
 
     challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
         call.respondRedirect(getLoginUrl(contextPath))
