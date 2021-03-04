@@ -59,11 +59,11 @@ fun getTokenForOtherApi(subjectToken: String): String {
 
 Dette biblioteket forventer at følgende miljøvariabler er satt:
 
-NAIS_CLUSTER_NAME
-NAIS_NAMESPACE
-TOKEN_X_WELL_KNOWN_URL
-TOKEN_X_CLIENT_ID
-TOKEN_X_PRIVATE_JWK
+- NAIS_CLUSTER_NAME
+- NAIS_NAMESPACE
+- TOKEN_X_WELL_KNOWN_URL
+- TOKEN_X_CLIENT_ID
+- TOKEN_X_PRIVATE_JWK
 
 Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt.
 
