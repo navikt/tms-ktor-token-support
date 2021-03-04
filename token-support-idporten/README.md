@@ -4,6 +4,14 @@ Dette biblioteket tilbyr en måte for en ktor app å autentisere en bruker mot i
 
 ## Oppsett
 
+Bruk av biblioteket forutsetter at nais-yaml er konfigurert for idporten:
+
+```yaml
+spec:
+  idporten:
+    enabled: true
+```
+
 For å kunne autentisere et endepunkt må man først installere autentikatorene.
 
 Her er det 4 variabler:
@@ -86,3 +94,16 @@ authenticate(IdPortenCookieAuthenticator.name) {
     }
 }
 ```
+
+## Bruk av biblioteket ved lokal kjøring 
+
+Dette biblioteket forventer at følgende miljøvariabler er satt:
+
+IDPORTEN_WELL_KNOWN_URL
+IDPORTEN_CLIENT_ID
+IDPORTEN_CLIENT_JWK
+IDPORTEN_REDIRECT_URI
+
+Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt. 
+
+Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/idporten/#runtime-variables-credentials) for nærmere forklaring.

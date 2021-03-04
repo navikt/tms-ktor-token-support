@@ -6,8 +6,8 @@ import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal suspend fun HttpClient.getTokenDingsConfigurationMetadata(url: String)
-        : TokenDingsConfigurationMetadata = withContext(Dispatchers.IO) {
+internal suspend fun HttpClient.getTokendingsConfigurationMetadata(url: String)
+        : TokendingsConfigurationMetadata = withContext(Dispatchers.IO) {
     request {
         method = HttpMethod.Get
         url(url)

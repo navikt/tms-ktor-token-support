@@ -7,12 +7,12 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.tms.token.support.tokendings.exchange.consumer.TokenDingsConsumer
+import no.nav.tms.token.support.tokendings.exchange.consumer.TokendingsConsumer
 import java.time.Instant
 import java.util.*
 
-class TokenDingsService internal constructor(
-        private val tokenDingsConsumer: TokenDingsConsumer,
+class TokendingsService internal constructor(
+        private val tokendingsConsumer: TokendingsConsumer,
         private val jwtAudience: String,
         private val clientId: String,
         privateJwk: String
@@ -23,7 +23,7 @@ class TokenDingsService internal constructor(
     suspend fun exchangeToken(token: String, targetApp: String): String {
         val jwt = clientAssertion(clientId, jwtAudience, privateRsaKey)
 
-        return tokenDingsConsumer.exchangeToken(token, jwt, targetApp).accessToken
+        return tokendingsConsumer.exchangeToken(token, jwt, targetApp).accessToken
     }
 
     private fun clientAssertion(clientId: String, audience: String, rsaKey: RSAKey): String {

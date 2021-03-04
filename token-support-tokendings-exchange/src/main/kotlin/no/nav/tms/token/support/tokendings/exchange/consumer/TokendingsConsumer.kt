@@ -8,13 +8,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.URL
 
-internal class TokenDingsConsumer(
+internal class TokendingsConsumer(
         private val httpClient: HttpClient,
-        tokenDingsUrl: String
+        tokendingsUrl: String
 ) {
-    private val endpoint = URL(tokenDingsUrl)
+    private val endpoint = URL(tokendingsUrl)
 
-    suspend fun exchangeToken(subjectToken: String, clientAssertion: String, audience: String): TokenDingsTokenResponse {
+    suspend fun exchangeToken(subjectToken: String, clientAssertion: String, audience: String): TokendingsTokenResponse {
 
         return withContext(Dispatchers.IO) {
             val urlParameters = ParametersBuilder().apply {

@@ -1,10 +1,10 @@
 package no.nav.tms.token.support.tokendings.exchange
 
-import no.nav.tms.token.support.tokendings.exchange.config.TokenDingsContext
+import no.nav.tms.token.support.tokendings.exchange.config.TokendingsContext
 
 object TokenExchangeServices {
-    private val context = TokenDingsContext()
+    private val context = TokendingsContext()
 
-    val tokenDingsService: TokenDingsService get() = context.tokenDingsService
+    val tokendingsService: TokendingsService get() = context.tokendingsService
     val targetAppNameBuilder: TargetAppNameBuilder get() = context.targetAppNameBuilder
 }
