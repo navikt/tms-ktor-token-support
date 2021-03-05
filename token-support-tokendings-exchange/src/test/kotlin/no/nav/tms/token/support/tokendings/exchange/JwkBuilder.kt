@@ -4,7 +4,7 @@ import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.KeyUse
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 
-object JwkBuilder {
+internal object JwkBuilder {
     fun generateJwk(): String {
         return RSAKeyGenerator(2048)
                 .keyUse(KeyUse.SIGNATURE)
