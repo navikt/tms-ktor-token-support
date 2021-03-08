@@ -3,7 +3,7 @@ package no.nav.tms.token.support.idporten
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.apache.*
 import io.ktor.features.*
 import io.ktor.routing.*
 import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
@@ -49,7 +49,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
         // Register authenticator which redirects user to idporten to perform login. This should only apply to endpoints
         // 'oath2/login' and 'oath2/callback'
         oauth(Idporten.authenticatorName) {
-            client = HttpClient(CIO)
+            client = HttpClient(Apache)
             providerLookup = { runtimeContext.oauth2ServerSettings }
             urlProvider = { runtimeContext.environment.idportenRedirectUri }
         }
