@@ -1,9 +1,6 @@
 package no.nav.tms.token.support.tokendings.exchange.config
 
 internal class Environment (
-        val cluster: String = getTokenxEnvVar("NAIS_CLUSTER_NAME"),
-        val namespace:String = getTokenxEnvVar("NAIS_NAMESPACE"),
-
         val tokenxWellKnownUrl: String = getTokenxEnvVar("TOKEN_X_WELL_KNOWN_URL"),
         val tokenxClientId: String = getTokenxEnvVar("TOKEN_X_CLIENT_ID"),
         val tokenxClientJwk: String = getTokenxEnvVar("TOKEN_X_PRIVATE_JWK")

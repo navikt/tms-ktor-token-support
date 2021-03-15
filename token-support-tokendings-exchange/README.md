@@ -50,7 +50,7 @@ fun Application.mainModule() {
 
 ### Caching
 
-Grunnet potensiell høy trafikk mot tokendings anbefales det å ikke skru av caching i `TokendingsService`.
+Grunnet potensiell høy trafikk mot tokendings anbefales det å ikke skru av caching av access tokens i `TokendingsService`.
 
 Default instillinger i `TokendingsServiceBuilder` er som følger: 
 ```kotlin
@@ -83,8 +83,6 @@ fun getTokenForOtherApi(subjectToken: String): String {
 
 Dette biblioteket forventer at følgende miljøvariabler er satt:
 
-- NAIS_CLUSTER_NAME
-- NAIS_NAMESPACE
 - TOKEN_X_WELL_KNOWN_URL
 - TOKEN_X_CLIENT_ID
 - TOKEN_X_PRIVATE_JWK
