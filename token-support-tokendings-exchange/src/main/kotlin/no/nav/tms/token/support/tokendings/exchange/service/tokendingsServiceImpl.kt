@@ -8,8 +8,7 @@ import no.nav.tms.token.support.tokendings.exchange.config.cache.AccessTokenEntr
 import no.nav.tms.token.support.tokendings.exchange.config.cache.CacheBuilder
 import no.nav.tms.token.support.tokendings.exchange.consumer.TokendingsConsumer
 import no.nav.tms.token.support.tokendings.exchange.service.ClientAssertion.createSignedAssertion
-import java.time.Instant
-import java.util.*
+import org.slf4j.LoggerFactory
 
 class NonCachingTokendingsService internal constructor(
         private val tokendingsConsumer: TokendingsConsumer,
@@ -27,6 +26,8 @@ class NonCachingTokendingsService internal constructor(
     }
 }
 
+val log = LoggerFactory.getLogger(CachingTokendingsService::class.java)
+
 class CachingTokendingsService internal constructor(
         private val tokendingsConsumer: TokendingsConsumer,
         private val jwtAudience: String,
@@ -43,8 +44,11 @@ class CachingTokendingsService internal constructor(
     override suspend fun exchangeToken(token: String, targetApp: String): String {
         val subject = extractSubject(token)
 
+        log.info("subject: $subject")
+
         return cache.get(subject) {
             runBlocking {
+                log.info("didn't find cached value for subject")
                 performTokenExchange(token, targetApp)
             }
         }.accessToken
