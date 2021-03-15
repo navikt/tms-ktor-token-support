@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Expiry
+import org.slf4j.LoggerFactory
 import java.util.concurrent.TimeUnit
 
 internal object CacheBuilder {
@@ -14,8 +15,11 @@ internal object CacheBuilder {
                 .build()
     }
 
+    val log = LoggerFactory.getLogger(CacheBuilder::class.java)
+
     private fun createExpiryPolicy(expiryMarginSeconds: Int) = object : Expiry<String, AccessTokenEntry> {
         override fun expireAfterCreate(key: String, response: AccessTokenEntry, currentTime: Long): Long {
+            log.info("expiryMargin: $expiryMarginSeconds, expiresIn: ${response.expiresInSeconds}")
             return TimeUnit.SECONDS.toNanos(response.expiresInSeconds - expiryMarginSeconds)
         }
 
