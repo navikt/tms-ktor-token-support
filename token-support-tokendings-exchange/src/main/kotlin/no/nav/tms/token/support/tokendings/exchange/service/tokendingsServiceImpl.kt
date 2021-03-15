@@ -8,8 +8,6 @@ import no.nav.tms.token.support.tokendings.exchange.config.cache.AccessTokenEntr
 import no.nav.tms.token.support.tokendings.exchange.config.cache.CacheBuilder
 import no.nav.tms.token.support.tokendings.exchange.consumer.TokendingsConsumer
 import no.nav.tms.token.support.tokendings.exchange.service.ClientAssertion.createSignedAssertion
-import java.time.Instant
-import java.util.*
 
 class NonCachingTokendingsService internal constructor(
         private val tokendingsConsumer: TokendingsConsumer,
@@ -41,7 +39,7 @@ class CachingTokendingsService internal constructor(
     private val privateRsaKey = RSAKey.parse(privateJwk)
 
     override suspend fun exchangeToken(token: String, targetApp: String): String {
-        val subject = extractSubject(token)
+        val subject = TokenStringUtil.extractSubject(token)
 
         return cache.get(subject) {
             runBlocking {
@@ -50,15 +48,17 @@ class CachingTokendingsService internal constructor(
         }.accessToken
     }
 
-    private fun extractSubject(tokenString: String): String {
-        return JWT.decode(tokenString).subject
-    }
-
     private suspend fun performTokenExchange(token: String, targetApp: String): AccessTokenEntry {
         val jwt = createSignedAssertion(clientId, jwtAudience, privateRsaKey)
 
         val response = tokendingsConsumer.exchangeToken(token, jwt, targetApp)
 
         return AccessTokenEntry.fromResponse(response)
+    }
+}
+
+internal object TokenStringUtil {
+    fun extractSubject(tokenString: String): String {
+        return JWT.decode(tokenString).subject
     }
 }
