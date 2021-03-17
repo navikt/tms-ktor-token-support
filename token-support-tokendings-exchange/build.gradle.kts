@@ -7,6 +7,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
+    implementation(Caffeine.caffeine)
     implementation(Jackson.dataTypeJsr310)
     implementation(Kotlin.reflect)
     implementation(Ktor.auth)

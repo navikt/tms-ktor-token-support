@@ -28,28 +28,52 @@ spec:
 
 Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#access-policies) for nærmere forklaring på adgangsstyring mellom apper.
 
-## Bruk
+## Oppsett
 
-Biblioteket tilbyr primært to service-klasser `TokendingsService` og `TargetAppNameBuilder`. 
-Disse konfigureres av biblioteket, og kan hentes fra `TokenExchangeServices`:
+Biblioteket tilbyr ett interface `TokendingsService` med to implementasjoner, `CachingTokendingsService` og `NonCachingTokendingsService`.
+Disse bygges ved hjelp av `TokendingsServiceBuilder`: 
 
 ```kotlin
 fun Application.mainModule() {
 
-    val tokendingsService = TokenExchangeServices.tokendingsService
-    val targetAppNameBuilder = TokenExchangeServices.targetAppNameBuilder
+    val serviceWithCache = TokendingsServiceBuilder.buildTokendingsService(
+        cachingEnabled = true,
+        maxCachedEntries = 100,
+        cacheMarginSeconds = 10
+    )
+   
+    val serviceWithoutCache = TokendingsServiceBuilder.buildTokendingsService(
+        cachingEnabled = false,
+    )
 }
 ```
 
+### Caching
+
+Grunnet potensiell høy trafikk mot tokendings anbefales det å ikke skru av caching av access tokens i `TokendingsService`.
+
+Default instillinger i `TokendingsServiceBuilder` er som følger: 
+```kotlin
+cachingEnabled = true
+maxCachedEntries = 1000
+cacheMarginSeconds = 5
+```
+
+`cacheMarginSeconds` bestemmer hvor lenge før access-tokenet egentlig utløper at vi invaliderer det fra cachen, for 
+å kompensere for potensielle tregheter.   
+
+Caching gjøres med `sub` claim på original token som nøkkel. 
+
+## Bruk
+
 `TokendingsService` brukes til å veksle tokens med tokendings. For å gjøre dette må en først ha et id_token eller access_token
 fra ID-porten eller tokendings som en ønsker å veksle. En må spesifisere hvilken app vekslet token er ment for i formatet `<cluster>:<namespace>:<appnavn>`.
-`TargetAppNameBuilder` er et convenience-verktøy som kan brukes til å lage en slik String. 
 
 Eksempel på tokenveksling for å nå en app i samme cluster og namespace:
 
 ```kotlin
 fun getTokenForOtherApi(subjectToken: String): String {
-    val appName = TokenExchangeServices.targetAppNameBuilder.buildName("other-api")
+    val appName = "cluster:namespace:other-api"
    
     return TokenExchangeServices.tokendingsService.exchangeToken(subjectToken, appName)
 }
@@ -59,8 +83,6 @@ fun getTokenForOtherApi(subjectToken: String): String {
 
 Dette biblioteket forventer at følgende miljøvariabler er satt:
 
-- NAIS_CLUSTER_NAME
-- NAIS_NAMESPACE
 - TOKEN_X_WELL_KNOWN_URL
 - TOKEN_X_CLIENT_ID
 - TOKEN_X_PRIVATE_JWK

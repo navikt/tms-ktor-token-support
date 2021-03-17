@@ -13,6 +13,13 @@ object Brukernotifikasjon {
     const val schemas = "com.github.navikt:brukernotifikasjon-schemas:$version"
 }
 
+object Caffeine {
+    private const val version = "3.0.0"
+    private const val groupId = "com.github.ben-manes.caffeine"
+
+    const val caffeine = "$groupId:caffeine:$version"
+}
+
 object Doknotifikasjon {
     private const val version = "1.2020.11.16-09.27-d037b30bb0ea"
     const val schemas = "com.github.navikt:doknotifikasjon-schemas:$version"
