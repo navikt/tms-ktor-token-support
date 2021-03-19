@@ -2,6 +2,7 @@ package no.nav.tms.token.support.idporten.authentication
 
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
@@ -54,11 +55,25 @@ private fun getLoginUrl(contextPath: String): String {
 }
 
 private fun AuthenticationContext.challengeAndRedirect(contextPath: String) {
-    call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.path(), path = "/$contextPath")
+    call.response.cookies.append(Idporten.postLoginRedirectCookie, call.request.pathWithParameters(), path = "/$contextPath")
 
     challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
         call.respondRedirect(getLoginUrl(contextPath))
         it.complete()
+    }
+}
+
+private fun ApplicationRequest.pathWithParameters(): String {
+    return if (queryParameters.isEmpty()) {
+        path()
+    } else {
+        val params = ParametersBuilder().apply {
+            queryParameters.forEach { name, values ->
+                appendAll(name, values)
+            }
+        }.build().formUrlEncode()
+
+        "${path()}?$params"
     }
 }
 
