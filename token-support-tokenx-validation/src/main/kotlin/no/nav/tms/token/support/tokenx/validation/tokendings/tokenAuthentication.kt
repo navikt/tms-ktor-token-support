@@ -5,16 +5,12 @@ import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
-import no.nav.tms.token.support.tokenx.validation.tokendings.Verifier.createVerifier
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.tokenDings(authenticatorName: String?, configBuilder: () -> TokenDingsConfig) {
-
-    val config = configBuilder()
+internal fun Authentication.Configuration.tokenX(authenticatorName: String?, verifier: VerifierWrapper) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
 
-    val verifier = createVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
 
@@ -22,24 +18,27 @@ internal fun Authentication.Configuration.tokenDings(authenticatorName: String?,
         val accessToken = bearerToken
         if (accessToken != null) {
             try {
-                val decodedJWT = verifier(accessToken)?.verify(accessToken)
-                if (decodedJWT != null) {
-                    context.principal(TokenDingsPrincipal(decodedJWT))
-                } else {
-                    log.debug("Found invalid token: accessToken")
-                    call.respond(HttpStatusCode.Unauthorized)
-                }
-            } catch (e: Throwable) {
+                val decodedJWT = verifier.verify(accessToken)
+                context.principal(TokenDingsPrincipal(decodedJWT))
+            } catch (e: Exception) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
-                call.respond(HttpStatusCode.Unauthorized)
+                context.respondUnauthorized("Invalid or expired token.")
             }
         } else {
             log.debug("No bearer token found.")
-            call.respond(HttpStatusCode.Unauthorized)
+            context.respondUnauthorized("No bearer token found.")
         }
     }
     register(provider)
+}
+
+private fun AuthenticationContext.respondUnauthorized(message: String) {
+
+    challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
+        call.respond(HttpStatusCode.Unauthorized, message)
+        it.complete()
+    }
 }
 
 private val bearerRegex = "Bearer .+".toRegex()

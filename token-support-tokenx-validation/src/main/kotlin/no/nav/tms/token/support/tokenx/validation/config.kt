@@ -3,26 +3,18 @@ package no.nav.tms.token.support.tokenx.validation
 import io.ktor.application.*
 import io.ktor.auth.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
-import no.nav.tms.token.support.tokenx.validation.tokendings.TokenDingsConfig
-import no.nav.tms.token.support.tokenx.validation.tokendings.tokenDings
+import no.nav.tms.token.support.tokenx.validation.tokendings.tokenX
 
 
-fun Application.installTokenDingsAuth(configure: IdportenAuthenticationConfig.() -> Unit) {
-    val config = IdportenAuthenticationConfig().apply(configure)
+fun Application.installTokenXAuth(configure: TokenXAuthenticatorConfig.() -> Unit = {}) {
+    val config = TokenXAuthenticatorConfig().also(configure)
 
     val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
     val runtimeContext = RuntimeContext()
 
     install(Authentication) {
-        tokenDings(authenticatorName) {
-            TokenDingsConfig (
-                    jwkProvider = runtimeContext.jwkProvider,
-                    clientId = runtimeContext.environment.tokenxClientId,
-                    issuer = runtimeContext.metadata.issuer
-            )
-        }
-
+        tokenX(authenticatorName, runtimeContext.verifierWrapper)
     }
 }
 
@@ -30,15 +22,15 @@ private fun getAuthenticatorName(isDefault: Boolean): String? {
     return if (isDefault) {
         null
     } else {
-        TokenDingsAuthenticator.name
+        TokenXAuthenticator.name
     }
 }
 
 // Configuration provided by library user. See readme for example of use
-class IdportenAuthenticationConfig {
+class TokenXAuthenticatorConfig {
     var setAsDefault: Boolean = false
 }
 
-object TokenDingsAuthenticator {
-    const val name = "tokendings_bearer_token"
+object TokenXAuthenticator {
+    const val name = "tokenx_bearer_access_token"
 }
