@@ -1,7 +1,6 @@
-# token-support-idporten
+# token-support-tokenx-validation
 
-Dette biblioteket tilbyr en måte for en ktor app å veksle id_tokens og access_tokens mot tokendings.
-
+Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens vekslet fra tokendings.
 
 ## Oppsett
 
@@ -13,45 +12,77 @@ spec:
     enabled: true
 ```
 
-For å kunen veksle tokens og kalle andre apper er det også nødvendig å konfigurere dette i nais-yaml. 
-Både navn på ønsket api og appens ingress (uten scheme) må defineres:
+For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
-```yaml
-spec:
-  accessPolicy:
-    outbound:
-      rules:
-        - application: other-api
-      external:
-        - host: other-api.nav.no
-```
+Denne har 1 variabel:
 
-Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#access-policies) for nærmere forklaring på adgangsstyring mellom apper.
-
-## Bruk
-
-Biblioteket tilbyr primært to service-klasser `TokendingsService` og `TargetAppNameBuilder`. 
-Disse konfigureres av biblioteket, og kan hentes fra `TokenExchangeServices`:
+`setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
+ 
+Eksempel på konfigurasjon:
 
 ```kotlin
 fun Application.mainModule() {
 
-    val tokendingsService = TokenExchangeServices.tokendingsService
-    val targetAppNameBuilder = TokenExchangeServices.targetAppNameBuilder
+    installTokenXAuth {
+        setAsDefault = false
+    }
 }
 ```
 
-`TokendingsService` brukes til å veksle tokens med tokendings. For å gjøre dette må en først ha et id_token eller access_token
-fra ID-porten eller tokendings som en ønsker å veksle. En må spesifisere hvilken app vekslet token er ment for i formatet `<cluster>:<namespace>:<appnavn>`.
-`TargetAppNameBuilder` er et convenience-verktøy som kan brukes til å lage en slik String. 
-
-Eksempel på tokenveksling for å nå en app i samme cluster og namespace:
+Deretter kan man autentisere bestemte endepunkt som følger. Hvis denne autentikatoren er satt som default, er det
+viktig å ha med navnet på autentikatoren.
 
 ```kotlin
-fun getTokenForOtherApi(subjectToken: String): String {
-    val appName = TokenExchangeServices.targetAppNameBuilder.buildName("other-api")
-   
-    return TokenExchangeServices.tokendingsService.exchangeToken(subjectToken, appName)
+fun Application.mainModule() {
+
+    installTokenXAuth {
+        setAsDefault = false
+    }
+    
+    routing {
+        authenticate(TokenXAuthenticator.name) {
+            get("/sikret") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+    }
+}
+```
+
+Typisk eksempel på bruk i miljø og dette er default authenticator:
+
+```kotlin
+fun Application.mainModule() {
+
+    installTokenXAuth {
+        setAsDefault = true
+    }
+    
+    routing {
+        authenticate {
+            get("/sikret") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+    }
+}
+```
+
+Alle endepunkt som er sikret på denne måten vil kreve at http-kall sender et gyldig jwt som Bearer-token
+i Authorization headeren. Cookie støttes ikke. Ugyldige kall vil alltid svares med en 401-feilkode.
+
+## TokenXUser
+
+Biblioteket tilbyr også en måte å pakke ut informasjon fra en autorisert brukers token.
+
+Dette kan gjøres som følger:
+
+```kotlin
+authenticate(TokenXAuthenticator.name) {
+    get("/sikret") {
+        val user = TokenXUserFactory.createNewAuthenticatedUser(call)
+        call.respond("Du er logger inn som $user.")
+    }
 }
 ```
 
@@ -59,12 +90,9 @@ fun getTokenForOtherApi(subjectToken: String): String {
 
 Dette biblioteket forventer at følgende miljøvariabler er satt:
 
-- NAIS_CLUSTER_NAME
-- NAIS_NAMESPACE
 - TOKEN_X_WELL_KNOWN_URL
 - TOKEN_X_CLIENT_ID
-- TOKEN_X_PRIVATE_JWK
 
-Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt.
+Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt. 
 
-Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#runtime-variables-credentials) for forklaring på de 3 siste av disse miljøvariablene.
+Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#runtime-variables-credentials) for nærmere forklaring.
