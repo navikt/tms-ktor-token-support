@@ -130,6 +130,16 @@ internal class TokenXAuthIT {
         response.content `should be equal to` "Invalid or expired token."
     }
 
+    @Test
+    fun `Should enable setting authenticator as default`()
+            = withTestApplication<Unit>({ testApiWithDefault() }) {
+
+        val response = handleRequest(HttpMethod.Get, "/test").response
+
+        response.status() `should be equal to` HttpStatusCode.Unauthorized
+        response.content `should be equal to` "No bearer token found."
+    }
+
     private fun Application.testApi() = withEnvironment(envVars) {
 
         installTokenXAuth()
