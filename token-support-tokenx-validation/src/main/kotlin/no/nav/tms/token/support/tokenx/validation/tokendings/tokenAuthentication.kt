@@ -19,7 +19,7 @@ internal fun Authentication.Configuration.tokenX(authenticatorName: String?, ver
         if (accessToken != null) {
             try {
                 val decodedJWT = verifier.verify(accessToken)
-                context.principal(TokenDingsPrincipal(decodedJWT))
+                context.principal(TokenXPrincipal(decodedJWT))
             } catch (e: Exception) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
