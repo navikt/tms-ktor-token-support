@@ -1,6 +1,5 @@
 package no.nav.tms.token.support.tokendings.exchange.config.cache
 
-import com.auth0.jwt.interfaces.DecodedJWT
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.github.benmanes.caffeine.cache.Expiry

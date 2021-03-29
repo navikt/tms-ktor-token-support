@@ -8,7 +8,6 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
-    implementation(Caffeine.caffeine)
     implementation(Kotlin.reflect)
     implementation(Ktor.auth)
     implementation(Ktor.authJwt)
@@ -17,7 +16,6 @@ dependencies {
     implementation(Ktor.clientJson)
     implementation(Ktor.serialization)
     implementation(Ktor.clientSerializationJvm)
-    implementation(Ktor.serverNetty)
     implementation(Nimbusds.joseJwt)
     implementation(Nimbusds.oauth2OidcSdk)
     testImplementation(kotlin("test-junit5"))

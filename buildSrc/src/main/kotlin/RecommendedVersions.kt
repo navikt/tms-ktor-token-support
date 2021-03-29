@@ -46,12 +46,6 @@ object Influxdb {
     const val java = "org.influxdb:influxdb-java:$version"
 }
 
-object Jackson {
-    private const val version = "2.11.3"
-    const val dataTypeJsr310 = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$version"
-    const val moduleKotlin = "com.fasterxml.jackson.module:jackson-module-kotlin:$version"
-}
-
 object Junit {
     private const val version = "5.4.1"
     private const val groupId = "org.junit.jupiter"
@@ -92,13 +86,13 @@ object Kotest {
 }
 
 object Ktor {
-    private const val version = "1.5.0"
+    private const val version = "1.5.2"
     private const val groupId = "io.ktor"
 
     const val auth = "$groupId:ktor-auth:$version"
     const val authJwt = "$groupId:ktor-auth-jwt:$version"
     const val htmlBuilder = "$groupId:ktor-html-builder:$version"
-    const val jackson = "$groupId:ktor-jackson:$version"
+    const val serialization = "$groupId:ktor-serialization:$version"
     const val serverNetty = "$groupId:ktor-server-netty:$version"
     const val clientApache = "$groupId:ktor-client-apache:$version"
     const val clientJson = "$groupId:ktor-client-json:$version"

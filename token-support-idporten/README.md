@@ -12,13 +12,13 @@ spec:
     enabled: true
 ```
 
-For å kunne autentisere et endepunkt må man først installere autentikatorene.
+For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
 Her er det 4 variabler:
 
 `tokenCookieName`: (Required) Navn på token-cookien som settes i browser etter bruker har logget inn.
 `postLoginRedirectUri`: (Optional) Url der bruker havner etter login dersom vi ikke finner en "redirect_uri" cookie. Default ""
-`setAsDefaultAuthenticator`: (Optional) Setter denne autentikatoren som default. Default 'false'
+`setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
 `secureCookie`: (Optional) Setter token-cookie som secure, slik at den kun sendes med https-kall. Default 'true'
  
 Eksempel på konfigurasjon:
@@ -29,7 +29,7 @@ fun Application.mainModule() {
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
         postLoginRedirectUri = '/post/login'
-        setAsDefaultAuthenticator = false
+        setAsDefault = false
         secureCookie = true
     }
 }
@@ -43,7 +43,7 @@ fun Application.mainModule() {
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
         postLoginRedirectUri = '/post/login'
-        setAsDefaultAuthenticator = false
+        setAsDefault = false
         secureCookie = true
     }
     
@@ -64,7 +64,7 @@ fun Application.mainModule() {
 
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
-        setAsDefaultAuthenticator = true
+        setAsDefault = true
     }
     
     routing {
@@ -82,7 +82,7 @@ Denne cookien er scopet til domene og rootpath for appen.
 
 ## IdportenUser
 
-Biblioteket tilbyr også en måte å hente informasjon om en autentisert brukers token i autentiserte endepunkt. 
+Biblioteket tilbyr også en måte å pakke ut informasjon fra en autorisert brukers token.
 
 Dette kan gjøres som følger:
 
