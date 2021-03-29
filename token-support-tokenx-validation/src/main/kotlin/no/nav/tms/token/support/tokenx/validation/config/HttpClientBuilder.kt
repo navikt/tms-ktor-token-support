@@ -1,12 +1,11 @@
 package no.nav.tms.token.support.tokenx.validation.config
 
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import kotlinx.serialization.json.Json
 
 internal object HttpClientBuilder {
     internal fun build(): HttpClient {
@@ -18,12 +17,10 @@ internal object HttpClientBuilder {
         }
     }
 
-    private fun buildJsonSerializer(): JacksonSerializer {
-        return JacksonSerializer {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        }
-    }
+    private fun buildJsonSerializer() = KotlinxSerializer(
+            Json {
+                ignoreUnknownKeys = true
+            }
+    )
 }
 

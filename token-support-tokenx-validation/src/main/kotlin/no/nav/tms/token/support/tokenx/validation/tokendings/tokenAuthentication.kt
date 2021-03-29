@@ -7,10 +7,9 @@ import io.ktor.response.*
 import io.ktor.util.pipeline.*
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.tokenX(authenticatorName: String?, verifier: VerifierWrapper) {
+internal fun Authentication.Configuration.tokenX(authenticatorName: String?, verifier: TokenVerifier) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
-
 
     val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
 

@@ -1,11 +1,11 @@
 package no.nav.tms.token.support.tokendings.exchange.config
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Serializable
 internal data class TokendingsConfigurationMetadata(
-        @JsonProperty(value = "issuer", required = true) val issuer: String,
-        @JsonProperty(value = "token_endpoint", required = true) val tokenEndpoint: String,
-        @JsonProperty(value = "jwks_uri", required = true) val jwksUri: String
+        @SerialName("issuer") val issuer: String,
+        @SerialName("token_endpoint") val tokenEndpoint: String,
+        @SerialName("jwks_uri") val jwksUri: String
 )

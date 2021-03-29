@@ -2,19 +2,20 @@ plugins {
     `maven-publish`
     `java-library`
     kotlin("jvm")
+    kotlin("plugin.serialization")
 }
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
-    implementation(Jackson.dataTypeJsr310)
     implementation(Kotlin.reflect)
     implementation(Ktor.auth)
     implementation(Ktor.authJwt)
     implementation(Ktor.clientApache)
     implementation(Ktor.clientJackson)
     implementation(Ktor.clientJson)
-    implementation(Ktor.jackson)
+    implementation(Ktor.serialization)
+    implementation(Ktor.clientSerializationJvm)
     implementation(Nimbusds.joseJwt)
     implementation(Nimbusds.oauth2OidcSdk)
     testImplementation(kotlin("test-junit5"))

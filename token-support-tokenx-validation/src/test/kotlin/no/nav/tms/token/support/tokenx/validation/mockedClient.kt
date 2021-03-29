@@ -1,16 +1,14 @@
 package no.nav.tms.token.support.tokenx.validation
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
 import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.util.*
+import kotlinx.serialization.encodeToString
+import no.nav.tms.token.support.tokenx.validation.ObjectMapper.objectMapper
 import no.nav.tms.token.support.tokenx.validation.config.OauthServerConfigurationMetadata
 
 
@@ -18,11 +16,7 @@ import no.nav.tms.token.support.tokenx.validation.config.OauthServerConfiguratio
 @KtorExperimentalAPI
 internal fun createMockedMockedClient() = HttpClient(MockEngine) {
     install(JsonFeature) {
-        serializer = JacksonSerializer {
-            registerKotlinModule()
-            registerModule(JavaTimeModule())
-            disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-        }
+        serializer = KotlinxSerializer(objectMapper)
     }
 
     engine {
@@ -38,11 +32,6 @@ internal fun createMockedMockedClient() = HttpClient(MockEngine) {
     }
 }
 
-private val objectMapper = ObjectMapper().apply {
-    registerModule(KotlinModule())
-    registerModule(JavaTimeModule())
-}
-
 internal val idportenMetadata = OauthServerConfigurationMetadata(
         issuer = "http://tokendings-url/provider",
         authorizationEndpoint = "http://tokendings-url/auth",
@@ -50,8 +39,8 @@ internal val idportenMetadata = OauthServerConfigurationMetadata(
         jwksUri = "http://tokendings-url/jwks",
 )
 
-private val metadataJson: ByteArray = idportenMetadata.let { metadata ->
-    objectMapper.writeValueAsBytes(metadata)
+private val metadataJson: String = idportenMetadata.let { metadata ->
+    objectMapper.encodeToString(metadata)
 }
 
 private val Url.hostWithPortIfRequired: String get() = if (port == protocol.defaultPort) host else hostWithPort

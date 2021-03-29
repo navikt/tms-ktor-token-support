@@ -3,7 +3,7 @@ package no.nav.tms.token.support.tokenx.validation.config
 import io.ktor.client.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.tokenx.validation.config.JwkProviderBuilder.createJwkProvider
-import no.nav.tms.token.support.tokenx.validation.tokendings.VerifierWrapper
+import no.nav.tms.token.support.tokenx.validation.tokendings.TokenVerifier
 
 internal class RuntimeContext {
     private val environment = Environment()
@@ -13,7 +13,7 @@ internal class RuntimeContext {
 
     private val jwkProvider = createJwkProvider(metadata)
 
-    val verifierWrapper = VerifierWrapper(
+    val verifierWrapper = TokenVerifier(
             jwkProvider = jwkProvider,
             clientId = environment.tokenxClientId,
             issuer = metadata.issuer

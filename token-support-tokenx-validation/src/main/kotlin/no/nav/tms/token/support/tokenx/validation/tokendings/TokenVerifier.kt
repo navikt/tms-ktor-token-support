@@ -8,7 +8,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
 import java.security.interfaces.RSAPublicKey
 
-internal class VerifierWrapper(
+internal class TokenVerifier(
         private val jwkProvider: JwkProvider,
         private val clientId: String,
         private val issuer: String
