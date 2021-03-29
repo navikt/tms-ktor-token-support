@@ -7,6 +7,6 @@ internal object TokendingsResponseObjectMother {
             accessToken = accessToken,
             tokenType = "",
             issuedTokenType = "",
-            expiresIn = expiresIn.toString()
+            expiresIn = expiresIn
     )
 }
