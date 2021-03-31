@@ -9,5 +9,6 @@ internal data class OauthServerConfigurationMetadata(
         @SerialName("issuer") val issuer: String,
         @SerialName("token_endpoint") val tokenEndpoint: String,
         @SerialName("jwks_uri") val jwksUri: String,
-        @SerialName("authorization_endpoint") var authorizationEndpoint: String = ""
+        @SerialName("authorization_endpoint") var authorizationEndpoint: String = "",
+        @SerialName("end_session_endpoint") var logoutEndpoint: String = "",
 )

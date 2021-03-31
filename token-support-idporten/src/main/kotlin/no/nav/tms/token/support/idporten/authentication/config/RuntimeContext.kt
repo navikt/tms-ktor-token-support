@@ -16,7 +16,8 @@ internal class RuntimeContext(
         val tokenCookieName: String,
         val contextPath: String,
         val postLoginRedirectUri: String,
-        val secureCookie: Boolean
+        val secureCookie: Boolean,
+        val postLogoutRedirectUri: String
 ) {
     val environment = Environment()
 
