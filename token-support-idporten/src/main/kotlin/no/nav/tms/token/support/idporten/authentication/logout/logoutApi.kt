@@ -3,11 +3,13 @@ package no.nav.tms.token.support.idporten.authentication.logout
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
+import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.date.*
 import no.nav.tms.token.support.idporten.authentication.IdTokenPrincipal
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 internal fun Routing.logoutApi(context: RuntimeContext) {
@@ -30,7 +32,7 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
     // Calls to this endpoint should be initiated by ID-porten through the user, after the user has signed out elsewhere
     get("/oauth2/logout") {
         call.invalidateCookieForExternalLogout(context.tokenCookieName, context.contextPath)
-        call.respondRedirect(context.postLogoutRedirectUri)
+        call.respond(OK)
     }
 }
 
@@ -54,10 +56,12 @@ private suspend fun ApplicationCall.redirectToSingleLogout(idToken: String, sign
 private fun ApplicationCall.invalidateCookieForExternalLogout(cookieName: String, contextPath: String) {
     val scheme = request.local.scheme
 
+    LoggerFactory.getLogger("Logout").info(scheme)
+
     if (scheme == "https") {
         response.cookies.appendExpiredCrossSite(cookieName, contextPath)
     } else {
-        response.cookies.appendExpired(cookieName, contextPath)
+        response.cookies.appendExpired(cookieName, path = "/$contextPath")
     }
 }
 
@@ -65,7 +69,7 @@ private fun ResponseCookies.appendExpiredCrossSite(cookieName: String, contextPa
     append(
             name = cookieName,
             value = "",
-            path = contextPath,
+            path = "/$contextPath",
             expires = GMTDate.START,
             secure = true,
             extensions = mapOf("SameSite" to "None")
