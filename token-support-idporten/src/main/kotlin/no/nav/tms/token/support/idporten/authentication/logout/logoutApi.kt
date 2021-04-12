@@ -26,16 +26,15 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
         }
     }
 
-    // This endpoint is intended to be called by idporten, and will invalidate idtokens issued for a specific session.
-    // Not currently implemented due to concerns with state handling across different pods.
+    // Calls to this endpoint should be initiated by ID-porten through the user, after the user has signed out elsewhere
     get("/oauth2/logout") {
-        call.respond(HttpStatusCode.OK)
+        call.invalidateCookie(context.tokenCookieName, context.contextPath)
+        call.respondRedirect(context.postLogoutRedirectUri)
     }
 }
 
 private fun ApplicationCall.invalidateCookie(cookieName: String, contextPath: String) {
     response.cookies.appendExpired(cookieName, path = "/$contextPath")
-
 }
 
 private suspend fun ApplicationCall.redirectToSingleSignout(idToken: String, signoutUrl: String, postLogoutUrl: String) {
