@@ -31,7 +31,7 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
 
     // Calls to this endpoint should be initiated by ID-porten through the user, after the user has signed out elsewhere
     get("/oauth2/logout") {
-        call.invalidateCookieForExternalLogout(context.tokenCookieName, context.contextPath)
+        call.invalidateCookieForExternalLogout(context.tokenCookieName, context.contextPath, context.secureCookie)
         call.respond(OK)
     }
 }
@@ -53,12 +53,9 @@ private suspend fun ApplicationCall.redirectToSingleLogout(idToken: String, sign
     respondRedirect(redirectUrl)
 }
 
-private fun ApplicationCall.invalidateCookieForExternalLogout(cookieName: String, contextPath: String) {
-    val scheme = request.local.scheme
+private fun ApplicationCall.invalidateCookieForExternalLogout(cookieName: String, contextPath: String, secure: Boolean) {
 
-    LoggerFactory.getLogger("Logout").info(scheme)
-
-    if (scheme == "https") {
+    if (secure) {
         response.cookies.appendExpiredCrossSite(cookieName, contextPath)
     } else {
         response.cookies.appendExpired(cookieName, path = "/$contextPath")
