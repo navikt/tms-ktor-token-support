@@ -62,13 +62,15 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             urlProvider = { runtimeContext.environment.idportenRedirectUri }
         }
 
+        // Register endpoints for performing logout. This includes an endpoint which initiates single logout through
+        // ID-porten, and one which handles logout initiated elsewhere
         idTokenLogout(LogoutAuthenticator.name) {
             LogoutConfig(tokenCookieName = cookieName)
         }
 
     }
 
-    // Register endpoints 'oauth2/login' and 'oath2/callback'
+    // Register endpoints 'oauth2/login',  'oath2/callback', '/logout', and /oauth2/logout
     routing {
         loginApi(runtimeContext)
         logoutApi(runtimeContext)

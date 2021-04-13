@@ -9,7 +9,6 @@ import io.ktor.routing.*
 import io.ktor.util.date.*
 import no.nav.tms.token.support.idporten.authentication.IdTokenPrincipal
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
-import org.slf4j.LoggerFactory
 import java.net.URI
 
 internal fun Routing.logoutApi(context: RuntimeContext) {

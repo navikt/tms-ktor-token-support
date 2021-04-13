@@ -10,6 +10,7 @@ import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import io.netty.handler.codec.http.HttpResponseStatus
 import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should contain`
@@ -85,10 +86,31 @@ internal class IdportenAuthIT {
         redirect `should be equal to` "/oauth2/login"
     }
 
+    @Test
+    fun `Requesting single logout with no valid token present should clear token and redirect to post logout url`()
+            = withTestApplication<Unit>({ testApiWithDefault() }) {
+
+        val response = handleRequest(HttpMethod.Get, "/logout").response
+
+        response.cookies["my_token"]!!.value `should be equal to` ""
+        response.headers["Location"]!! `should be equal to` "http://dummy.io"
+    }
+
+    @Test
+    fun `Handling single logout initiated elsewhere should clear token and respond ok`()
+            = withTestApplication<Unit>({ testApiWithDefault() }) {
+
+        val response = handleRequest(HttpMethod.Get, "/oauth2/logout").response
+
+        response.cookies["my_token"]!!.value `should be equal to` ""
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
     private fun Application.testApi() = withEnvironment(envVars) {
 
         installIdPortenAuth {
             tokenCookieName = "my_token"
+            postLogoutRedirectUri = "http://dummy.io"
         }
 
         routing {
@@ -105,6 +127,8 @@ internal class IdportenAuthIT {
         installIdPortenAuth {
             tokenCookieName = "my_token"
             setAsDefault = true
+            postLogoutRedirectUri = "http://dummy.io"
+            secureCookie = false
         }
 
         routing {
