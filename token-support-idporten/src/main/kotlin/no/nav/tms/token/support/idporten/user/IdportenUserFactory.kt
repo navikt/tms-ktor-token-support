@@ -15,7 +15,7 @@ object IdportenUserFactory {
         val principal = call.principal<IdTokenPrincipal>()
                 ?: throw Exception("Principal har ikke blitt satt for authentication context.")
 
-        return createIdportenUser(principal)
+        return createIdportenUser(principal, identClaim)
     }
 
     private fun createIdportenUser(principal: IdTokenPrincipal, identClaim: String): IdportenUser {
