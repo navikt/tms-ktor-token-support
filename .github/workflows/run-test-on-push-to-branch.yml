@@ -1,0 +1,17 @@
+name: Build and create release
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  build-and-create-release-on-main:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Sjekk ut koden
+        uses: actions/checkout@v2
+
+      - name: Kompiler og kjør tester
+        run: ./gradlew clean build
