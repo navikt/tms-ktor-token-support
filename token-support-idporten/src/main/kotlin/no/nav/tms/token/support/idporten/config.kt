@@ -11,6 +11,10 @@ import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.authentication.idToken
 import no.nav.tms.token.support.idporten.authentication.loginApi
+import no.nav.tms.token.support.idporten.authentication.logout.LogoutAuthenticator
+import no.nav.tms.token.support.idporten.authentication.logout.LogoutConfig
+import no.nav.tms.token.support.idporten.authentication.logout.idTokenLogout
+import no.nav.tms.token.support.idporten.authentication.logout.logoutApi
 
 
 // This method is responsible for wiring up all the necessary endpoints and registering the authenticators.
@@ -19,16 +23,20 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     val config = IdportenAuthenticationConfig().apply(configure)
     val contextPath = environment.rootPath
     val cookieName = config.tokenCookieName
+    val postLogoutRedirectUri = config.postLogoutRedirectUri
 
     val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
     require(cookieName.isNotBlank()) { "Navn på token-cookie må spesifiseres." }
 
+    require(postLogoutRedirectUri.isNotBlank()) { "Post-logout uri må spesifiseres. Pass på at dette matcher nais yaml." }
+
     val runtimeContext = RuntimeContext(
             tokenCookieName = cookieName,
             contextPath = contextPath,
             postLoginRedirectUri = config.postLoginRedirectUri,
-            secureCookie = config.secureCookie
+            secureCookie = config.secureCookie,
+            postLogoutRedirectUri = postLogoutRedirectUri
     )
 
     installXForwardedHeaderSupportIfMissing()
@@ -54,11 +62,18 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             urlProvider = { runtimeContext.environment.idportenRedirectUri }
         }
 
+        // Register endpoints for performing logout. This includes an endpoint which initiates single logout through
+        // ID-porten, and one which handles logout initiated elsewhere
+        idTokenLogout(LogoutAuthenticator.name) {
+            LogoutConfig(tokenCookieName = cookieName)
+        }
+
     }
 
-    // Register endpoints 'oauth2/login' and 'oath2/callback'
+    // Register endpoints 'oauth2/login',  'oath2/callback', '/logout', and /oauth2/logout
     routing {
         loginApi(runtimeContext)
+        logoutApi(runtimeContext)
     }
 
 }
@@ -83,6 +98,7 @@ class IdportenAuthenticationConfig {
     var postLoginRedirectUri: String = ""
     var setAsDefault: Boolean = false
     var secureCookie: Boolean = true
+    var postLogoutRedirectUri: String = ""
 }
 
 // Name of token authenticator. See README for example of use

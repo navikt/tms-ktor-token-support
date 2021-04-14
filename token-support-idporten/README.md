@@ -14,9 +14,10 @@ spec:
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
-Her er det 4 variabler:
+Her er det 5 variabler:
 
 `tokenCookieName`: (Required) Navn på token-cookien som settes i browser etter bruker har logget inn.
+`postLogoutRedirectUri`: (Required) Bestemmer hvor bruker sendes etter de har logget ut. Denne må samsvare med nais-yaml.
 `postLoginRedirectUri`: (Optional) Url der bruker havner etter login dersom vi ikke finner en "redirect_uri" cookie. Default ""
 `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
 `secureCookie`: (Optional) Setter token-cookie som secure, slik at den kun sendes med https-kall. Default 'true'
@@ -28,6 +29,7 @@ fun Application.mainModule() {
 
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
+        postLogoutRedirectUri = "https://www.nav.no"
         postLoginRedirectUri = '/post/login'
         setAsDefault = false
         secureCookie = true
@@ -42,6 +44,7 @@ fun Application.mainModule() {
 
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
+        postLogoutRedirectUri = "https://www.nav.no"
         postLoginRedirectUri = '/post/login'
         setAsDefault = false
         secureCookie = true
@@ -64,6 +67,7 @@ fun Application.mainModule() {
 
     installIdPortenAuth {
         tokenCookieName = "user_id_token"
+        postLogoutRedirectUri = "https://www.nav.no"
         setAsDefault = true
     }
     
