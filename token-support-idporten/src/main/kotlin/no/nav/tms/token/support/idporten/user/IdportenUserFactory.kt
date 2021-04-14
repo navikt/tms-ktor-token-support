@@ -11,17 +11,17 @@ object IdportenUserFactory {
 
     private val IDENT_CLAIM = "pid"
 
-    fun createIdportenUser(call: ApplicationCall): IdportenUser {
+    fun createIdportenUser(call: ApplicationCall, identClaim: String = IDENT_CLAIM): IdportenUser {
         val principal = call.principal<IdTokenPrincipal>()
                 ?: throw Exception("Principal har ikke blitt satt for authentication context.")
 
         return createIdportenUser(principal)
     }
 
-    private fun createIdportenUser(principal: IdTokenPrincipal): IdportenUser {
+    private fun createIdportenUser(principal: IdTokenPrincipal, identClaim: String): IdportenUser {
         val token = principal.decodedJWT
 
-        val ident: String = token.getClaim(IDENT_CLAIM).asString()
+        val ident: String = token.getClaim(identClaim).asString()
         val loginLevel = extractLoginLevel(token)
         val expirationTime =
             getTokenExpirationLocalDateTime(
