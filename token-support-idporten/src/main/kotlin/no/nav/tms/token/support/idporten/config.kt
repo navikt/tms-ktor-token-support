@@ -6,11 +6,12 @@ import io.ktor.client.*
 import io.ktor.client.engine.apache.*
 import io.ktor.features.*
 import io.ktor.routing.*
+import no.nav.tms.token.support.idporten.SecurityLevel.NOT_SPECIFIED
 import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.authentication.idToken
-import no.nav.tms.token.support.idporten.authentication.loginApi
+import no.nav.tms.token.support.idporten.authentication.oauth2LoginApi
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutAuthenticator
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutConfig
 import no.nav.tms.token.support.idporten.authentication.logout.idTokenLogout
@@ -24,6 +25,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     val contextPath = environment.rootPath
     val cookieName = config.tokenCookieName
     val postLogoutRedirectUri = config.postLogoutRedirectUri
+    val shouldRedirect = config.alwaysRedirectToLogin
 
     val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
@@ -36,7 +38,8 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             contextPath = contextPath,
             postLoginRedirectUri = config.postLoginRedirectUri,
             secureCookie = config.secureCookie,
-            postLogoutRedirectUri = postLogoutRedirectUri
+            postLogoutRedirectUri = postLogoutRedirectUri,
+            securityLevel = config.securityLevel
     )
 
     installXForwardedHeaderSupportIfMissing()
@@ -50,7 +53,8 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
                     contextPath = contextPath,
                     tokenCookieName = cookieName,
                     clientId = runtimeContext.environment.idportenClientId,
-                    issuer = runtimeContext.metadata.issuer
+                    issuer = runtimeContext.metadata.issuer,
+                    shouldRedirect = shouldRedirect
             )
         }
 
@@ -72,7 +76,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
     // Register endpoints 'oauth2/login',  'oath2/callback', '/logout', and /oauth2/logout
     routing {
-        loginApi(runtimeContext)
+        oauth2LoginApi(runtimeContext)
         logoutApi(runtimeContext)
     }
 
@@ -99,6 +103,12 @@ class IdportenAuthenticationConfig {
     var setAsDefault: Boolean = false
     var secureCookie: Boolean = true
     var postLogoutRedirectUri: String = ""
+    var alwaysRedirectToLogin: Boolean = false
+    var securityLevel: SecurityLevel = NOT_SPECIFIED
+}
+
+enum class SecurityLevel {
+    NOT_SPECIFIED, LEVEL_3, LEVEL_4
 }
 
 // Name of token authenticator. See README for example of use

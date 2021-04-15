@@ -18,20 +18,24 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String?, co
     val config = configBuilder()
     val provider = IdTokenAuthenticationProvider.build(authenticatorName)
 
-    val verifier = createVerifier(config.jwkProvider, config.clientId, config.issuer)
+    if (config.shouldRedirect) {
+        setupRedirectingInterceptor(provider, config)
+    } else {
+        setupNonRedirectingInterceptor(provider, config)
+    }
+
+    register(provider)
+}
+
+private fun setupRedirectingInterceptor(provider: IdTokenAuthenticationProvider, config: AuthConfiguration) {
+    val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
         val idToken = call.request.cookies[config.tokenCookieName]
         if (idToken != null) {
             try {
-                val decodedJWT = verifier(idToken)?.verify(idToken)
-                if (decodedJWT != null) {
-                    context.principal(IdTokenPrincipal(decodedJWT))
-                } else {
-                    log.debug("Found invalid token: idToken")
-                    call.response.cookies.appendExpired(config.tokenCookieName)
-                    context.challengeAndRedirect(config.contextPath)
-                }
+                val decodedJWT = verifier.verify(idToken)
+                context.principal(IdTokenPrincipal(decodedJWT))
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
@@ -43,7 +47,28 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String?, co
             context.challengeAndRedirect(config.contextPath)
         }
     }
-    register(provider)
+}
+
+private fun setupNonRedirectingInterceptor(provider: IdTokenAuthenticationProvider, config: AuthConfiguration) {
+    val verifier = createVerifier(config.jwkProvider, config.clientId, config.issuer)
+
+    provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
+        val idToken = call.request.cookies[config.tokenCookieName]
+        if (idToken != null) {
+            try {
+                val decodedJWT = verifier(idToken).verify(idToken)
+                context.principal(IdTokenPrincipal(decodedJWT))
+            } catch (e: Throwable) {
+                val message = e.message ?: e.javaClass.simpleName
+                log.debug("Token verification failed: {}", message)
+                call.response.cookies.appendExpired(config.tokenCookieName)
+                context.challengeAndRespondUnauthorized()
+            }
+        } else {
+            log.debug("Couldn't find cookie ${config.tokenCookieName}.")
+            context.challengeAndRespondUnauthorized()
+        }
+    }
 }
 
 private fun getLoginUrl(contextPath: String): String {
@@ -59,6 +84,13 @@ private fun AuthenticationContext.challengeAndRedirect(contextPath: String) {
 
     challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
         call.respondRedirect(getLoginUrl(contextPath))
+        it.complete()
+    }
+}
+
+private fun AuthenticationContext.challengeAndRespondUnauthorized() {
+    challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
+        call.respond(HttpStatusCode.Unauthorized)
         it.complete()
     }
 }

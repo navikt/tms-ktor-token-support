@@ -10,7 +10,6 @@ import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import io.netty.handler.codec.http.HttpResponseStatus
 import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should contain`
@@ -39,13 +38,23 @@ internal class IdportenAuthIT {
     }
 
     @Test
-    fun `Should send redirect to local login on call to cookie-authenticated endpoint when no valid cookie provided`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should send redirect to local login when no valid cookie provided and config is set to always redirect`()
+            = withTestApplication<Unit>({ testApi(shouldRedirect = true) }) {
 
         val redirect = handleRequest(HttpMethod.Get, "/test")
                 .response.headers["Location"]
 
         redirect `should be equal to` "/oauth2/login"
+    }
+
+    @Test
+    fun `Should respond unauthorized when no valid cookie provided and config is set to default`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val status = handleRequest(HttpMethod.Get, "/test")
+                .response.status()
+
+        status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -78,7 +87,7 @@ internal class IdportenAuthIT {
 
     @Test
     fun `Can set authenticator as default and expect same result`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
+            = withTestApplication<Unit>({ testApiWithDefault(shouldRedirect = true) }) {
 
         val redirect = handleRequest(HttpMethod.Get, "/test")
                 .response.headers["Location"]
@@ -106,11 +115,12 @@ internal class IdportenAuthIT {
         response.status() `should be equal to` HttpStatusCode.OK
     }
 
-    private fun Application.testApi() = withEnvironment(envVars) {
+    private fun Application.testApi(shouldRedirect: Boolean = false) = withEnvironment(envVars) {
 
         installIdPortenAuth {
             tokenCookieName = "my_token"
             postLogoutRedirectUri = "http://dummy.io"
+            alwaysRedirectToLogin = shouldRedirect
         }
 
         routing {
@@ -122,13 +132,14 @@ internal class IdportenAuthIT {
         }
     }
 
-    private fun Application.testApiWithDefault() = withEnvironment(envVars) {
+    private fun Application.testApiWithDefault(shouldRedirect: Boolean = false) = withEnvironment(envVars) {
 
         installIdPortenAuth {
             tokenCookieName = "my_token"
             setAsDefault = true
             postLogoutRedirectUri = "http://dummy.io"
             secureCookie = false
+            alwaysRedirectToLogin = shouldRedirect
         }
 
         routing {

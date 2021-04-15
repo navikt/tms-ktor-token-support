@@ -7,5 +7,6 @@ internal class AuthConfiguration(
         val tokenCookieName: String,
         val jwkProvider: JwkProvider,
         val clientId: String,
-        val issuer: String
+        val issuer: String,
+        val shouldRedirect: Boolean
 )

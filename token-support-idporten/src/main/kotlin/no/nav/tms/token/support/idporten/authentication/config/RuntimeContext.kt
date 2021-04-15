@@ -6,6 +6,8 @@ import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
+import no.nav.tms.token.support.idporten.SecurityLevel
+import no.nav.tms.token.support.idporten.SecurityLevel.*
 import no.nav.tms.token.support.idporten.authentication.IdportenClientInterceptor
 import no.nav.tms.token.support.idporten.authentication.OauthServerConfigurationMetadata
 import no.nav.tms.token.support.idporten.authentication.config.HttpClientBuilder.buildHttpClient
@@ -17,7 +19,8 @@ internal class RuntimeContext(
         val contextPath: String,
         val postLoginRedirectUri: String,
         val secureCookie: Boolean,
-        val postLogoutRedirectUri: String
+        val postLogoutRedirectUri: String,
+        val securityLevel: SecurityLevel
 ) {
     val environment = Environment()
 
@@ -25,12 +28,13 @@ internal class RuntimeContext(
     val metadata = fetchMetadata(httpClient, environment.idportenWellKnownUrl)
 
     private val idportenClientInterceptor = createIdPortenClientInterceptor(environment, metadata)
-    val oauth2ServerSettings = createOAuth2ServerSettings(environment, metadata, idportenClientInterceptor)
+    val oauth2ServerSettings = createOAuth2ServerSettings(environment, securityLevel, metadata, idportenClientInterceptor)
     val jwkProvider = createJwkProvider(metadata)
 }
 
 private fun createOAuth2ServerSettings(
         environment: Environment,
+        securityLevel: SecurityLevel,
         metadata: OauthServerConfigurationMetadata,
         idportenClientInterceptor: IdportenClientInterceptor
 ) = OAuthServerSettings.OAuth2ServerSettings(
@@ -42,9 +46,21 @@ private fun createOAuth2ServerSettings(
         accessTokenRequiresBasicAuth = false,
         requestMethod = HttpMethod.Post,
         defaultScopes = listOf(Idporten.scope),
-        authorizeUrlInterceptor = { this.parameters.append("response_mode", "query") },
+        authorizeUrlInterceptor = createAuthorizeUrlInterceptior(securityLevel),
         accessTokenInterceptor = idportenClientInterceptor.appendClientAssertion
 )
+
+private fun createAuthorizeUrlInterceptior(securityLevel: SecurityLevel): URLBuilder.() -> Unit {
+    return {
+        parameters.append("response_mode", "query")
+
+        when (securityLevel) {
+            LEVEL_3 -> parameters.append("acr_values", "Level3")
+            LEVEL_4 -> parameters.append("acr_values", "Level4")
+            NOT_SPECIFIED -> {}
+        }
+    }
+}
 
 private fun fetchMetadata(httpClient: HttpClient, idPortenUrl: String) = runBlocking {
     httpClient.getOAuthServerConfigurationMetadata(idPortenUrl)
