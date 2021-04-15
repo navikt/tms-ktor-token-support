@@ -11,6 +11,7 @@ import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.authentication.idToken
+import no.nav.tms.token.support.idporten.authentication.loginApi
 import no.nav.tms.token.support.idporten.authentication.oauth2LoginApi
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutAuthenticator
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutConfig
@@ -74,8 +75,9 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
     }
 
-    // Register endpoints 'oauth2/login',  'oath2/callback', '/logout', and /oauth2/logout
+    // Register endpoints '/login', '/login/status', 'oauth2/login', 'oath2/callback', '/logout', and /oauth2/logout
     routing {
+        loginApi(runtimeContext)
         oauth2LoginApi(runtimeContext)
         logoutApi(runtimeContext)
     }
