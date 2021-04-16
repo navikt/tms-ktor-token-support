@@ -7,7 +7,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.JWTVerifier
 import java.security.interfaces.RSAPublicKey
 
-internal fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: String): (String) -> JWTVerifier? = {
+internal fun createVerifier(jwkProvider: JwkProvider, clientId: String, issuer: String): (String) -> JWTVerifier = {
     jwkProvider.get(JWT.decode(it).keyId).idTokenVerifier(
             clientId,
             issuer

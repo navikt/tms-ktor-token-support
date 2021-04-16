@@ -31,7 +31,7 @@ object IdportenUserFactory {
         return IdportenUser(ident, loginLevel, expirationTime, token)
     }
 
-    private fun extractLoginLevel(token: DecodedJWT): Int {
+    internal fun extractLoginLevel(token: DecodedJWT): Int {
 
         return when (token.getClaim("acr").asString()) {
             "Level3" -> 3
