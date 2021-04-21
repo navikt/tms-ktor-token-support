@@ -48,6 +48,7 @@ internal class IdportenClientInterceptor(privateJwk: String, private val clientI
         val now = Date.from(Instant.now())
         return JWTClaimsSet.Builder()
                 .issuer(clientId)
+                .subject(clientId)
                 .audience(audience)
                 .issueTime(now)
                 .expirationTime(Date.from(Instant.now().plusSeconds(60)))
