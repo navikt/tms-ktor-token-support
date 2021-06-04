@@ -40,7 +40,8 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             postLoginRedirectUri = config.postLoginRedirectUri,
             secureCookie = config.secureCookie,
             postLogoutRedirectUri = postLogoutRedirectUri,
-            securityLevel = config.securityLevel
+            securityLevel = config.securityLevel,
+            tokenRefreshMarginSeconds = config.tokenRefreshMarginSeconds
     )
 
     installXForwardedHeaderSupportIfMissing()
@@ -107,6 +108,8 @@ class IdportenAuthenticationConfig {
     var postLogoutRedirectUri: String = ""
     var alwaysRedirectToLogin: Boolean = false
     var securityLevel: SecurityLevel = NOT_SPECIFIED
+    var tokenRefreshEnabled: Boolean = true
+    var tokenRefreshMarginSeconds: Long = 60
 }
 
 enum class SecurityLevel {

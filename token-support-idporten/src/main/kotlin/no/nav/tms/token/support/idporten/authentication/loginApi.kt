@@ -26,9 +26,21 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
         val idToken = call.validIdTokenOrNull(runtimeContext.tokenCookieName, verifier)
 
         if (idToken == null) {
-            call.respond(LoginStatus.unAuthenticated())
+            call.respond(LoginStatus.unauthenticated())
         } else {
             call.respond(LoginStatus.authenticated(IdportenUserFactory.extractLoginLevel(idToken)))
+        }
+    }
+
+    get("/refresh") {
+        val idToken = call.validIdTokenOrNull(runtimeContext.tokenCookieName, verifier)
+
+        if (idToken != null) {
+            val refreshedToken = runtimeContext.tokenRefreshService.getRefreshedToken(idToken.token)
+
+            call.respondText(refreshedToken)
+        } else {
+            call.respondText("No token found")
         }
     }
 }
