@@ -4,7 +4,6 @@ import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.http.ContentType.Application.FormUrlEncoded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.tms.token.support.idporten.authentication.ClientAssertionService
@@ -15,27 +14,29 @@ internal class TokenRefreshConsumer(
         private val httpClient: HttpClient,
         private val clientAssertionService: ClientAssertionService,
         private val clientId: String,
-        private val tokenUrlString: String
+        tokenUrlString: String
 ) {
     private val tokenUrl = URL(tokenUrlString)
 
     private val log = LoggerFactory.getLogger(TokenRefreshConsumer::class.java)
 
-    suspend fun fetchRefreshedToken(token: String): String = withContext(Dispatchers.IO) {
+    suspend fun fetchRefreshedToken(refreshToken: String): String = withContext(Dispatchers.IO) {
         val jwt = clientAssertionService.createClientAssertion()
 
-        val urlParameters = ParametersBuilder().apply {
+        val parameters = ParametersBuilder().apply {
             append(OAuth2RequestParameters.ClientId, clientId)
             append(OAuth2RequestParameters.GrantType, "refresh_token")
             append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
             append("client_assertion", jwt)
-            append("refresh_token", token)
+            append("refresh_token", refreshToken)
         }.build().formUrlEncode()
 
         val response: RefreshTokenResponse = httpClient.post {
-            url("$tokenUrl?$urlParameters")
-            contentType(FormUrlEncoded)
+            url("$tokenUrl")
+            body = parameters
         }
+
+        log.info("Response: $response")
 
         response.refreshToken
     }

@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit
 
 internal class RuntimeContext(
         val tokenCookieName: String,
+        val tokenRefreshCookieName: String,
         val contextPath: String,
         val postLoginRedirectUri: String,
         val secureCookie: Boolean,

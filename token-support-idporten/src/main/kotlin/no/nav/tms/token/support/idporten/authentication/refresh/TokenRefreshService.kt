@@ -20,7 +20,7 @@ internal class TokenRefreshService(
         return now().epochSecond + refreshMarginSeconds > expiryTime.toInstant().epochSecond
     }
 
-    suspend fun getRefreshedToken(token: String): String {
-        return tokenRefreshConsumer.fetchRefreshedToken(token)
+    suspend fun getRefreshedToken(refreshToken: String): String {
+        return tokenRefreshConsumer.fetchRefreshedToken(refreshToken)
     }
 }

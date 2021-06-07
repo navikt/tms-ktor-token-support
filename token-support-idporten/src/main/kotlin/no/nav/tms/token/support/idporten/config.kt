@@ -36,6 +36,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
     val runtimeContext = RuntimeContext(
             tokenCookieName = cookieName,
+            tokenRefreshCookieName = config.refreshTokenCookieName,
             contextPath = contextPath,
             postLoginRedirectUri = config.postLoginRedirectUri,
             secureCookie = config.secureCookie,
@@ -110,6 +111,8 @@ class IdportenAuthenticationConfig {
     var securityLevel: SecurityLevel = NOT_SPECIFIED
     var tokenRefreshEnabled: Boolean = true
     var tokenRefreshMarginSeconds: Long = 60
+
+    val refreshTokenCookieName get() = "${tokenCookieName}_refresh_token"
 }
 
 enum class SecurityLevel {

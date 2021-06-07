@@ -19,6 +19,7 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
             val principal = call.principal<IdTokenPrincipal>()
 
             call.invalidateCookie(context.tokenCookieName, context.contextPath)
+            call.invalidateCookie(context.tokenRefreshCookieName, context.contextPath)
 
             if (principal == null) {
                 call.respondRedirect(context.postLogoutRedirectUri)
@@ -31,6 +32,7 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
     // Calls to this endpoint should be initiated by ID-porten through the user, after the user has signed out elsewhere
     get("/oauth2/logout") {
         call.invalidateCookieForExternalLogout(context.tokenCookieName, context.contextPath, context.secureCookie)
+        call.invalidateCookieForExternalLogout(context.tokenRefreshCookieName, context.contextPath, context.secureCookie)
         call.respond(OK)
     }
 }

@@ -33,10 +33,10 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
     }
 
     get("/refresh") {
-        val idToken = call.validIdTokenOrNull(runtimeContext.tokenCookieName, verifier)
+        val refreshToken = call.validIdTokenOrNull(runtimeContext.tokenRefreshCookieName, verifier)
 
-        if (idToken != null) {
-            val refreshedToken = runtimeContext.tokenRefreshService.getRefreshedToken(idToken.token)
+        if (refreshToken != null) {
+            val refreshedToken = runtimeContext.tokenRefreshService.getRefreshedToken(refreshToken.token)
 
             call.respondText(refreshedToken)
         } else {

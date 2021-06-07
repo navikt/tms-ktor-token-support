@@ -1,6 +1,5 @@
 package no.nav.tms.token.support.idporten.authentication
 
-import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -12,8 +11,6 @@ import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 
 internal fun Routing.oauth2LoginApi(runtimeContext: RuntimeContext) {
 
-    val settings = runtimeContext.oauth2ServerSettings
-
     authenticate(Idporten.authenticatorName) {
         // This method is empty because the authenticator will redirect any calls to idporten, which will in turn
         // redirect to 'oath2/callback'. This method exists to differentiate between internal and external redirects
@@ -23,11 +20,14 @@ internal fun Routing.oauth2LoginApi(runtimeContext: RuntimeContext) {
         // This parameter will be used to retrieve the user's token directly from idporten, and will then be provided
         // to the user as a token. The name of this token is determined when installing authentication.
         get("/oauth2/callback") {
+
             val principal = checkNotNull(call.authentication.principal<OAuthAccessTokenResponse.OAuth2>())
-            when (val decodedJWT = settings.verify(principal, runtimeContext)) {
+
+            when (val tokenWrapper = unpackVerifiedToken(principal, runtimeContext)) {
                 null -> call.respond(HttpStatusCode.InternalServerError, "Fant ikke ${Idporten.responseToken} i tokenrespons")
                 else -> {
-                    call.setTokenCookie(decodedJWT.token, runtimeContext)
+                    call.setIdTokenCookie(tokenWrapper.token, runtimeContext)
+                    call.setRefreshTokenCookie(tokenWrapper.refreshToken, runtimeContext)
                     call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie, path = "/${runtimeContext.contextPath}")
                     call.respondRedirect(call.request.cookies[Idporten.postLoginRedirectCookie] ?: runtimeContext.postLoginRedirectUri)
                 }
@@ -36,10 +36,40 @@ internal fun Routing.oauth2LoginApi(runtimeContext: RuntimeContext) {
     }
 }
 
-private fun ApplicationCall.setTokenCookie(token: String, runtimeContext: RuntimeContext) {
+private data class VerifiedTokenWrapper(
+        val token: String,
+        val refreshToken: String
+)
+
+private fun unpackVerifiedToken(principal: OAuthAccessTokenResponse.OAuth2, context: RuntimeContext): VerifiedTokenWrapper? {
+
+    val settings = context.oauth2ServerSettings
+
+    val refreshToken = principal.refreshToken
+
+    val decodedJWT = settings.verify(principal, context)
+
+    return if(refreshToken != null && decodedJWT != null) {
+        VerifiedTokenWrapper(decodedJWT.token, refreshToken)
+    } else {
+        null
+    }
+}
+
+private fun ApplicationCall.setIdTokenCookie(idToken: String, runtimeContext: RuntimeContext) {
     response.cookies.append(
             name = runtimeContext.tokenCookieName,
-            value = token,
+            value = idToken,
+            secure = runtimeContext.secureCookie,
+            httpOnly = true,
+            path = "/${runtimeContext.contextPath}"
+    )
+}
+
+private fun ApplicationCall.setRefreshTokenCookie(refreshToken: String, runtimeContext: RuntimeContext) {
+    response.cookies.append(
+            name = runtimeContext.tokenRefreshCookieName,
+            value = refreshToken,
             secure = runtimeContext.secureCookie,
             httpOnly = true,
             path = "/${runtimeContext.contextPath}"

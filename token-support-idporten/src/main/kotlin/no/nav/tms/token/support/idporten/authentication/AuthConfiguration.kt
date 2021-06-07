@@ -9,4 +9,6 @@ internal class AuthConfiguration(
         val clientId: String,
         val issuer: String,
         val shouldRedirect: Boolean
-)
+) {
+    val refreshTokenCookieName = "${tokenCookieName}_refresh_token"
+}
