@@ -4,6 +4,7 @@ import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import io.ktor.http.ContentType.Application.FormUrlEncoded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.tms.token.support.idporten.authentication.ClientAssertionService
@@ -33,6 +34,7 @@ internal class TokenRefreshConsumer(
 
         val response: RefreshTokenResponse = httpClient.post {
             url("$tokenUrl?$urlParameters")
+            contentType(FormUrlEncoded)
         }
 
         response.refreshToken
