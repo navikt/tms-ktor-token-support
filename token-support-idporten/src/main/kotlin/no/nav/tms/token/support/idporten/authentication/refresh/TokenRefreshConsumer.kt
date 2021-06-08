@@ -3,6 +3,7 @@ package no.nav.tms.token.support.idporten.authentication.refresh
 import io.ktor.auth.*
 import io.ktor.client.*
 import io.ktor.client.request.*
+import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,11 +30,11 @@ internal class TokenRefreshConsumer(
             append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
             append("client_assertion", jwt)
             append("refresh_token", refreshToken)
-        }.build().formUrlEncode()
+        }.build()
 
         val response: RefreshTokenResponse = httpClient.post {
             url("$tokenUrl")
-            body = parameters
+            body = FormDataContent(parameters)
         }
 
         log.info("Response: $response")
