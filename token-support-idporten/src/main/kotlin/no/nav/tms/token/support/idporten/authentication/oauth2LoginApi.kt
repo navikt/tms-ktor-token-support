@@ -24,9 +24,10 @@ internal fun Routing.oauth2LoginApi(runtimeContext: RuntimeContext) {
             val principal = checkNotNull(call.authentication.principal<OAuthAccessTokenResponse.OAuth2>())
 
             when (val tokenWrapper = unpackVerifiedToken(principal, runtimeContext)) {
-                null -> call.respond(HttpStatusCode.InternalServerError, "Fant ikke ${Idporten.responseToken} i tokenrespons")
+                null -> call.respond(HttpStatusCode.InternalServerError, "Fant ikke ${Idporten.idTokenParameter} i tokenrespons")
                 else -> {
-                    call.setIdTokenCookie(tokenWrapper.token, runtimeContext)
+                    call.setAccessTokenCookie(tokenWrapper.accessToken, runtimeContext)
+                    call.setIdTokenCookie(tokenWrapper.idToken, runtimeContext)
                     call.setRefreshTokenCookie(tokenWrapper.refreshToken, runtimeContext)
                     call.response.cookies.appendExpired(Idporten.postLoginRedirectCookie, path = "/${runtimeContext.contextPath}")
                     call.respondRedirect(call.request.cookies[Idporten.postLoginRedirectCookie] ?: runtimeContext.postLoginRedirectUri)
@@ -37,7 +38,8 @@ internal fun Routing.oauth2LoginApi(runtimeContext: RuntimeContext) {
 }
 
 private data class VerifiedTokenWrapper(
-        val token: String,
+        val idToken: String,
+        val accessToken: String,
         val refreshToken: String
 )
 
@@ -47,18 +49,29 @@ private fun unpackVerifiedToken(principal: OAuthAccessTokenResponse.OAuth2, cont
 
     val refreshToken = principal.refreshToken
 
-    val decodedJWT = settings.verify(principal, context)
+    val idToken = settings.verifyIdToken(principal, context)
+    val accessToken = settings.verifyAccessToken(principal, context)
 
-    return if(refreshToken != null && decodedJWT != null) {
-        VerifiedTokenWrapper(decodedJWT.token, refreshToken)
+    return if(refreshToken != null && idToken != null && accessToken != null) {
+        VerifiedTokenWrapper(idToken.token, accessToken.token, refreshToken)
     } else {
         null
     }
 }
 
+private fun ApplicationCall.setAccessTokenCookie(accessToken: String, runtimeContext: RuntimeContext) {
+    response.cookies.append(
+            name = runtimeContext.accessTokenCookieName,
+            value = accessToken,
+            secure = runtimeContext.secureCookie,
+            httpOnly = true,
+            path = "/${runtimeContext.contextPath}"
+    )
+}
+
 private fun ApplicationCall.setIdTokenCookie(idToken: String, runtimeContext: RuntimeContext) {
     response.cookies.append(
-            name = runtimeContext.tokenCookieName,
+            name = runtimeContext.idTokenTokenCookieName,
             value = idToken,
             secure = runtimeContext.secureCookie,
             httpOnly = true,
@@ -76,9 +89,14 @@ private fun ApplicationCall.setRefreshTokenCookie(refreshToken: String, runtimeC
     )
 }
 
-private fun OAuthServerSettings.OAuth2ServerSettings.verify(tokenResponse: OAuthAccessTokenResponse.OAuth2?, runtimeContext: RuntimeContext): DecodedJWT? =
-tokenResponse?.idToken(Idporten.responseToken)?.let {
-    TokenVerifier(runtimeContext.jwkProvider, clientId, runtimeContext.metadata.issuer).verify(it)
+private fun OAuthServerSettings.OAuth2ServerSettings.verifyIdToken(tokenResponse: OAuthAccessTokenResponse.OAuth2?, runtimeContext: RuntimeContext): DecodedJWT? =
+tokenResponse?.idToken?.let {
+    TokenVerifier(runtimeContext.jwkProvider, clientId, runtimeContext.metadata.issuer).verifyIdToken(it)
 }
 
-private fun OAuthAccessTokenResponse.OAuth2.idToken(tokenCookieName: String): String? = extraParameters[tokenCookieName]
+private fun OAuthServerSettings.OAuth2ServerSettings.verifyAccessToken(tokenResponse: OAuthAccessTokenResponse.OAuth2?, runtimeContext: RuntimeContext): DecodedJWT? =
+tokenResponse?.accessToken?.let {
+    TokenVerifier(runtimeContext.jwkProvider, clientId, runtimeContext.metadata.issuer).verifyAccessToken(it)
+}
+
+private val OAuthAccessTokenResponse.OAuth2.idToken: String? get() = extraParameters[Idporten.idTokenParameter]

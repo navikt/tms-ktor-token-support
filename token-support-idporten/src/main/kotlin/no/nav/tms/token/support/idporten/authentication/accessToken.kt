@@ -8,15 +8,15 @@ import io.ktor.response.*
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import org.slf4j.LoggerFactory
 
-private val log = LoggerFactory.getLogger(IdTokenAuthenticationProvider::class.java)
+private val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
 
 // This method configures an authenticator which checks if an end user has hit an authenticated endpoint
 // with a valid token cookie. If the user is missing the token cookie, or the provided token is invalid, we redirect
 // the user to the endpoint 'oauth2/login', where the user will be prompted to log in through idporten
-internal fun Authentication.Configuration.idToken(authenticatorName: String?, configBuilder: () -> AuthConfiguration) {
+internal fun Authentication.Configuration.accessToken(authenticatorName: String?, configBuilder: () -> AuthConfiguration) {
 
     val config = configBuilder()
-    val provider = IdTokenAuthenticationProvider.build(authenticatorName)
+    val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
 
     if (config.shouldRedirect) {
         setupRedirectingInterceptor(provider, config)
@@ -27,45 +27,50 @@ internal fun Authentication.Configuration.idToken(authenticatorName: String?, co
     register(provider)
 }
 
-private fun setupRedirectingInterceptor(provider: IdTokenAuthenticationProvider, config: AuthConfiguration) {
+private fun setupRedirectingInterceptor(provider: AccessTokenAuthenticationProvider, config: AuthConfiguration) {
     val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val idToken = call.request.cookies[config.tokenCookieName]
-        if (idToken != null) {
+        val accessToken = call.request.cookies[config.accessTokenCookieName]
+        val refreshToken = call.request.cookies[config.refreshTokenCookieName]
+
+        if (accessToken != null && refreshToken != null) {
             try {
-                val decodedJWT = verifier.verify(idToken)
-                context.principal(IdTokenPrincipal(decodedJWT))
+                val decodedJWT = verifier.verifyAccessToken(accessToken)
+
+                context.principal(IdPortenTokenPrincipal(decodedJWT, refreshToken))
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
-                call.response.cookies.appendExpired(config.tokenCookieName)
+                call.expireAccessToken(config)
                 context.challengeAndRedirect(config.contextPath)
             }
         } else {
-            log.debug("Couldn't find cookie ${config.tokenCookieName}.")
+            log.debug("Couldn't find cookie ${config.accessTokenCookieName}.")
             context.challengeAndRedirect(config.contextPath)
         }
     }
 }
 
-private fun setupNonRedirectingInterceptor(provider: IdTokenAuthenticationProvider, config: AuthConfiguration) {
-    val verifier = createVerifier(config.jwkProvider, config.clientId, config.issuer)
+private fun setupNonRedirectingInterceptor(provider: AccessTokenAuthenticationProvider, config: AuthConfiguration) {
+    val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val idToken = call.request.cookies[config.tokenCookieName]
-        if (idToken != null) {
+        val accessToken = call.request.cookies[config.accessTokenCookieName]
+        val refreshToken = call.request.cookies[config.refreshTokenCookieName]
+
+        if (accessToken != null && refreshToken != null) {
             try {
-                val decodedJWT = verifier(idToken).verify(idToken)
-                context.principal(IdTokenPrincipal(decodedJWT))
+                val decodedJWT = verifier.verifyAccessToken(accessToken)
+                context.principal(IdPortenTokenPrincipal(decodedJWT, refreshToken))
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
-                call.response.cookies.appendExpired(config.tokenCookieName)
+                call.expireAccessToken(config)
                 context.challengeAndRespondUnauthorized()
             }
         } else {
-            log.debug("Couldn't find cookie ${config.tokenCookieName}.")
+            log.debug("Couldn't find cookies ${config.accessTokenCookieName} or ${config.refreshTokenCookieName}.")
             context.challengeAndRespondUnauthorized()
         }
     }
@@ -95,6 +100,11 @@ private fun AuthenticationContext.challengeAndRespondUnauthorized() {
     }
 }
 
+private fun ApplicationCall.expireAccessToken(config: AuthConfiguration) {
+    response.cookies.appendExpired(config.accessTokenCookieName)
+    response.cookies.appendExpired(config.refreshTokenCookieName)
+}
+
 private fun ApplicationRequest.pathWithParameters(): String {
     return if (queryParameters.isEmpty()) {
         path()
@@ -109,12 +119,12 @@ private fun ApplicationRequest.pathWithParameters(): String {
     }
 }
 
-private class IdTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
+private class AccessTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
 
     class Configuration(name: String?) : AuthenticationProvider.Configuration(name)
 
     companion object {
-        fun build(name: String?) = IdTokenAuthenticationProvider(Configuration(name))
+        fun build(name: String?) = AccessTokenAuthenticationProvider(Configuration(name))
     }
 }
 

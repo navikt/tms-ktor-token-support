@@ -10,12 +10,12 @@ import no.nav.tms.token.support.idporten.SecurityLevel.NOT_SPECIFIED
 import no.nav.tms.token.support.idporten.authentication.AuthConfiguration
 import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
-import no.nav.tms.token.support.idporten.authentication.idToken
+import no.nav.tms.token.support.idporten.authentication.accessToken
 import no.nav.tms.token.support.idporten.authentication.loginApi
 import no.nav.tms.token.support.idporten.authentication.oauth2LoginApi
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutAuthenticator
 import no.nav.tms.token.support.idporten.authentication.logout.LogoutConfig
-import no.nav.tms.token.support.idporten.authentication.logout.idTokenLogout
+import no.nav.tms.token.support.idporten.authentication.logout.idPortenLogout
 import no.nav.tms.token.support.idporten.authentication.logout.logoutApi
 
 
@@ -35,8 +35,9 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     require(postLogoutRedirectUri.isNotBlank()) { "Post-logout uri må spesifiseres. Pass på at dette matcher nais yaml." }
 
     val runtimeContext = RuntimeContext(
-            tokenCookieName = cookieName,
+            accessTokenCookieName = cookieName,
             tokenRefreshCookieName = config.refreshTokenCookieName,
+            idTokenTokenCookieName = config.idTokenCookieName,
             contextPath = contextPath,
             postLoginRedirectUri = config.postLoginRedirectUri,
             secureCookie = config.secureCookie,
@@ -50,11 +51,13 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
     install(Authentication) {
         // Register authenticator which redirects to internal oauth2/login endpoint if user does not have a valid token.
         // This can apply to any number of endpoints.
-        idToken(authenticatorName) {
+        accessToken(authenticatorName) {
             AuthConfiguration (
                     jwkProvider = runtimeContext.jwkProvider,
                     contextPath = contextPath,
-                    tokenCookieName = cookieName,
+                    accessTokenCookieName = cookieName,
+                    idTokenCookieName = runtimeContext.idTokenTokenCookieName,
+                    refreshTokenCookieName = runtimeContext.tokenRefreshCookieName,
                     clientId = runtimeContext.environment.idportenClientId,
                     issuer = runtimeContext.metadata.issuer,
                     shouldRedirect = shouldRedirect
@@ -71,8 +74,10 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
         // Register endpoints for performing logout. This includes an endpoint which initiates single logout through
         // ID-porten, and one which handles logout initiated elsewhere
-        idTokenLogout(LogoutAuthenticator.name) {
-            LogoutConfig(tokenCookieName = cookieName)
+        idPortenLogout(LogoutAuthenticator.name) {
+            LogoutConfig(
+                    idTokenCookieName = runtimeContext.idTokenTokenCookieName,
+            )
         }
 
     }
@@ -113,6 +118,7 @@ class IdportenAuthenticationConfig {
     var tokenRefreshMarginSeconds: Long = 60
 
     val refreshTokenCookieName get() = "${tokenCookieName}_refresh_token"
+    val idTokenCookieName get() = "${tokenCookieName}_id_token"
 }
 
 enum class SecurityLevel {

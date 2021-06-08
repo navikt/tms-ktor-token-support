@@ -18,7 +18,8 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 internal class RuntimeContext(
-        val tokenCookieName: String,
+        val accessTokenCookieName: String,
+        val idTokenTokenCookieName: String,
         val tokenRefreshCookieName: String,
         val contextPath: String,
         val postLoginRedirectUri: String,

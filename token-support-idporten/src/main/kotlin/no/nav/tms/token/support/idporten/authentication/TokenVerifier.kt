@@ -14,16 +14,29 @@ internal class TokenVerifier(
         private val issuer: String
 ) {
 
-    fun verify(accessToken: String): DecodedJWT {
+    fun verifyIdToken(accessToken: String): DecodedJWT {
         return JWT.decode(accessToken).keyId
                 .let { kid -> jwkProvider.get(kid) }
                 .run { idTokenVerifier(clientId, issuer) }
                 .run { verify(accessToken) }
     }
 
+    fun verifyAccessToken(accessToken: String): DecodedJWT {
+        return JWT.decode(accessToken).keyId
+                .let { kid -> jwkProvider.get(kid) }
+                .run { accessTokenVerifier(clientId, issuer) }
+                .run { verify(accessToken) }
+    }
+
     private fun Jwk.idTokenVerifier(clientId: String, issuer: String): JWTVerifier =
             JWT.require(this.RSA256())
                     .withAudience(clientId)
+                    .withIssuer(issuer)
+                    .build()
+
+    private fun Jwk.accessTokenVerifier(clientId: String, issuer: String): JWTVerifier =
+            JWT.require(this.RSA256())
+                    .withClaim("client_id", clientId)
                     .withIssuer(issuer)
                     .build()
 

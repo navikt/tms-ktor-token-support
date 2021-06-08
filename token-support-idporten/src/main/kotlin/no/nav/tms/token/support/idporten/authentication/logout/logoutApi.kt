@@ -7,7 +7,7 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.date.*
-import no.nav.tms.token.support.idporten.authentication.IdTokenPrincipal
+import no.nav.tms.token.support.idporten.authentication.LogoutPrincipal
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import java.net.URI
 
@@ -16,22 +16,24 @@ internal fun Routing.logoutApi(context: RuntimeContext) {
     authenticate(LogoutAuthenticator.name) {
         // Calling this endpoint with a bearer token will send a redirect to idporten to trigger single-logout
         get("/logout") {
-            val principal = call.principal<IdTokenPrincipal>()
+            val principal = call.principal<LogoutPrincipal>()
 
-            call.invalidateCookie(context.tokenCookieName, context.contextPath)
+            call.invalidateCookie(context.accessTokenCookieName, context.contextPath)
+            call.invalidateCookie(context.idTokenTokenCookieName, context.contextPath)
             call.invalidateCookie(context.tokenRefreshCookieName, context.contextPath)
 
             if (principal == null) {
                 call.respondRedirect(context.postLogoutRedirectUri)
             } else {
-                call.redirectToSingleLogout(principal.decodedJWT.token, context.metadata.logoutEndpoint, context.postLogoutRedirectUri)
+                call.redirectToSingleLogout(principal.idToken.token, context.metadata.logoutEndpoint, context.postLogoutRedirectUri)
             }
         }
     }
 
     // Calls to this endpoint should be initiated by ID-porten through the user, after the user has signed out elsewhere
     get("/oauth2/logout") {
-        call.invalidateCookieForExternalLogout(context.tokenCookieName, context.contextPath, context.secureCookie)
+        call.invalidateCookieForExternalLogout(context.accessTokenCookieName, context.contextPath, context.secureCookie)
+        call.invalidateCookieForExternalLogout(context.idTokenTokenCookieName, context.contextPath, context.secureCookie)
         call.invalidateCookieForExternalLogout(context.tokenRefreshCookieName, context.contextPath, context.secureCookie)
         call.respond(OK)
     }
