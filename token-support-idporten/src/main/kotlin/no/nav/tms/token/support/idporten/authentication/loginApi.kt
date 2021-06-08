@@ -33,10 +33,10 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
     }
 
     get("/refresh") {
-        val refreshToken = call.validIdTokenOrNull(runtimeContext.tokenRefreshCookieName, verifier)
+        val refreshToken = call.request.cookies[runtimeContext.tokenRefreshCookieName]
 
         if (refreshToken != null) {
-            val refreshedToken = runtimeContext.tokenRefreshService.getRefreshedToken(refreshToken.token)
+            val refreshedToken = runtimeContext.tokenRefreshService.getRefreshedToken(refreshToken)
 
             call.respondText(refreshedToken)
         } else {
@@ -46,6 +46,21 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
 }
 
 private fun ApplicationCall.validIdTokenOrNull(tokenCookieName: String, verifier: TokenVerifier): DecodedJWT? {
+
+    val idToken = request.cookies[tokenCookieName]
+
+    return if (idToken != null) {
+        try {
+            verifier.verify(idToken)
+        } catch (e: Throwable) {
+            null
+        }
+    } else {
+        null
+    }
+}
+
+private fun ApplicationCall.refreshTokenOrNull(tokenCookieName: String): DecodedJWT? {
 
     val idToken = request.cookies[tokenCookieName]
 
