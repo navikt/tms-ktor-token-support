@@ -60,21 +60,6 @@ private fun ApplicationCall.validIdTokenOrNull(tokenCookieName: String, verifier
     }
 }
 
-private fun ApplicationCall.refreshTokenOrNull(tokenCookieName: String): DecodedJWT? {
-
-    val idToken = request.cookies[tokenCookieName]
-
-    return if (idToken != null) {
-        try {
-            verifier.verify(idToken)
-        } catch (e: Throwable) {
-            null
-        }
-    } else {
-        null
-    }
-}
-
 private fun createVerifier(runtimeContext: RuntimeContext) = TokenVerifier(
         jwkProvider = runtimeContext.jwkProvider,
         clientId = runtimeContext.environment.idportenClientId,
