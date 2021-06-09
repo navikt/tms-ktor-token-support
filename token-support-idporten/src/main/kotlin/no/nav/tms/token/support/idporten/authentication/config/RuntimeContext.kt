@@ -26,7 +26,7 @@ internal class RuntimeContext(
         val secureCookie: Boolean,
         val postLogoutRedirectUri: String,
         val securityLevel: SecurityLevel,
-        val tokenRefreshMarginSeconds: Long
+        val tokenRefreshMarginPercentage: Int
 ) {
     val environment = Environment()
 
@@ -36,7 +36,7 @@ internal class RuntimeContext(
     private val clientAssertionService = ClientAssertionService(environment.idportenClientJwk, environment.idportenClientId, metadata.issuer)
 
     private val tokenRefreshConsumer = TokenRefreshConsumer(httpClient, clientAssertionService, environment.idportenClientId, metadata.tokenEndpoint)
-    val tokenRefreshService = TokenRefreshService(tokenRefreshConsumer, tokenRefreshMarginSeconds)
+    val tokenRefreshService = TokenRefreshService(tokenRefreshConsumer, tokenRefreshMarginPercentage)
 
     private val idportenClientInterceptor = createIdPortenClientInterceptor(clientAssertionService, environment, metadata)
     val oauth2ServerSettings = createOAuth2ServerSettings(environment, securityLevel, metadata, idportenClientInterceptor)

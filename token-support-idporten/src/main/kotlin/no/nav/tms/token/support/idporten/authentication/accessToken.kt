@@ -1,5 +1,7 @@
 package no.nav.tms.token.support.idporten.authentication
 
+import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
@@ -28,21 +30,17 @@ internal fun Authentication.Configuration.accessToken(authenticatorName: String?
 }
 
 private fun setupRedirectingInterceptor(provider: AccessTokenAuthenticationProvider, config: AuthConfiguration) {
-    val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val accessToken = call.request.cookies[config.accessTokenCookieName]
-        val refreshToken = call.request.cookies[config.refreshTokenCookieName]
 
-        if (accessToken != null && refreshToken != null) {
+        if (call.request.hasRequiredCookies(config)) {
             try {
-                val decodedJWT = verifier.verifyAccessToken(accessToken)
+                val decodedJWT = call.getVerifiedToken(config)
 
-                context.principal(IdPortenTokenPrincipal(decodedJWT, refreshToken))
+                context.principal(IdPortenTokenPrincipal(decodedJWT))
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
-                call.expireAccessToken(config)
                 context.challengeAndRedirect(config.contextPath)
             }
         } else {
@@ -53,20 +51,16 @@ private fun setupRedirectingInterceptor(provider: AccessTokenAuthenticationProvi
 }
 
 private fun setupNonRedirectingInterceptor(provider: AccessTokenAuthenticationProvider, config: AuthConfiguration) {
-    val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
 
     provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val accessToken = call.request.cookies[config.accessTokenCookieName]
-        val refreshToken = call.request.cookies[config.refreshTokenCookieName]
 
-        if (accessToken != null && refreshToken != null) {
+        if (call.request.hasRequiredCookies(config)) {
             try {
-                val decodedJWT = verifier.verifyAccessToken(accessToken)
-                context.principal(IdPortenTokenPrincipal(decodedJWT, refreshToken))
+                val decodedJWT = call.getVerifiedToken(config)
+                context.principal(IdPortenTokenPrincipal(decodedJWT))
             } catch (e: Throwable) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)
-                call.expireAccessToken(config)
                 context.challengeAndRespondUnauthorized()
             }
         } else {
@@ -100,9 +94,63 @@ private fun AuthenticationContext.challengeAndRespondUnauthorized() {
     }
 }
 
-private fun ApplicationCall.expireAccessToken(config: AuthConfiguration) {
-    response.cookies.appendExpired(config.accessTokenCookieName)
-    response.cookies.appendExpired(config.refreshTokenCookieName)
+private fun ApplicationRequest.hasRequiredCookies(config: AuthConfiguration): Boolean {
+    return cookies[config.accessTokenCookieName] != null &&
+        cookies[config.refreshTokenCookieName] != null
+}
+
+private suspend fun ApplicationCall.getVerifiedToken(config: AuthConfiguration): DecodedJWT {
+    val verifier = TokenVerifier(config.jwkProvider, config.clientId, config.issuer)
+
+    val accessToken = request.cookies[config.accessTokenCookieName]!!
+    val refreshToken = request.cookies[config.refreshTokenCookieName]!!
+
+    val currentToken = verifier.verifyAccessToken(accessToken)
+
+    return if (config.shouldRefreshToken && config.tokenRefreshService.shouldRefreshToken(currentToken)) {
+        val refreshedToken = refreshAccessTokenCookie(refreshToken, config)
+
+        if (refreshedToken != null) {
+            refreshedToken
+        } else {
+            currentToken
+        }
+    } else {
+        currentToken
+    }
+}
+
+private suspend fun ApplicationCall.refreshAccessTokenCookie(refreshToken: String, config: AuthConfiguration): DecodedJWT? {
+    try {
+        val result = config.tokenRefreshService.getRefreshedToken(refreshToken)
+        setAccessTokenCookie(result.accessToken, config)
+        setRefreshTokenCookie(result.refreshToken, config)
+
+        return JWT.decode(result.accessToken)
+    } catch (e: Exception) {
+        log.warn("Was unable to refresh access token.")
+        return null
+    }
+}
+
+private fun ApplicationCall.setAccessTokenCookie(accessToken: String, config: AuthConfiguration) {
+    response.cookies.append(
+            name = config.accessTokenCookieName,
+            value = accessToken,
+            secure = config.secureCookie,
+            httpOnly = true,
+            path = "/${config.contextPath}"
+    )
+}
+
+private fun ApplicationCall.setRefreshTokenCookie(refreshToken: String, config: AuthConfiguration) {
+    response.cookies.append(
+            name = config.refreshTokenCookieName,
+            value = refreshToken,
+            secure = config.secureCookie,
+            httpOnly = true,
+            path = "/${config.contextPath}"
+    )
 }
 
 private fun ApplicationRequest.pathWithParameters(): String {

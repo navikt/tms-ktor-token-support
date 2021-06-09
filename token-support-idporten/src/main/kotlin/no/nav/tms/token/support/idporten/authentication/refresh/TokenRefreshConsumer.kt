@@ -21,7 +21,7 @@ internal class TokenRefreshConsumer(
 
     private val log = LoggerFactory.getLogger(TokenRefreshConsumer::class.java)
 
-    suspend fun fetchRefreshedToken(refreshToken: String): String = withContext(Dispatchers.IO) {
+    suspend fun fetchRefreshedToken(refreshToken: String): RefreshTokenWrapper = withContext(Dispatchers.IO) {
         val jwt = clientAssertionService.createClientAssertion()
 
         val parameters = ParametersBuilder().apply {
@@ -37,8 +37,6 @@ internal class TokenRefreshConsumer(
             body = FormDataContent(parameters)
         }
 
-        log.info("Response: $response")
-
-        response.refreshToken
+        RefreshTokenWrapper(response.accessToken, response.refreshToken)
     }
 }

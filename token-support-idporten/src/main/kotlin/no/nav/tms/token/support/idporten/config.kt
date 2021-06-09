@@ -43,7 +43,7 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
             secureCookie = config.secureCookie,
             postLogoutRedirectUri = postLogoutRedirectUri,
             securityLevel = config.securityLevel,
-            tokenRefreshMarginSeconds = config.tokenRefreshMarginSeconds
+            tokenRefreshMarginPercentage = config.tokenRefreshMarginPercentage
     )
 
     installXForwardedHeaderSupportIfMissing()
@@ -56,11 +56,13 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
                     jwkProvider = runtimeContext.jwkProvider,
                     contextPath = contextPath,
                     accessTokenCookieName = cookieName,
-                    idTokenCookieName = runtimeContext.idTokenTokenCookieName,
                     refreshTokenCookieName = runtimeContext.tokenRefreshCookieName,
                     clientId = runtimeContext.environment.idportenClientId,
                     issuer = runtimeContext.metadata.issuer,
-                    shouldRedirect = shouldRedirect
+                    shouldRedirect = shouldRedirect,
+                    shouldRefreshToken = config.tokenRefreshEnabled,
+                    tokenRefreshService = runtimeContext.tokenRefreshService,
+                    secureCookie = config.secureCookie
             )
         }
 
@@ -115,7 +117,7 @@ class IdportenAuthenticationConfig {
     var alwaysRedirectToLogin: Boolean = false
     var securityLevel: SecurityLevel = NOT_SPECIFIED
     var tokenRefreshEnabled: Boolean = true
-    var tokenRefreshMarginSeconds: Long = 60
+    var tokenRefreshMarginPercentage: Int = 25
 
     val refreshTokenCookieName get() = "${tokenCookieName}_refresh_token"
     val idTokenCookieName get() = "${tokenCookieName}_id_token"

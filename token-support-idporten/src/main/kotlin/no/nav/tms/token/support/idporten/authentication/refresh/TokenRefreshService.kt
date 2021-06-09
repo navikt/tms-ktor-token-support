@@ -1,26 +1,32 @@
 package no.nav.tms.token.support.idporten.authentication.refresh
 
-import com.auth0.jwt.JWT
+import com.auth0.jwt.interfaces.DecodedJWT
 import java.time.Instant.now
 import java.util.*
 
 internal class TokenRefreshService(
         private val tokenRefreshConsumer: TokenRefreshConsumer,
-        private val refreshMarginSeconds: Long
+        private val refreshMarginPercentage: Int
 ) {
-    fun shouldRefreshToken(token: String): Boolean {
-        val decodedJWT = JWT.decode(token)
+    fun shouldRefreshToken(accessToken: DecodedJWT): Boolean {
 
-        val expiryTime = decodedJWT.expiresAt
+        val issueTime = accessToken.expiresAt
+        val expiryTime = accessToken.issuedAt
 
-        return currentTImeIsWithinMargin(expiryTime)
+        return currentTimeIsWithinMargin(issueTime, expiryTime)
     }
 
-    private fun currentTImeIsWithinMargin(expiryTime: Date): Boolean {
-        return now().epochSecond + refreshMarginSeconds > expiryTime.toInstant().epochSecond
+    private fun currentTimeIsWithinMargin(issueTime: Date, expiryTime: Date): Boolean {
+        val totalDuration = expiryTime.toInstant().epochSecond - issueTime.toInstant().epochSecond
+
+        val percentage = refreshMarginPercentage / 100.0
+
+        val marginSeconds = totalDuration * percentage
+
+        return now().epochSecond + marginSeconds > expiryTime.toInstant().epochSecond
     }
 
-    suspend fun getRefreshedToken(refreshToken: String): String {
+    suspend fun getRefreshedToken(refreshToken: String): RefreshTokenWrapper {
         return tokenRefreshConsumer.fetchRefreshedToken(refreshToken)
     }
 }
