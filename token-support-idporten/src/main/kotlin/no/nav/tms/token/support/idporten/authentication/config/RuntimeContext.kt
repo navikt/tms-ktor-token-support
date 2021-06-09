@@ -64,7 +64,7 @@ private fun createOAuth2ServerSettings(
 private fun createAuthorizeUrlInterceptior(securityLevel: SecurityLevel): URLBuilder.() -> Unit {
     return {
         parameters.append("response_mode", "query")
-        parameters.append("resource", "tokenx")
+        parameters.append("resource", "https://tokenx")
 
         when (securityLevel) {
             LEVEL_3 -> parameters.append("acr_values", "Level3")
