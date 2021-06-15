@@ -34,6 +34,10 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 
     require(postLogoutRedirectUri.isNotBlank()) { "Post-logout uri må spesifiseres. Pass på at dette matcher nais yaml." }
 
+    require(config.tokenRefreshMarginPercentage in 0..100) {
+        "tokenRefreshMarginPercentage må være mellom inklusive 0 og 100."
+    }
+
     val runtimeContext = RuntimeContext(
             accessTokenCookieName = cookieName,
             tokenRefreshCookieName = config.refreshTokenCookieName,
@@ -116,7 +120,7 @@ class IdportenAuthenticationConfig {
     var postLogoutRedirectUri: String = ""
     var alwaysRedirectToLogin: Boolean = false
     var securityLevel: SecurityLevel = NOT_SPECIFIED
-    var tokenRefreshEnabled: Boolean = true
+    var tokenRefreshEnabled: Boolean = false
     var tokenRefreshMarginPercentage: Int = 25
 
     val refreshTokenCookieName get() = "${tokenCookieName}_refresh_token"

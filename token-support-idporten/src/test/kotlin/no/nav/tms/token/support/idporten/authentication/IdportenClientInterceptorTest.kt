@@ -10,7 +10,7 @@ import org.amshove.kluent.`should not contain`
 import org.junit.jupiter.api.Test
 
 internal class IdportenClientInterceptorTest {
-    private val jwk = JwkBuilder.generateJwk()
+    private val jwk = JwkBuilder.generateJwkString()
     private val clientId = "clientId"
     private val audience = "audience"
 

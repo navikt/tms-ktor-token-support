@@ -121,15 +121,16 @@ private suspend fun ApplicationCall.getVerifiedToken(config: AuthConfiguration):
 }
 
 private suspend fun ApplicationCall.refreshAccessTokenCookie(refreshToken: String, config: AuthConfiguration): DecodedJWT? {
-    try {
+    return try {
         val result = config.tokenRefreshService.getRefreshedToken(refreshToken)
+
         setAccessTokenCookie(result.accessToken, config)
         setRefreshTokenCookie(result.refreshToken, config)
 
-        return JWT.decode(result.accessToken)
+        JWT.decode(result.accessToken)
     } catch (e: Exception) {
         log.warn("Was unable to refresh access token.")
-        return null
+        null
     }
 }
 

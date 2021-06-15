@@ -10,10 +10,14 @@ internal class TokenRefreshService(
 ) {
     fun shouldRefreshToken(accessToken: DecodedJWT): Boolean {
 
-        val issueTime = accessToken.expiresAt
-        val expiryTime = accessToken.issuedAt
+        val issueTime = accessToken.issuedAt
+        val expiryTime = accessToken.expiresAt
 
         return currentTimeIsWithinMargin(issueTime, expiryTime)
+    }
+
+    suspend fun getRefreshedToken(refreshToken: String): RefreshTokenWrapper {
+        return tokenRefreshConsumer.fetchRefreshedToken(refreshToken)
     }
 
     private fun currentTimeIsWithinMargin(issueTime: Date, expiryTime: Date): Boolean {
@@ -24,9 +28,5 @@ internal class TokenRefreshService(
         val marginSeconds = totalDuration * percentage
 
         return now().epochSecond + marginSeconds > expiryTime.toInstant().epochSecond
-    }
-
-    suspend fun getRefreshedToken(refreshToken: String): RefreshTokenWrapper {
-        return tokenRefreshConsumer.fetchRefreshedToken(refreshToken)
     }
 }
