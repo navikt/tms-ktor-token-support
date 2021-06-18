@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.tokendings.exchange.TokendingsService
 import no.nav.tms.token.support.tokendings.exchange.config.cache.AccessTokenEntry
+import no.nav.tms.token.support.tokendings.exchange.config.cache.AccessTokenKey
 import no.nav.tms.token.support.tokendings.exchange.config.cache.CacheBuilder
 import no.nav.tms.token.support.tokendings.exchange.consumer.TokendingsConsumer
 import no.nav.tms.token.support.tokendings.exchange.service.ClientAssertion.createSignedAssertion
@@ -41,7 +42,9 @@ class CachingTokendingsService internal constructor(
     override suspend fun exchangeToken(token: String, targetApp: String): String {
         val subject = TokenStringUtil.extractSubject(token)
 
-        return cache.get(subject) {
+        val cacheKey = AccessTokenKey(subject, targetApp)
+
+        return cache.get(cacheKey) {
             runBlocking {
                 performTokenExchange(token, targetApp)
             }
