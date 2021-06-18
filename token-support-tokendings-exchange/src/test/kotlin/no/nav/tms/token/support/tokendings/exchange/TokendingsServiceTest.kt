@@ -9,6 +9,7 @@ import no.nav.tms.token.support.tokendings.exchange.service.NonCachingTokendings
 import no.nav.tms.token.support.tokendings.exchange.service.TokenStringUtil
 import org.amshove.kluent.`should be equal to`
 import org.amshove.kluent.`should contain`
+import org.amshove.kluent.`should not be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
@@ -139,5 +140,43 @@ internal class TokendingsServiceTest {
         }
 
         coVerify(exactly = 3) {tokendingsConsumer.exchangeToken(any(), any(), target) }
+    }
+
+    @Test
+    fun `CachingService should cache one unique token per target`() {
+        val assertion = slot<String>()
+        val token = "<token>"
+        val subject = "<subject>"
+        val exchangedToken1 = "<exchanged token 1>"
+        val exchangedToken2 = "<exchanged token 2>"
+        val target1 = "cluster:namespace:otherApi1"
+        val target2 = "cluster:namespace:otherApi2"
+
+        mockkObject(TokenStringUtil)
+
+        every {
+            TokenStringUtil.extractSubject(token)
+        } returns subject
+
+        coEvery {
+            tokendingsConsumer.exchangeToken(any(), capture(assertion), target1)
+        } returns TokendingsResponseObjectMother.createTokendingsResponse(exchangedToken1)
+
+        coEvery {
+            tokendingsConsumer.exchangeToken(any(), capture(assertion), target2)
+        } returns TokendingsResponseObjectMother.createTokendingsResponse(exchangedToken2)
+
+        val result1 = runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
+        val result2 = runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
+        val result3 = runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
+        val result4 = runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
+
+        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target1) }
+        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target2) }
+
+        result1 `should be equal to` result3
+        result2 `should be equal to` result4
+        result1 `should not be equal to` result2
+        result3 `should not be equal to` result4
     }
 }

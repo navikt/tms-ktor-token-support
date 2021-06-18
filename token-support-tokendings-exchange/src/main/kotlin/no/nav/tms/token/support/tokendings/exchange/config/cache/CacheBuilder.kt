@@ -6,24 +6,24 @@ import com.github.benmanes.caffeine.cache.Expiry
 import java.util.concurrent.TimeUnit
 
 internal object CacheBuilder {
-    fun buildCache(maxEntries: Long, expiryMarginSeconds: Int): Cache<String, AccessTokenEntry> {
+    fun buildCache(maxEntries: Long, expiryMarginSeconds: Int): Cache<AccessTokenKey, AccessTokenEntry> {
         return Caffeine.newBuilder()
                 .expireAfter(createExpiryPolicy(expiryMarginSeconds))
                 .maximumSize(maxEntries)
                 .build()
     }
 
-    private fun createExpiryPolicy(expiryMarginSeconds: Int) = object : Expiry<String, AccessTokenEntry> {
-        override fun expireAfterCreate(key: String, response: AccessTokenEntry, currentTime: Long): Long {
+    private fun createExpiryPolicy(expiryMarginSeconds: Int) = object : Expiry<AccessTokenKey, AccessTokenEntry> {
+        override fun expireAfterCreate(key: AccessTokenKey, response: AccessTokenEntry, currentTime: Long): Long {
             return TimeUnit.SECONDS.toNanos(response.expiresInSeconds - expiryMarginSeconds)
         }
 
-        override fun expireAfterUpdate(key: String,
+        override fun expireAfterUpdate(key: AccessTokenKey,
                                        value: AccessTokenEntry,
                                        currentTime: Long,
                                        currentDuration: Long): Long = currentDuration
 
-        override fun expireAfterRead(key: String,
+        override fun expireAfterRead(key: AccessTokenKey,
                                      value: AccessTokenEntry,
                                      currentTime: Long,
                                      currentDuration: Long): Long = currentDuration
