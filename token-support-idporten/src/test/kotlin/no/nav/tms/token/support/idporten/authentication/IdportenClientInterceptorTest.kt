@@ -10,11 +10,13 @@ import org.amshove.kluent.`should not contain`
 import org.junit.jupiter.api.Test
 
 internal class IdportenClientInterceptorTest {
-    private val jwk = JwkBuilder.generateJwk()
+    private val jwk = JwkBuilder.generateJwkString()
     private val clientId = "clientId"
     private val audience = "audience"
 
-    private val interceptor = IdportenClientInterceptor(jwk, clientId, audience)
+    private val clientAssertionService = ClientAssertionService(jwk, clientId, audience)
+
+    private val interceptor = IdportenClientInterceptor(clientAssertionService, clientId, audience)
 
     @Test
     fun `Should intercept token calls of 'client_secret' format and transform to 'private_key_jwt' format`() {

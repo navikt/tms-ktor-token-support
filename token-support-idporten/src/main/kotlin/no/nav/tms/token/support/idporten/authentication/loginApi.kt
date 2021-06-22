@@ -23,23 +23,23 @@ internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
     }
 
     get("/login/status") {
-        val idToken = call.validIdTokenOrNull(runtimeContext.tokenCookieName, verifier)
+        val idToken = call.validAccessTokenOrNull(runtimeContext.accessTokenCookieName, verifier)
 
         if (idToken == null) {
-            call.respond(LoginStatus.unAuthenticated())
+            call.respond(LoginStatus.unauthenticated())
         } else {
             call.respond(LoginStatus.authenticated(IdportenUserFactory.extractLoginLevel(idToken)))
         }
     }
 }
 
-private fun ApplicationCall.validIdTokenOrNull(tokenCookieName: String, verifier: TokenVerifier): DecodedJWT? {
+private fun ApplicationCall.validAccessTokenOrNull(tokenCookieName: String, verifier: TokenVerifier): DecodedJWT? {
 
     val idToken = request.cookies[tokenCookieName]
 
     return if (idToken != null) {
         try {
-            verifier.verify(idToken)
+            verifier.verifyAccessToken(idToken)
         } catch (e: Throwable) {
             null
         }

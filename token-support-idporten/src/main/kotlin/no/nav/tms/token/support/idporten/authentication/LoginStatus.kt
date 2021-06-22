@@ -8,7 +8,7 @@ internal data class LoginStatus(
     val level: Int?
 ) {
     companion object {
-        fun unAuthenticated() = LoginStatus(false, null)
+        fun unauthenticated() = LoginStatus(false, null)
         fun authenticated(level: Int) = LoginStatus(true, level)
     }
 }

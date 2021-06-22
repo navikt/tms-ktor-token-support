@@ -22,7 +22,7 @@ internal class IdportenAuthIT {
     val envVars = listOf(
             "IDPORTEN_WELL_KNOWN_URL" to "http://mocked-issuer/config",
             "IDPORTEN_CLIENT_ID" to "123456",
-            "IDPORTEN_CLIENT_JWK" to JwkBuilder.generateJwk(),
+            "IDPORTEN_CLIENT_JWK" to JwkBuilder.generateJwkString(),
             "IDPORTEN_REDIRECT_URI" to "/oath2/callback"
     ).toMap()
 
