@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.tokenx.validation
+package no.nav.tms.token.support.azure.validation
 
 import com.auth0.jwk.Jwk
 import com.auth0.jwk.SigningKeyNotFoundException
