@@ -1,29 +1,13 @@
 package no.nav.tms.token.support.azure.validation
 
 import io.ktor.application.*
-import io.ktor.auth.*
-import no.nav.tms.token.support.azure.validation.config.RuntimeContext
-import no.nav.tms.token.support.azure.validation.intercept.azure
+import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
 
 
 fun Application.installAzureAuth(configure: AzureAuthenticatorConfig.() -> Unit = {}) {
     val config = AzureAuthenticatorConfig().also(configure)
 
-    val authenticatorName = getAuthenticatorName(config.setAsDefault)
-
-    val runtimeContext = RuntimeContext()
-
-    install(Authentication) {
-        azure(authenticatorName, runtimeContext.verifierWrapper)
-    }
-}
-
-private fun getAuthenticatorName(isDefault: Boolean): String? {
-    return if (isDefault) {
-        null
-    } else {
-        AzureAuthenticator.name
-    }
+    performAzureAuthenticatorInstallation(config)
 }
 
 // Configuration provided by library user. See readme for example of use

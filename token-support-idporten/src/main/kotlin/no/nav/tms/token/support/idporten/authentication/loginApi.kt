@@ -8,7 +8,7 @@ import no.nav.tms.token.support.idporten.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.user.IdportenUserFactory
 
-internal fun Routing.loginApi(runtimeContext: RuntimeContext) {
+internal fun Routing.idPortenLoginApi(runtimeContext: RuntimeContext) {
 
     val verifier = createVerifier(runtimeContext)
 

@@ -8,7 +8,7 @@ import io.ktor.util.pipeline.*
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.azure(authenticatorName: String?, verifier: TokenVerifier) {
+internal fun Authentication.Configuration.azureAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
 
