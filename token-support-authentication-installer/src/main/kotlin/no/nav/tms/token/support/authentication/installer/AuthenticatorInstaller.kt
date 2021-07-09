@@ -28,13 +28,13 @@ internal object AuthenticatorInstaller {
             val tokenXConfig = config.tokenXConfig
 
             if (tokenXConfig != null) {
-                performTokenXAuthenticatorInstallation(tokenXConfig)
+                performTokenXAuthenticatorInstallation(tokenXConfig, this)
             }
 
             val azureConfig = config.azureConfig
 
             if (azureConfig != null) {
-                performAzureAuthenticatorInstallation(azureConfig)
+                performAzureAuthenticatorInstallation(azureConfig, this)
             }
         }
 
