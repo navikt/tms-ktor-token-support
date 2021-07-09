@@ -4,6 +4,7 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.IdPortenInstaller.performIdPortenAuthenticatorInstallation
+import no.nav.tms.token.support.idporten.IdPortenRoutesConfig
 import no.nav.tms.token.support.tokenx.validation.TokenXInstaller.performTokenXAuthenticatorInstallation
 import org.slf4j.LoggerFactory
 
@@ -14,12 +15,14 @@ internal object AuthenticatorInstaller {
         checkUsage(config)
         validateDefaultToggle(config)
 
+        var idPortenRoutesConfig: IdPortenRoutesConfig? = null
+
         install(Authentication) {
 
             val idPortenConfig = config.idPortenConfig
 
             if (idPortenConfig != null) {
-                performIdPortenAuthenticatorInstallation(idPortenConfig, this)
+                idPortenRoutesConfig = performIdPortenAuthenticatorInstallation(idPortenConfig, this)
             }
 
             val tokenXConfig = config.tokenXConfig
@@ -34,6 +37,12 @@ internal object AuthenticatorInstaller {
                 performAzureAuthenticatorInstallation(azureConfig)
             }
         }
+
+        setupIdPortenRoutesIfRequired(idPortenRoutesConfig)
+    }
+
+    private fun Application.setupIdPortenRoutesIfRequired(routesConfig: IdPortenRoutesConfig?) {
+        routesConfig?.setupRoutes?.invoke(this)
     }
 
     private fun checkUsage(config: AuthenticatorConfig) {

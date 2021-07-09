@@ -21,7 +21,7 @@ object IdPortenInstaller {
     fun Application.performIdPortenAuthenticatorInstallation(
             config: IdportenAuthenticationConfig,
             existingAuthContext: Authentication.Configuration? = null
-    ) {
+    ): IdPortenRoutesConfig {
         validateIdPortenConfig(config)
 
         val runtimeContext = RuntimeContext(
@@ -46,11 +46,14 @@ object IdPortenInstaller {
             existingAuthContext.setupAuthenticators(config,runtimeContext)
         }
 
-        // Register endpoints '/login', '/login/status', 'oauth2/login', 'oath2/callback', '/logout', and /oauth2/logout
-        routing {
-            idPortenLoginApi(runtimeContext)
-            oauth2LoginApi(runtimeContext)
-            idPortenLogoutApi(runtimeContext)
+        // Return routes to be enabled as a callback, as it as to be run after all other authenticators have been installed
+        return IdPortenRoutesConfig {
+            // Register endpoints '/login', '/login/status', 'oauth2/login', 'oath2/callback', '/logout', and /oauth2/logout
+            routing {
+                idPortenLoginApi(runtimeContext)
+                oauth2LoginApi(runtimeContext)
+                idPortenLogoutApi(runtimeContext)
+            }
         }
     }
 
@@ -115,3 +118,5 @@ object IdPortenInstaller {
         }
     }
 }
+
+class IdPortenRoutesConfig(val setupRoutes: Application.() -> Unit)

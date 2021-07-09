@@ -10,7 +10,9 @@ import no.nav.tms.token.support.idporten.SecurityLevel.NOT_SPECIFIED
 fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -> Unit) {
     val config = IdportenAuthenticationConfig().apply(configure)
 
-    performIdPortenAuthenticatorInstallation(config)
+    val routesConfig = performIdPortenAuthenticatorInstallation(config)
+
+    routesConfig.setupRoutes(this)
 }
 
 // Configuration provided by library user. See readme for example of use
