@@ -32,7 +32,7 @@ fun Application.mainModule() {
 }
 ```
 
-Deretter kan man autentisere bestemte endepunkt som følger. Hvis denne autentikatoren er satt som default, er det
+Deretter kan man autentisere bestemte endepunkt som følger. Hvis ikke denne autentikatoren er satt som default, er det
 viktig å ha med navnet på autentikatoren.
 
 ```kotlin
