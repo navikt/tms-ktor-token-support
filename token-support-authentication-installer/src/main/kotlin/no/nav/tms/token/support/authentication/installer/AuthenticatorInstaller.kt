@@ -2,9 +2,12 @@ package no.nav.tms.token.support.authentication.installer
 
 import io.ktor.application.*
 import io.ktor.auth.*
+import no.nav.tms.token.support.azure.validation.AzureAuthenticatorConfig
 import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.IdPortenInstaller.performIdPortenAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.IdPortenRoutesConfig
+import no.nav.tms.token.support.idporten.IdportenAuthenticationConfig
+import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticatorConfig
 import no.nav.tms.token.support.tokenx.validation.TokenXInstaller.performTokenXAuthenticatorInstallation
 import org.slf4j.LoggerFactory
 
@@ -17,24 +20,28 @@ internal object AuthenticatorInstaller {
 
         var idPortenRoutesConfig: IdPortenRoutesConfig? = null
 
+        val application = this
+
         install(Authentication) {
 
             val idPortenConfig = config.idPortenConfig
 
+            val authContext = this
+
             if (idPortenConfig != null) {
-                idPortenRoutesConfig = performIdPortenAuthenticatorInstallation(idPortenConfig, this)
+                idPortenRoutesConfig = InstallerProxy.invokeIdPortenInstaller(application, idPortenConfig, authContext)
             }
 
             val tokenXConfig = config.tokenXConfig
 
             if (tokenXConfig != null) {
-                performTokenXAuthenticatorInstallation(tokenXConfig, this)
+                InstallerProxy.invokeTokenXInstaller(application, tokenXConfig, authContext)
             }
 
             val azureConfig = config.azureConfig
 
             if (azureConfig != null) {
-                performAzureAuthenticatorInstallation(azureConfig, this)
+                InstallerProxy.invokeAzureInstaller(application, azureConfig, authContext)
             }
         }
 
@@ -64,5 +71,29 @@ internal object AuthenticatorInstaller {
     }
 }
 
+// The primary purpose of this simple proxy is to enable testing without compromising on legibility too much
+internal object InstallerProxy {
+    internal fun invokeIdPortenInstaller(
+            application: Application,
+            idPortenConfig: IdportenAuthenticationConfig,
+            existingAuthContext: Authentication.Configuration): IdPortenRoutesConfig {
 
+        return application.performIdPortenAuthenticatorInstallation(idPortenConfig, existingAuthContext)
+    }
 
+    internal fun invokeTokenXInstaller(
+            application: Application,
+            tokenXConfig: TokenXAuthenticatorConfig,
+            existingAuthContext: Authentication.Configuration) {
+
+        application.performTokenXAuthenticatorInstallation(tokenXConfig, existingAuthContext)
+    }
+
+    internal fun invokeAzureInstaller(
+            application: Application,
+            azureConfig: AzureAuthenticatorConfig,
+            existingAuthContext: Authentication.Configuration) {
+
+        application.performAzureAuthenticatorInstallation(azureConfig, existingAuthContext)
+    }
+}

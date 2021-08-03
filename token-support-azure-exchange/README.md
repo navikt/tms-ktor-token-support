@@ -3,7 +3,7 @@
 Dette biblioteket tilbyr en måte for en ktor app å hente azure access tokens ment for client-client kommunikasjon.
 
 
-## Oppsett
+## Nais-yaml
 
 Bruk av biblioteket forutsetter at nais-yaml er konfigurert for azure:
 

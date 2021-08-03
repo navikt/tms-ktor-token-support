@@ -2,7 +2,7 @@
 
 Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens vekslet fra tokendings.
 
-## Oppsett
+## Nais-yaml
 
 Bruk av biblioteket forutsetter at nais-yaml er konfigurert for tokenx:
 
@@ -11,6 +11,9 @@ spec:
   tokenx:
     enabled: true
 ```
+
+
+## Oppsett 
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 

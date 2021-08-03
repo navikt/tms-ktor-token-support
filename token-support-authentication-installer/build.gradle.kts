@@ -19,6 +19,7 @@ dependencies {
     testImplementation(Jjwt.jackson)
     testImplementation(Junit.engine)
     testImplementation(Kluent.kluent)
+    testImplementation(Ktor.serverTestHost)
     testImplementation(Mockk.mockk)
 }
 
