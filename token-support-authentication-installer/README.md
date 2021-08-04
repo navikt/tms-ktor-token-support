@@ -1,6 +1,6 @@
 # token-support-authentication-installer
 
-Denne modulen tilbyr en måte å installere flere av bibliotekets autentiaktorer i parallell. Det er ikke nødvendig å 
+Denne modulen tilbyr en måte å installere flere av bibliotekets autentikatorer i parallell. Det er ikke nødvendig å 
 bruke denne modulen dersom en kun ønsker å installere én autentikator.
 
 
