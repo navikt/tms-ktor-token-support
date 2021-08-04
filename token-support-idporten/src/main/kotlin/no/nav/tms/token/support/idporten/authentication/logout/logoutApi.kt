@@ -11,7 +11,7 @@ import no.nav.tms.token.support.idporten.authentication.LogoutPrincipal
 import no.nav.tms.token.support.idporten.authentication.config.RuntimeContext
 import java.net.URI
 
-internal fun Routing.logoutApi(context: RuntimeContext) {
+internal fun Routing.idPortenLogoutApi(context: RuntimeContext) {
 
     authenticate(LogoutAuthenticator.name) {
         // Calling this endpoint with a bearer token will send a redirect to idporten to trigger single-logout

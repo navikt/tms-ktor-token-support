@@ -15,7 +15,7 @@ private val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::cla
 // This method configures an authenticator which checks if an end user has hit an authenticated endpoint
 // with a valid token cookie. If the user is missing the token cookie, or the provided token is invalid, we redirect
 // the user to the endpoint 'oauth2/login', where the user will be prompted to log in through idporten
-internal fun Authentication.Configuration.accessToken(authenticatorName: String?, configBuilder: () -> AuthConfiguration) {
+internal fun Authentication.Configuration.idPortenAccessToken(authenticatorName: String?, configBuilder: () -> AuthConfiguration) {
 
     val config = configBuilder()
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)

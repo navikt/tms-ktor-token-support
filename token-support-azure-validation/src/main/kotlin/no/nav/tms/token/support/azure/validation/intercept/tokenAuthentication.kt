@@ -1,13 +1,14 @@
-package no.nav.tms.token.support.tokenx.validation.tokendings
+package no.nav.tms.token.support.azure.validation.intercept
 
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
+import no.nav.tms.token.support.azure.validation.AzurePrincipal
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.tokenXAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
+internal fun Authentication.Configuration.azureAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
 
@@ -18,7 +19,7 @@ internal fun Authentication.Configuration.tokenXAccessToken(authenticatorName: S
         if (accessToken != null) {
             try {
                 val decodedJWT = verifier.verify(accessToken)
-                context.principal(TokenXPrincipal(decodedJWT))
+                context.principal(AzurePrincipal(decodedJWT))
             } catch (e: Exception) {
                 val message = e.message ?: e.javaClass.simpleName
                 log.debug("Token verification failed: {}", message)

@@ -3,7 +3,7 @@
 Dette biblioteket tilbyr en måte for en ktor app å veksle id_tokens og access_tokens mot tokendings.
 
 
-## Oppsett
+## Nais-yaml
 
 Bruk av biblioteket forutsetter at nais-yaml er konfigurert for tokenx:
 
@@ -13,7 +13,7 @@ spec:
     enabled: true
 ```
 
-For å kunen veksle tokens og kalle andre apper er det også nødvendig å konfigurere dette i nais-yaml. 
+For å kunne veksle tokens og kalle andre apper er det også nødvendig å konfigurere dette i nais-yaml. 
 Både navn på ønsket api og appens ingress (uten scheme) må defineres:
 
 ```yaml
@@ -74,8 +74,10 @@ Eksempel på tokenveksling for å nå en app i samme cluster og namespace:
 ```kotlin
 fun getTokenForOtherApi(subjectToken: String): String {
     val appName = "cluster:namespace:other-api"
-   
-    return TokenExchangeServices.tokendingsService.exchangeToken(subjectToken, appName)
+
+    val tokendingsService = TokendingsServiceBuilder.buildTokendingsService()
+
+    return tokendingsService.exchangeToken(subjectToken, appName)
 }
 ```
 
@@ -89,4 +91,4 @@ Dette biblioteket forventer at følgende miljøvariabler er satt:
 
 Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt.
 
-Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#runtime-variables-credentials) for forklaring på de 3 siste av disse miljøvariablene.
+Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#runtime-variables-credentials) for forklaring på disse miljøvariablene.

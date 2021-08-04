@@ -3,7 +3,7 @@ package no.nav.tms.token.support.tokenx.validation
 import io.ktor.application.*
 import io.ktor.auth.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
-import no.nav.tms.token.support.tokenx.validation.tokendings.tokenX
+import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken
 
 
 fun Application.installTokenXAuth(configure: TokenXAuthenticatorConfig.() -> Unit = {}) {
@@ -14,7 +14,7 @@ fun Application.installTokenXAuth(configure: TokenXAuthenticatorConfig.() -> Uni
     val runtimeContext = RuntimeContext()
 
     install(Authentication) {
-        tokenX(authenticatorName, runtimeContext.verifierWrapper)
+        tokenXAccessToken(authenticatorName, runtimeContext.verifierWrapper)
     }
 }
 

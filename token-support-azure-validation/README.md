@@ -1,19 +1,19 @@
-# token-support-tokenx-validation
+# token-support-azure-validation
 
-Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens vekslet fra tokendings.
+Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens utstedt fra azure.
 
 ## Nais-yaml
 
-Bruk av biblioteket forutsetter at nais-yaml er konfigurert for tokenx:
+Bruk av biblioteket forutsetter at nais-yaml er konfigurert for azure:
 
 ```yaml
 spec:
-  tokenx:
-    enabled: true
+  azure:
+    application:
+      enabled: true
 ```
 
-
-## Oppsett 
+## Oppsett
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
@@ -26,7 +26,7 @@ Eksempel på konfigurasjon:
 ```kotlin
 fun Application.mainModule() {
 
-    installTokenXAuth {
+    installAzureAuth {
         setAsDefault = false
     }
 }
@@ -38,12 +38,12 @@ viktig å ha med navnet på autentikatoren.
 ```kotlin
 fun Application.mainModule() {
 
-    installTokenXAuth {
+    installAzureAuth {
         setAsDefault = false
     }
     
     routing {
-        authenticate(TokenXAuthenticator.name) {
+        authenticate(AzureAuthenticator.name) {
             get("/sikret") {
                 call.respond(HttpStatusCode.OK)
             }
@@ -57,7 +57,7 @@ Typisk eksempel på bruk i miljø og dette er default authenticator:
 ```kotlin
 fun Application.mainModule() {
 
-    installTokenXAuth {
+    installAzureAuth {
         setAsDefault = true
     }
     
@@ -74,28 +74,20 @@ fun Application.mainModule() {
 Alle endepunkt som er sikret på denne måten vil kreve at http-kall sender et gyldig jwt som Bearer-token
 i Authorization headeren. Cookie støttes ikke. Ugyldige kall vil alltid svares med en 401-feilkode.
 
-## TokenXUser
+## AzurePrincipal
 
-Biblioteket tilbyr også en måte å pakke ut informasjon fra en autorisert brukers token.
+Dette biblioteket er i utgangspunktet ment for bruk ved client-client kommunikasjon uten at en bruker er involvert. 
+Derfor er det ikke implementert en måte å bygge et "AzureUser" objekt, slik det er i andre moduler.
 
-Dette kan gjøres som følger:
-
-```kotlin
-authenticate(TokenXAuthenticator.name) {
-    get("/sikret") {
-        val user = TokenXUserFactory.createNewAuthenticatedUser(call)
-        call.respond("Du er logger inn som $user.")
-    }
-}
-```
+Dersom det er behov for å hente ut bestemte claims fra mottatt access token, er AzurePrincipal eksponert til brukere av biblioteket.
 
 ## Bruk av biblioteket ved lokal kjøring 
 
 Dette biblioteket forventer at følgende miljøvariabler er satt:
 
-- TOKEN_X_WELL_KNOWN_URL
-- TOKEN_X_CLIENT_ID
+- AZURE_APP_WELL_KNOWN_URL
+- AZURE_APP_CLIENT_ID
 
 Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt. 
 
-Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#runtime-variables-credentials) for nærmere forklaring.
+Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/azure-ad/index.html#runtime-variables-credentials) for nærmere forklaring.
