@@ -1,4 +1,4 @@
-# token-support-idporten
+# token-support-azure-exchange
 
 Dette biblioteket tilbyr en måte for en ktor app å hente azure access tokens ment for client-client kommunikasjon.
 
