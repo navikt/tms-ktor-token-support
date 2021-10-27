@@ -26,6 +26,7 @@ class IdportenAuthenticationConfig {
     var securityLevel: SecurityLevel = NOT_SPECIFIED
     var tokenRefreshEnabled: Boolean = false
     var tokenRefreshMarginPercentage: Int = 25
+    var enableDefaultProxy: Boolean = false
 
     val refreshTokenCookieName get() = "${tokenCookieName}_refresh_token"
     val idTokenCookieName get() = "${tokenCookieName}_id_token"

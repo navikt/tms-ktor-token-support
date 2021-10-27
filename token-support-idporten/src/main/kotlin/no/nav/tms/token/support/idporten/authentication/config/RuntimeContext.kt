@@ -26,11 +26,12 @@ internal class RuntimeContext(
         val secureCookie: Boolean,
         val postLogoutRedirectUri: String,
         val securityLevel: SecurityLevel,
-        val tokenRefreshMarginPercentage: Int
+        val tokenRefreshMarginPercentage: Int,
+        enableDefaultProxy: Boolean
 ) {
     val environment = Environment()
 
-    private val httpClient = buildHttpClient()
+    private val httpClient = buildHttpClient(enableDefaultProxy)
     val metadata = fetchMetadata(httpClient, environment.idportenWellKnownUrl)
 
     private val clientAssertionService = ClientAssertionService(environment.idportenClientJwk, environment.idportenClientId, metadata.issuer)

@@ -33,7 +33,8 @@ object IdPortenInstaller {
                 secureCookie = config.secureCookie,
                 postLogoutRedirectUri = config.postLogoutRedirectUri,
                 securityLevel = config.securityLevel,
-                tokenRefreshMarginPercentage = config.tokenRefreshMarginPercentage
+                tokenRefreshMarginPercentage = config.tokenRefreshMarginPercentage,
+                enableDefaultProxy = config.enableDefaultProxy
         )
 
         installXForwardedHeaderSupportIfMissing()

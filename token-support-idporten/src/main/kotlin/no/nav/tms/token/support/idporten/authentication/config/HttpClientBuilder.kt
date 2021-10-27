@@ -5,14 +5,20 @@ import io.ktor.client.engine.apache.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import org.apache.http.impl.conn.SystemDefaultRoutePlanner
+import java.net.ProxySelector
 
 internal object HttpClientBuilder {
-    internal fun buildHttpClient(): HttpClient {
+    internal fun buildHttpClient(enableDefaultProxy: Boolean): HttpClient {
         return HttpClient(Apache) {
             install(JsonFeature) {
                 serializer = buildJsonSerializer()
             }
             install(HttpTimeout)
+
+            if (enableDefaultProxy) {
+                enableSystemDefaultProxy()
+            }
         }
     }
 
@@ -22,5 +28,10 @@ internal object HttpClientBuilder {
             }
     )
 
+    private fun HttpClientConfig<ApacheEngineConfig>.enableSystemDefaultProxy() {
+        engine {
+            customizeClient { setRoutePlanner(SystemDefaultRoutePlanner(ProxySelector.getDefault())) }
+        }
+    }
 }
 
