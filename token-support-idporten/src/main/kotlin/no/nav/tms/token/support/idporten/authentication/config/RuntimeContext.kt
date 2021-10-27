@@ -31,7 +31,7 @@ internal class RuntimeContext(
 ) {
     val environment = Environment()
 
-    private val httpClient = buildHttpClient(enableDefaultProxy)
+    val httpClient = buildHttpClient(enableDefaultProxy)
     val metadata = fetchMetadata(httpClient, environment.idportenWellKnownUrl)
 
     private val clientAssertionService = ClientAssertionService(environment.idportenClientJwk, environment.idportenClientId, metadata.issuer)
