@@ -29,7 +29,7 @@ internal class IdportenAuthIT {
     @BeforeEach
     fun setupMock() {
         mockkObject(HttpClientBuilder)
-        every { HttpClientBuilder.buildHttpClient() } returns mockedClient
+        every { HttpClientBuilder.buildHttpClient(any()) } returns mockedClient
     }
 
     @AfterEach
