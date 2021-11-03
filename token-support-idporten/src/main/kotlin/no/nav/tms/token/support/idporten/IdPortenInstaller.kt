@@ -33,7 +33,8 @@ object IdPortenInstaller {
                 secureCookie = config.secureCookie,
                 postLogoutRedirectUri = config.postLogoutRedirectUri,
                 securityLevel = config.securityLevel,
-                tokenRefreshMarginPercentage = config.tokenRefreshMarginPercentage
+                tokenRefreshMarginPercentage = config.tokenRefreshMarginPercentage,
+                enableDefaultProxy = config.enableDefaultProxy
         )
 
         installXForwardedHeaderSupportIfMissing()
@@ -90,7 +91,7 @@ object IdPortenInstaller {
         // Register authenticator which redirects user to idporten to perform login. This should only apply to endpoints
         // 'oath2/login' and 'oath2/callback'
         oauth(Idporten.authenticatorName) {
-            client = HttpClient(Apache)
+            client = runtimeContext.httpClient
             providerLookup = { runtimeContext.oauth2ServerSettings }
             urlProvider = { runtimeContext.environment.idportenRedirectUri }
         }

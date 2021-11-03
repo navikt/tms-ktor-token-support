@@ -16,15 +16,16 @@ For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
 Her er det en rekke variabler:
 
-`tokenCookieName`: (Required) Navn på token-cookien som settes i browser etter bruker har logget inn.
-`postLogoutRedirectUri`: (Required) Bestemmer hvor bruker sendes etter de har logget ut. Denne må samsvare med nais-yaml.
-`postLoginRedirectUri`: (Optional) Url der bruker havner etter login dersom vi ikke finner en "redirect_uri" cookie. Default ""
-`setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
-`secureCookie`: (Optional) Setter token-cookie som secure, slik at den kun sendes med https-kall. Bør kun skrus av ved lokal kjøring. Default 'true'
-`alwaysRedirectToLogin`: (Optional) Bestemmer om beskyttede endepunkt kan sende bruker til ID-porten, eller om de kun svarer med status 401. Default 'false'
-`securityLevel`: (Optional) Setter minimum sikkerhetsnivå for alle innlogginger. Default 'NOT_SPECIFIED'
-`tokenRefreshEnabled`: (Optional) Bestemmer om biblioteket automatisk skal fornye brukers token når det nærmer seg å løpe ut. Default 'false'
-`tokenRefreshMarginPercentage`: (Optional) Bestemmer hvor nær et token skal være å løpe ut før det fornyes. Gis som en prosentverdi av tokenets totale levetid. Default '25'
+- `tokenCookieName`: (Required) Navn på token-cookien som settes i browser etter bruker har logget inn.
+- `postLogoutRedirectUri`: (Required) Bestemmer hvor bruker sendes etter de har logget ut. Denne må samsvare med nais-yaml.
+- `postLoginRedirectUri`: (Optional) Url der bruker havner etter login dersom vi ikke finner en "redirect_uri" cookie. Default ""
+- `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
+- `secureCookie`: (Optional) Setter token-cookie som secure, slik at den kun sendes med https-kall. Bør kun skrus av ved lokal kjøring. Default 'true'
+- `alwaysRedirectToLogin`: (Optional) Bestemmer om beskyttede endepunkt kan sende bruker til ID-porten, eller om de kun svarer med status 401. Default 'false'
+- `securityLevel`: (Optional) Setter minimum sikkerhetsnivå for alle innlogginger. Default 'NOT_SPECIFIED'
+- `tokenRefreshEnabled`: (Optional) Bestemmer om biblioteket automatisk skal fornye brukers token når det nærmer seg å løpe ut. Default 'false'
+- `tokenRefreshMarginPercentage`: (Optional) Bestemmer hvor nær et token skal være å løpe ut før det fornyes. Gis som en prosentverdi av tokenets totale levetid. Default '25'
+- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
  
 Eksempel på konfigurasjon:
 
@@ -41,6 +42,7 @@ fun Application.mainModule() {
         securityLevel = SecurityLevel.LEVEL_3
         tokenRefreshEnabled = true
         tokenRefreshMarginPercentage = 20
+        enableDefaultProxy = false
     }
 }
 ```
@@ -60,6 +62,7 @@ fun Application.mainModule() {
         securityLevel = SecurityLevel.LEVEL_3
         tokenRefreshEnabled = true
         tokenRefreshMarginPercentage = 20
+        enableDefaultProxy = false
     }
     
     routing {
