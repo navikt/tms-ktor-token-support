@@ -7,6 +7,8 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import org.apache.http.impl.conn.SystemDefaultRoutePlanner
 import java.net.ProxySelector
+import kotlinx.serialization.json.Json
+
 
 internal object HttpClientBuilder {
     internal fun buildHttpClient(enableDefaultProxy: Boolean): HttpClient {
@@ -23,9 +25,9 @@ internal object HttpClientBuilder {
     }
 
     private fun buildJsonSerializer() = KotlinxSerializer(
-            kotlinx.serialization.json.Json {
-                ignoreUnknownKeys = true
-            }
+        Json {
+            ignoreUnknownKeys = true
+        }
     )
 
     private fun HttpClientConfig<ApacheEngineConfig>.enableSystemDefaultProxy() {

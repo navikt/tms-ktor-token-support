@@ -17,10 +17,11 @@ spec:
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
-Denne har 1 variabel:
+Denne har 2 variabler:
 
-`setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
- 
+- `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
+- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
+
 Eksempel på konfigurasjon:
 
 ```kotlin

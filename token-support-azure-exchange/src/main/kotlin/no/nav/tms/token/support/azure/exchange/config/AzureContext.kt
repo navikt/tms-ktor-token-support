@@ -3,9 +3,9 @@ package no.nav.tms.token.support.azure.exchange.config
 import no.nav.tms.token.support.azure.exchange.consumer.AzureConsumer
 import no.nav.tms.token.support.azure.exchange.service.NonCachingAzureService
 
-internal class AzureContext {
+internal class AzureContext(enableDefaultProxy: Boolean) {
 
-    val httpClient = HttpClientBuilder.buildHttpClient()
+    val httpClient = HttpClientBuilder.buildHttpClient(enableDefaultProxy)
 
     val environment = Environment()
 
@@ -15,12 +15,4 @@ internal class AzureContext {
             environment.azureClientId,
             environment.azureOpenidTokenEndpoint
     )
-
-    val azureService = NonCachingAzureService(
-            azureConsumer,
-            environment.azureOpenidIssuer,
-            environment.azureClientId,
-            environment.azureJwk
-    )
-
 }

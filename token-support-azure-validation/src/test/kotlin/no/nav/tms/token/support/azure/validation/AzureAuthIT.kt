@@ -37,7 +37,7 @@ internal class AzureAuthIT {
     fun setupMock() {
         mockkObject(HttpClientBuilder)
         mockkObject(JwkProviderBuilder)
-        every { HttpClientBuilder.build() } returns mockedClient
+        every { HttpClientBuilder.build(any()) } returns mockedClient
         every { JwkProviderBuilder.createJwkProvider(any()) } returns mockedJwkProvider
     }
 
