@@ -12,7 +12,7 @@ object AzureInstaller {
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
-        val runtimeContext = RuntimeContext()
+        val runtimeContext = RuntimeContext(config.enableDefaultProxy)
 
         if (existingAuthContext == null) {
             install(Authentication) {

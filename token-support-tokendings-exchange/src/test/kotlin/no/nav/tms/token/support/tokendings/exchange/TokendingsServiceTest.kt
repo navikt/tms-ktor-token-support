@@ -171,6 +171,11 @@ internal class TokendingsServiceTest {
         val result3 = runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
         val result4 = runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
 
+        runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
+        runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
+        runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
+        runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
+
         coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target1) }
         coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target2) }
 

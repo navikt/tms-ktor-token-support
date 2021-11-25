@@ -5,10 +5,10 @@ import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.azure.validation.config.JwkProviderBuilder.createJwkProvider
 import no.nav.tms.token.support.azure.validation.intercept.TokenVerifier
 
-internal class RuntimeContext {
+internal class RuntimeContext(enableDefaultProxy: Boolean) {
     private val environment = Environment()
 
-    private val httpClient = HttpClientBuilder.build()
+    private val httpClient = HttpClientBuilder.build(enableDefaultProxy)
     private val metadata = fetchMetadata(httpClient, environment.azureWellKnownUrl)
 
     private val jwkProvider = createJwkProvider(metadata)

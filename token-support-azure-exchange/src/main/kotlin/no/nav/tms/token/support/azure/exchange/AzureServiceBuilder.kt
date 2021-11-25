@@ -6,13 +6,14 @@ import no.nav.tms.token.support.azure.exchange.service.NonCachingAzureService
 
 object AzureServiceBuilder {
 
-    private val context = AzureContext()
-
     fun buildAzureService(
             cachingEnabled: Boolean = true,
             maxCachedEntries: Long = 1000L,
-            cacheExpiryMarginSeconds: Int = 5
+            cacheExpiryMarginSeconds: Int = 5,
+            enableDefaultProxy: Boolean
     ): AzureService {
+
+        val context = AzureContext(enableDefaultProxy)
 
         if (cachingEnabled) {
             require(maxCachedEntries > 0) { "'maxCachedEntries' should be at least 1" }
@@ -20,13 +21,13 @@ object AzureServiceBuilder {
         }
 
         return if (cachingEnabled) {
-            createCachingService(maxCachedEntries, cacheExpiryMarginSeconds)
+            createCachingService(context, maxCachedEntries, cacheExpiryMarginSeconds)
         } else {
-            createNonCachingService()
+            createNonCachingService(context)
         }
     }
 
-    private fun createNonCachingService()
+    private fun createNonCachingService(context: AzureContext)
             = NonCachingAzureService(
                     azureConsumer = context.azureConsumer,
                     issuer = context.environment.azureOpenidIssuer,
@@ -34,7 +35,7 @@ object AzureServiceBuilder {
                     privateJwk = context.environment.azureJwk
             )
 
-    private fun createCachingService(maxCachedEntries: Long, cacheExpiryMarginSeconds: Int)
+    private fun createCachingService(context: AzureContext, maxCachedEntries: Long, cacheExpiryMarginSeconds: Int)
             = CachingAzureService(
                     azureConsumer = context.azureConsumer,
                     issuer = context.environment.azureOpenidIssuer,

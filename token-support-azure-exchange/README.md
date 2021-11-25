@@ -25,7 +25,9 @@ fun Application.mainModule() {
     val serviceWithCache = AzureServiceBuilder.buildAzureService(
         cachingEnabled = true,
         maxCachedEntries = 100,
-        cacheMarginSeconds = 10
+        cacheMarginSeconds = 10,
+        enableDefaultProxy = true
+
     )
    
     val serviceWithoutCache = AzureServiceBuilder.buildAzureService(
@@ -33,6 +35,8 @@ fun Application.mainModule() {
     )
 }
 ```
+
+Default proxy er nødvendig dersom appen kjører on-prem med webproxy.
 
 ### Caching
 

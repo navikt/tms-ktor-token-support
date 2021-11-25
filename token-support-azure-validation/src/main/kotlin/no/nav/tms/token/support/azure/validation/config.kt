@@ -13,6 +13,7 @@ fun Application.installAzureAuth(configure: AzureAuthenticatorConfig.() -> Unit 
 // Configuration provided by library user. See readme for example of use
 class AzureAuthenticatorConfig {
     var setAsDefault: Boolean = false
+    var enableDefaultProxy: Boolean = false
 }
 
 object AzureAuthenticator {
