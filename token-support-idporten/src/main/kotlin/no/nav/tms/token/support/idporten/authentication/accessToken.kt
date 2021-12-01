@@ -129,7 +129,7 @@ private suspend fun ApplicationCall.refreshAccessTokenCookie(refreshToken: Strin
 
         JWT.decode(result.accessToken)
     } catch (e: Exception) {
-        log.warn("Was unable to refresh access token.")
+        log.debug("Was unable to refresh access token.", e)
         null
     }
 }
