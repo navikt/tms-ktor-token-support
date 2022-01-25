@@ -54,7 +54,7 @@ private fun getLoginUrl(contextPath: String): String {
     return if (contextPath.isBlank()) {
         "/oauth2/login?redirect=/login/callback"
     } else {
-        "/$contextPath/oauth2/login?redirect=$contextPath/login/callback"
+        "/$contextPath/oauth2/login?redirect=/$contextPath/login/callback"
     }
 }
 
