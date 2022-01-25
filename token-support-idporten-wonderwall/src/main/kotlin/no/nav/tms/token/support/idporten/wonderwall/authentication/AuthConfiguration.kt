@@ -10,10 +10,10 @@ internal class AuthConfiguration(
         val fallbackTokenCookieEnabled: Boolean,
         val fallbackTokenCookieName: String
 ) {
-        val tokenVerifier = TokenVerifier(
+        val tokenVerifier = TokenVerifierBuilder.buildTokenVerifier(
                 jwkProvider = jwkProvider,
                 clientId = clientId,
                 issuer = issuer,
-                minLoginLevel = loginLevel
+                loginLevel = loginLevel
         )
 }

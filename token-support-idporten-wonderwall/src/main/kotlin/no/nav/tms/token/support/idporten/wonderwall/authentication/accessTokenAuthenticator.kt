@@ -37,6 +37,7 @@ private fun setupInterceptor(provider: AccessTokenAuthenticationProvider, config
                 context.challengeAndRespondUnauthorized()
             }
         } else {
+            log.debug("Token missing. No header or fallback cookie provided.")
             context.challengeAndRespondUnauthorized()
         }
     }
