@@ -15,7 +15,6 @@ object JwtBuilder {
         return JWTClaimsSet.Builder()
             .issuer(issuer)
             .issueTime(issueTime)
-            .notBeforeTime(issueTime)
             .expirationTime(expiryTime)
             .claim("client_id", clientId)
             .claim("acr", loginLevel)
