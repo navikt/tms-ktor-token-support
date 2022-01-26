@@ -1,3 +1,7 @@
+# Deprecated
+
+Direkteintegrasjon mot ID-porten er deprecated. Bruk token-support-idporten-sidecar i stedet.
+
 # token-support-idporten
 
 Dette biblioteket tilbyr en måte for en ktor app å autentisere en bruker mot idporten.
