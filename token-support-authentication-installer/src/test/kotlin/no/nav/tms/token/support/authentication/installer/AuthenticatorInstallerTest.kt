@@ -6,7 +6,7 @@ import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import io.mockk.verify
-import no.nav.tms.token.support.idporten.IdPortenRoutesConfig
+import no.nav.tms.token.support.idporten.sidecar.IdPortenRoutesConfig
 import org.amshove.kluent.`should throw`
 import org.amshove.kluent.invoking
 import org.junit.jupiter.api.AfterEach

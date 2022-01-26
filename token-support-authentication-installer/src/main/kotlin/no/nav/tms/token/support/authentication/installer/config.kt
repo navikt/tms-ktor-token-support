@@ -3,7 +3,7 @@ package no.nav.tms.token.support.authentication.installer
 import io.ktor.application.*
 import no.nav.tms.token.support.authentication.installer.AuthenticatorInstaller.performInstallation
 import no.nav.tms.token.support.azure.validation.AzureAuthenticatorConfig
-import no.nav.tms.token.support.idporten.IdportenAuthenticationConfig
+import no.nav.tms.token.support.idporten.sidecar.IdportenAuthenticationConfig
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticatorConfig
 
 fun Application.installAuthenticators(configure: AuthenticatorConfig.() -> Unit = {}) {

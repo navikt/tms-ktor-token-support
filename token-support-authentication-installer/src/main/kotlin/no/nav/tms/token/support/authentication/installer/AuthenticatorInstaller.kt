@@ -4,9 +4,9 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticatorConfig
 import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
-import no.nav.tms.token.support.idporten.IdPortenInstaller.performIdPortenAuthenticatorInstallation
-import no.nav.tms.token.support.idporten.IdPortenRoutesConfig
-import no.nav.tms.token.support.idporten.IdportenAuthenticationConfig
+import no.nav.tms.token.support.idporten.sidecar.IdPortenInstaller.performIdPortenAuthenticatorInstallation
+import no.nav.tms.token.support.idporten.sidecar.IdPortenRoutesConfig
+import no.nav.tms.token.support.idporten.sidecar.IdportenAuthenticationConfig
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticatorConfig
 import no.nav.tms.token.support.tokenx.validation.TokenXInstaller.performTokenXAuthenticatorInstallation
 import org.slf4j.LoggerFactory
