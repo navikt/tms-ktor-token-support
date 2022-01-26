@@ -10,8 +10,7 @@ import org.slf4j.LoggerFactory
 private val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
 
 // This method configures an authenticator which checks if an end user has hit an authenticated endpoint
-// with a valid token cookie. If the user is missing the token cookie, or the provided token is invalid, we redirect
-// the user to the endpoint 'oauth2/login', where the user will be prompted to log in through idporten
+// with a valid token. If the user is missing the token, or the provided token is invalid, we respond with http-code 401
 internal fun Authentication.Configuration.idPortenAccessToken(authenticatorName: String?, config: AuthConfiguration) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
