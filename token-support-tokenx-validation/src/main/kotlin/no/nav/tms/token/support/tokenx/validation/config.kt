@@ -2,6 +2,7 @@ package no.nav.tms.token.support.tokenx.validation
 
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.http.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
 import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken
 
@@ -33,4 +34,8 @@ class TokenXAuthenticatorConfig {
 
 object TokenXAuthenticator {
     const val name = "tokenx_bearer_access_token"
+}
+
+object TokenXHeader {
+    const val Authorization = "token-x-authorization"
 }

@@ -70,7 +70,20 @@ internal class AzureAuthIT {
     }
 
     @Test
-    fun `Should respond ok if valid bearer token is provided`()
+    fun `Should respond ok if valid bearer token is provided in azure-auth header`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(AzureHeader.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should respond ok if valid bearer token is provided in auth header`()
             = withTestApplication<Unit>({ testApi() }) {
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
@@ -80,6 +93,48 @@ internal class AzureAuthIT {
         }.response
 
         response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should prioritize well-formed azure-auth header over regular auth header`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(AzureHeader.Authorization, "Bearer $bearerToken")
+            addHeader(HttpHeaders.Authorization, "Bearer othertoken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should fall back to regular auth header if azure-auth header is malformed`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(AzureHeader.Authorization, "Malformed")
+            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should return 401 if azure token is welformed but invalid, even with valid auth token`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(AzureHeader.Authorization, "Bearer invalid")
+            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test

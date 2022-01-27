@@ -5,6 +5,7 @@ import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
+import no.nav.tms.token.support.tokenx.validation.TokenXHeader
 import org.slf4j.LoggerFactory
 
 internal fun Authentication.Configuration.tokenXAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
@@ -43,10 +44,22 @@ private fun AuthenticationContext.respondUnauthorized(message: String) {
 private val bearerRegex = "Bearer .+".toRegex()
 
 private val PipelineContext<*, ApplicationCall>.bearerToken: String? get() {
-    return call.request.headers[HttpHeaders.Authorization]
-            ?.takeIf { bearerRegex.matches(it) }
-            ?.let { it.split(" ")[1] }
+    return tokenFromTokenxHeader(call)
+        ?: tokenFromAuthHeader(call)
 }
+
+private fun tokenFromTokenxHeader(call: ApplicationCall): String? {
+    return call.request.headers[TokenXHeader.Authorization]
+        ?.takeIf { bearerRegex.matches(it) }
+        ?.let { it.split(" ")[1] }
+}
+
+private fun tokenFromAuthHeader(call: ApplicationCall): String? {
+    return call.request.headers[HttpHeaders.Authorization]
+        ?.takeIf { bearerRegex.matches(it) }
+        ?.let { it.split(" ")[1] }
+}
+
 
 private class AccessTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
 

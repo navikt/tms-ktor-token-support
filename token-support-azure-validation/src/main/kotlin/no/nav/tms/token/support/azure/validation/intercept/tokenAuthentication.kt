@@ -5,6 +5,7 @@ import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.pipeline.*
+import no.nav.tms.token.support.azure.validation.AzureHeader
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
 import org.slf4j.LoggerFactory
 
@@ -44,9 +45,20 @@ private fun AuthenticationContext.respondUnauthorized(message: String) {
 private val bearerRegex = "Bearer .+".toRegex()
 
 private val PipelineContext<*, ApplicationCall>.bearerToken: String? get() {
+    return tokenFromAzureHeader(call)
+        ?: tokenFromAuthHeader(call)
+}
+
+private fun tokenFromAzureHeader(call: ApplicationCall): String? {
+    return call.request.headers[AzureHeader.Authorization]
+        ?.takeIf { bearerRegex.matches(it) }
+        ?.let { it.split(" ")[1] }
+}
+
+private fun tokenFromAuthHeader(call: ApplicationCall): String? {
     return call.request.headers[HttpHeaders.Authorization]
-            ?.takeIf { bearerRegex.matches(it) }
-            ?.let { it.split(" ")[1] }
+        ?.takeIf { bearerRegex.matches(it) }
+        ?.let { it.split(" ")[1] }
 }
 
 private class AccessTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
