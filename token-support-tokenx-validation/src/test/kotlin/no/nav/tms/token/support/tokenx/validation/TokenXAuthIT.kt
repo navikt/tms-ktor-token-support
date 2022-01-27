@@ -82,6 +82,62 @@ internal class TokenXAuthIT {
         response.status() `should be equal to` HttpStatusCode.OK
     }
 
+
+    @Test
+    fun `Should respond ok if valid bearer token is provided in auth header`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should prioritize well-formed tokenx-auth header over regular auth header`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(TokenXHeader.Authorization, "Bearer $bearerToken")
+            addHeader(HttpHeaders.Authorization, "Bearer othertoken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should fall back to regular auth header if tokenx-auth header is malformed`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(TokenXHeader.Authorization, "Malformed")
+            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.OK
+    }
+
+    @Test
+    fun `Should return 401 if tokenx token is welformed but invalid, even with valid auth token`()
+            = withTestApplication<Unit>({ testApi() }) {
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+
+        val response = handleRequest(HttpMethod.Get, "/test") {
+            addHeader(TokenXHeader.Authorization, "Bearer invalid")
+            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }.response
+
+        response.status() `should be equal to` HttpStatusCode.Unauthorized
+    }
+
     @Test
     fun `Should respond with status 401 if bearer belongs to different app`()
             = withTestApplication<Unit>({ testApi() }) {

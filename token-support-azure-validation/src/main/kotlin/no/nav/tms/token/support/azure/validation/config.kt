@@ -19,3 +19,7 @@ class AzureAuthenticatorConfig {
 object AzureAuthenticator {
     const val name = "azure_bearer_access_token"
 }
+
+object AzureHeader {
+    const val Authorization = "azure-authorization"
+}
