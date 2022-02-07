@@ -20,7 +20,6 @@ import java.util.*
 
 internal class TokenVerifierTest {
     private val jwk = JwkBuilder.generateJwk()
-    private val clientId = "clientId"
     private val issuer = "issuer"
     private val level4 = "Level4"
 
@@ -38,7 +37,6 @@ internal class TokenVerifierTest {
     fun `Should accept valid token`() {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
-            clientId = clientId,
             issuer = issuer,
             minLoginLevel = 4
         )
@@ -47,7 +45,6 @@ internal class TokenVerifierTest {
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = issuer,
-            clientId = clientId,
             loginLevel = level4,
             rsaKey = jwk
         )
@@ -60,36 +57,9 @@ internal class TokenVerifierTest {
     }
 
     @Test
-    fun `Should not accept token with invalid client`() {
-        val verifier = TokenVerifier(
-            jwkProvider = jwkProvider,
-            clientId = clientId,
-            issuer = issuer,
-            minLoginLevel = 4
-        )
-
-
-        val token = JwtBuilder.generateJwtString(
-            issueTime = now.toDate(),
-            expiryTime = hourFromNow.toDate(),
-            issuer = issuer,
-            clientId = "invalid",
-            loginLevel = level4,
-            rsaKey = jwk
-        )
-
-        every { jwkProvider.get(any()) } returns jwk.toJwk()
-
-        invoking {
-            verifier.verifyAccessToken(token)
-        } `should throw` Exception::class
-    }
-
-    @Test
     fun `Should not accept token with invalid issuer`() {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
-            clientId = clientId,
             issuer = issuer,
             minLoginLevel = 4
         )
@@ -99,7 +69,6 @@ internal class TokenVerifierTest {
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = "invalid",
-            clientId = clientId,
             loginLevel = level4,
             rsaKey = jwk
         )
@@ -115,7 +84,6 @@ internal class TokenVerifierTest {
     fun `Should not accept expired token`() {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
-            clientId = clientId,
             issuer = issuer,
             minLoginLevel = 4
         )
@@ -125,7 +93,6 @@ internal class TokenVerifierTest {
             issueTime = now.minus(2, HOURS).toDate(),
             expiryTime = now.minus(1, HOURS).toDate(),
             issuer = issuer,
-            clientId = clientId,
             loginLevel = level4,
             rsaKey = jwk
         )
@@ -141,7 +108,6 @@ internal class TokenVerifierTest {
     fun `Should not accept token with too low login level`() {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
-            clientId = clientId,
             issuer = issuer,
             minLoginLevel = 4
         )
@@ -151,7 +117,6 @@ internal class TokenVerifierTest {
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = issuer,
-            clientId = clientId,
             loginLevel = "Level3",
             rsaKey = jwk
         )
