@@ -104,10 +104,9 @@ authenticate(IdPortenCookieAuthenticator.name) {
 
 ## Bruk av biblioteket ved lokal kjøring 
 
-Dette biblioteket forventer at følgende miljøvariabler er satt:
+Dette biblioteket forventer at følgende miljøvariabel er satt:
 
 - IDPORTEN_WELL_KNOWN_URL
-- IDPORTEN_CLIENT_ID
 
 Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt. 
 
