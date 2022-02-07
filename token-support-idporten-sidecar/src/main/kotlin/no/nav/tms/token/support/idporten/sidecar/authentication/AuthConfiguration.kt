@@ -4,7 +4,6 @@ import com.auth0.jwk.JwkProvider
 
 internal class AuthConfiguration(
         jwkProvider: JwkProvider,
-        clientId: String,
         issuer: String,
         loginLevel: Int,
         val fallbackTokenCookieEnabled: Boolean,
@@ -12,7 +11,6 @@ internal class AuthConfiguration(
 ) {
         val tokenVerifier = TokenVerifierBuilder.buildTokenVerifier(
                 jwkProvider = jwkProvider,
-                clientId = clientId,
                 issuer = issuer,
                 loginLevel = loginLevel
         )

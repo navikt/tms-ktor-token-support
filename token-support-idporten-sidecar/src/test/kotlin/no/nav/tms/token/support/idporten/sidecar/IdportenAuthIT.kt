@@ -35,7 +35,7 @@ internal class IdportenAuthIT {
     fun setupMock() {
         mockkObject(TokenVerifierBuilder)
         mockkObject(HttpClientBuilder)
-        every { TokenVerifierBuilder.buildTokenVerifier(any(), any(), any(), any()) } returns verifier
+        every { TokenVerifierBuilder.buildTokenVerifier(any(), any(), any()) } returns verifier
         every { HttpClientBuilder.buildHttpClient(any()) } returns mockedClient
     }
 

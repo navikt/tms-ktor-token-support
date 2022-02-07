@@ -28,7 +28,6 @@ internal class RuntimeContext(
 
     val authConfiguration = AuthConfiguration(
         jwkProvider = jwkProvider,
-        clientId = environment.idportenClientId,
         issuer = metadata.issuer,
         fallbackTokenCookieEnabled = fallbackTokenCookieEnabled,
         fallbackTokenCookieName = fallbackTokenCookieName,

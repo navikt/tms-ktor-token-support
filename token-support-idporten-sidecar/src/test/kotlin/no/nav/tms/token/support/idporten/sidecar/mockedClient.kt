@@ -37,7 +37,6 @@ val mockedClient = HttpClient(MockEngine) {
 
 internal val idportenMetadata = OauthServerConfigurationMetadata(
         issuer = "http://mocked-issuer/provider",
-        tokenEndpoint = "http://mocked-issuer/token",
         jwksUri = "http://mocked-issuer/jwks",
 )
 

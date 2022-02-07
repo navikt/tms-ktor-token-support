@@ -11,12 +11,11 @@ import java.util.*
 
 object JwtBuilder {
 
-    fun generateJwtString(issueTime: Date, expiryTime: Date, issuer: String, clientId: String, loginLevel: String, rsaKey: RSAKey): String {
+    fun generateJwtString(issueTime: Date, expiryTime: Date, issuer: String, loginLevel: String, rsaKey: RSAKey): String {
         return JWTClaimsSet.Builder()
             .issuer(issuer)
             .issueTime(issueTime)
             .expirationTime(expiryTime)
-            .claim("client_id", clientId)
             .claim("acr", loginLevel)
             .jwtID(UUID.randomUUID().toString())
             .build()

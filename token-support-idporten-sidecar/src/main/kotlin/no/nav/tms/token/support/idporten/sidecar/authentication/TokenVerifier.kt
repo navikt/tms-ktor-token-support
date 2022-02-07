@@ -10,7 +10,6 @@ import java.security.interfaces.RSAPublicKey
 
 internal class TokenVerifier(
         private val jwkProvider: JwkProvider,
-        private val clientId: String,
         private val issuer: String,
         private val minLoginLevel: Int
 ) {
@@ -20,7 +19,7 @@ internal class TokenVerifier(
     fun verifyAccessToken(accessToken: String): DecodedJWT {
         val decodedToken = JWT.decode(accessToken).keyId
             .let { kid -> jwkProvider.get(kid) }
-            .run { accessTokenVerifier(clientId, issuer) }
+            .run { accessTokenVerifier(issuer) }
             .run { verify(accessToken) }
 
         verifyLoginLevel(decodedToken)
@@ -28,9 +27,8 @@ internal class TokenVerifier(
         return decodedToken
     }
 
-    private fun Jwk.accessTokenVerifier(clientId: String, issuer: String): JWTVerifier =
+    private fun Jwk.accessTokenVerifier(issuer: String): JWTVerifier =
             JWT.require(this.RSA256())
-                .withClaim("client_id", clientId)
                 .withIssuer(issuer)
                 .build()
 
