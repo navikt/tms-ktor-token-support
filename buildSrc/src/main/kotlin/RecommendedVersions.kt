@@ -117,7 +117,7 @@ object Mockk {
 }
 
 object Nimbusds {
-    private const val version = "8.20"
+    private const val version = "9.19"
     private const val groupId = "com.nimbusds"
 
     const val joseJwt = "$groupId:nimbus-jose-jwt:$version"
