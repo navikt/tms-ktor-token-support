@@ -57,3 +57,5 @@ fun Application.mainModule() {
 ## Bruk av biblioteket ved lokal kjøring 
 
 Dette biblioteket krever ingen miljøvariabler. Dette biblioteket skal ikke brukes i miljø.
+
+Biblioteket legger ikke til ekstra endepunkt som f. eks. '/login'

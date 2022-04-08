@@ -2,11 +2,11 @@ package no.nav.tms.token.support.idporten.sidecar.mock.authentication
 
 import com.auth0.jwt.JWT
 import no.nav.tms.token.support.idporten.sidecar.mock.SecurityLevel
-import no.nav.tms.token.support.idporten.sidecar.mock.IdPortenAuthenticatorConfig
+import no.nav.tms.token.support.idporten.sidecar.mock.IdPortenMockedAuthenticatorConfig
 
 internal object AuthInfoValidator {
 
-    fun validateAuthInfo(config: IdPortenAuthenticatorConfig): AuthInfo {
+    fun validateAuthInfo(config: IdPortenMockedAuthenticatorConfig): AuthInfo {
         return if (config.alwaysAuthenticated) {
             when (config.staticJwtOverride) {
                 null -> validateIdentAndSecurityLevel(config)
@@ -17,7 +17,7 @@ internal object AuthInfoValidator {
         }
     }
 
-    private fun validateJwtOverride(config: IdPortenAuthenticatorConfig): AuthInfo {
+    private fun validateJwtOverride(config: IdPortenMockedAuthenticatorConfig): AuthInfo {
         val decodedJWT = JWT.decode(config.staticJwtOverride)
 
         val claims = decodedJWT.claims
@@ -35,7 +35,7 @@ internal object AuthInfoValidator {
         return AuthInfo(true, securityLevel, ident, config.staticJwtOverride)
     }
 
-    private fun validateIdentAndSecurityLevel(config: IdPortenAuthenticatorConfig): AuthInfo {
+    private fun validateIdentAndSecurityLevel(config: IdPortenMockedAuthenticatorConfig): AuthInfo {
         require(config.staticUserPid != null) { "Statisk ident må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
         require(config.staticSecurityLevel != null) { "Statisk securityLevel må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
 

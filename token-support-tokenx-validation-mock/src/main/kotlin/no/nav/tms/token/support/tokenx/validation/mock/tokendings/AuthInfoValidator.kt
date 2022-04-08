@@ -2,11 +2,11 @@ package no.nav.tms.token.support.tokenx.validation.mock.tokendings
 
 import com.auth0.jwt.JWT
 import no.nav.tms.token.support.tokenx.validation.mock.SecurityLevel
-import no.nav.tms.token.support.tokenx.validation.mock.TokenXAuthenticatorConfig
+import no.nav.tms.token.support.tokenx.validation.mock.TokenXMockedAuthenticatorConfig
 
 internal object AuthInfoValidator {
 
-    fun validateAuthInfo(config: TokenXAuthenticatorConfig): AuthInfo {
+    fun validateAuthInfo(config: TokenXMockedAuthenticatorConfig): AuthInfo {
         return if (config.alwaysAuthenticated) {
             when (config.staticJwtOverride) {
                 null -> validateIdentAndSecurityLevel(config)
@@ -17,7 +17,7 @@ internal object AuthInfoValidator {
         }
     }
 
-    private fun validateJwtOverride(config: TokenXAuthenticatorConfig): AuthInfo {
+    private fun validateJwtOverride(config: TokenXMockedAuthenticatorConfig): AuthInfo {
         val decodedJWT = JWT.decode(config.staticJwtOverride)
 
         val claims = decodedJWT.claims
@@ -35,7 +35,7 @@ internal object AuthInfoValidator {
         return AuthInfo(true, securityLevel, ident, config.staticJwtOverride)
     }
 
-    private fun validateIdentAndSecurityLevel(config: TokenXAuthenticatorConfig): AuthInfo {
+    private fun validateIdentAndSecurityLevel(config: TokenXMockedAuthenticatorConfig): AuthInfo {
         require(config.staticUserPid != null) { "Statisk ident må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
         require(config.staticSecurityLevel != null) { "Statisk securityLevel må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
 

@@ -4,12 +4,12 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenCookieAuthenticator
 import no.nav.tms.token.support.idporten.sidecar.mock.authentication.AuthInfoValidator.validateAuthInfo
-import no.nav.tms.token.support.idporten.sidecar.mock.authentication.idportenAuthMock
+import no.nav.tms.token.support.idporten.sidecar.mock.authentication.idPortenAuthMock
 
 object IdPortenMockInstaller {
     fun Application.performIdPortenMockInstallation(
-            config: IdPortenAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration? = null
+        config: IdPortenMockedAuthenticatorConfig,
+        existingAuthContext: Authentication.Configuration? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
@@ -17,10 +17,10 @@ object IdPortenMockInstaller {
 
         if (existingAuthContext == null) {
             install(Authentication) {
-                idportenAuthMock(authenticatorName, authInfo)
+                idPortenAuthMock(authenticatorName, authInfo)
             }
         } else {
-            existingAuthContext.idportenAuthMock(authenticatorName, authInfo)
+            existingAuthContext.idPortenAuthMock(authenticatorName, authInfo)
         }
     }
 

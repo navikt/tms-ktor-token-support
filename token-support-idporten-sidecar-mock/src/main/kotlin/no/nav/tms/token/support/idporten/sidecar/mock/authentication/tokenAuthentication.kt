@@ -6,7 +6,7 @@ import io.ktor.http.*
 import io.ktor.response.*
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.idportenAuthMock(authenticatorName: String?, authInfo: AuthInfo) {
+internal fun Authentication.Configuration.idPortenAuthMock(authenticatorName: String?, authInfo: AuthInfo) {
 
     val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
 

@@ -7,8 +7,8 @@ import no.nav.tms.token.support.tokenx.validation.mock.tokendings.AuthInfoValida
 import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock
 
 
-fun Application.installTokenXAuthMock(configure: TokenXAuthenticatorConfig.() -> Unit = {}) {
-    val config = TokenXAuthenticatorConfig().also(configure)
+fun Application.installTokenXAuthMock(configure: TokenXMockedAuthenticatorConfig.() -> Unit = {}) {
+    val config = TokenXMockedAuthenticatorConfig().also(configure)
 
     val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
@@ -33,7 +33,7 @@ enum class SecurityLevel(val claim: String) {
 }
 
 // Configuration provided by library user. See readme for example of use
-class TokenXAuthenticatorConfig {
+class TokenXMockedAuthenticatorConfig {
     var setAsDefault: Boolean = false
     var alwaysAuthenticated: Boolean = false
     var staticSecurityLevel: SecurityLevel? = null

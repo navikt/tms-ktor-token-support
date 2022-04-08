@@ -8,8 +8,8 @@ import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock
 
 object TokenXMockInstaller {
     fun Application.performTokenXMockInstallation(
-            config: TokenXAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration? = null
+        config: TokenXMockedAuthenticatorConfig,
+        existingAuthContext: Authentication.Configuration? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
