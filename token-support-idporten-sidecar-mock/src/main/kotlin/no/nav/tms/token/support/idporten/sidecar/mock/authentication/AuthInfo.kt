@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten.validation.mock.tokendings
+package no.nav.tms.token.support.idporten.sidecar.mock.authentication
 
 internal data class AuthInfo(
     val alwaysAuthenticated: Boolean,

@@ -1,14 +1,14 @@
-package no.nav.tms.token.support.idporten.validation.mock
+package no.nav.tms.token.support.idporten.sidecar.mock
 
 import io.ktor.application.*
 import io.ktor.auth.*
-import no.nav.tms.token.support.idporten.validation.IdportenAuthenticator
-import no.nav.tms.token.support.idporten.validation.mock.tokendings.AuthInfoValidator.validateAuthInfo
-import no.nav.tms.token.support.idporten.validation.mock.tokendings.idportenAuthMock
+import no.nav.tms.token.support.idporten.sidecar.IdPortenCookieAuthenticator
+import no.nav.tms.token.support.idporten.sidecar.mock.authentication.AuthInfoValidator.validateAuthInfo
+import no.nav.tms.token.support.idporten.sidecar.mock.authentication.idportenAuthMock
 
-object IdportenMockInstaller {
-    fun Application.performIdportenMockInstallation(
-            config: IdportenAuthenticatorConfig,
+object IdPortenMockInstaller {
+    fun Application.performIdPortenMockInstallation(
+            config: IdPortenAuthenticatorConfig,
             existingAuthContext: Authentication.Configuration? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
@@ -28,7 +28,7 @@ object IdportenMockInstaller {
         return if (isDefault) {
             null
         } else {
-            IdportenAuthenticator.name
+            IdPortenCookieAuthenticator.name
         }
     }
 }

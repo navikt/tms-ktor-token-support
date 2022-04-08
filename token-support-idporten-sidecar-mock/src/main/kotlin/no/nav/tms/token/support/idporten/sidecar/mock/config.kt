@@ -1,14 +1,14 @@
-package no.nav.tms.token.support.idporten.validation.mock
+package no.nav.tms.token.support.idporten.sidecar.mock
 
 import io.ktor.application.*
 import io.ktor.auth.*
-import no.nav.tms.token.support.idporten.validation.IdportenAuthenticator
-import no.nav.tms.token.support.idporten.validation.mock.tokendings.AuthInfoValidator
-import no.nav.tms.token.support.idporten.validation.mock.tokendings.idportenAuthMock
+import no.nav.tms.token.support.idporten.sidecar.IdPortenCookieAuthenticator
+import no.nav.tms.token.support.idporten.sidecar.mock.authentication.AuthInfoValidator
+import no.nav.tms.token.support.idporten.sidecar.mock.authentication.idportenAuthMock
 
 
-fun Application.installIdportenAuthMock(configure: IdportenAuthenticatorConfig.() -> Unit = {}) {
-    val config = IdportenAuthenticatorConfig().also(configure)
+fun Application.installIdPortenAuthMock(configure: IdPortenAuthenticatorConfig.() -> Unit = {}) {
+    val config = IdPortenAuthenticatorConfig().also(configure)
 
     val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
@@ -23,7 +23,7 @@ private fun getAuthenticatorName(isDefault: Boolean): String? {
     return if (isDefault) {
         null
     } else {
-        IdportenAuthenticator.name
+        IdPortenCookieAuthenticator.name
     }
 }
 
@@ -33,7 +33,7 @@ enum class SecurityLevel(val claim: String) {
 }
 
 // Configuration provided by library user. See readme for example of use
-class IdportenAuthenticatorConfig {
+class IdPortenAuthenticatorConfig {
     var setAsDefault: Boolean = false
     var alwaysAuthenticated: Boolean = false
     var staticSecurityLevel: SecurityLevel? = null

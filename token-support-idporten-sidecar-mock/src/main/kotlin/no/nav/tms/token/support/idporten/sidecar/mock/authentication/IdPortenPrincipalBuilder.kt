@@ -1,23 +1,23 @@
-package no.nav.tms.token.support.idporten.validation.mock.tokendings
+package no.nav.tms.token.support.idporten.sidecar.mock.authentication
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.nimbusds.jwt.JWTClaimsSet
-import no.nav.tms.token.support.idporten.validation.tokendings.IdportenPrincipal
+import no.nav.tms.token.support.idporten.sidecar.authentication.IdPortenTokenPrincipal
 import java.time.Instant
 import java.time.temporal.ChronoUnit.HOURS
 import java.util.*
 
-internal object IdportenPrincipalBuilder {
+internal object IdPortenPrincipalBuilder {
 
-    fun createPrincipal(authInfo: AuthInfo): IdportenPrincipal {
+    fun createPrincipal(authInfo: AuthInfo): IdPortenTokenPrincipal {
         val decodedJWT = if (authInfo.jwtOverride != null) {
             JWT.decode(authInfo.jwtOverride)
         } else {
             buildJwt(authInfo.securityLevel!!, authInfo.ident!!)
         }
 
-        return IdportenPrincipal(decodedJWT)
+        return IdPortenTokenPrincipal(decodedJWT)
     }
 
     private fun buildJwt(securityLevel: String, ident: String): DecodedJWT {

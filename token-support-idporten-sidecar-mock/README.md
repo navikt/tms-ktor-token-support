@@ -25,7 +25,7 @@ Eksempel på konfigurasjon:
 ```kotlin
 fun Application.mainModule() {
 
-    installIdportenAuthMock {
+    installIdPortenAuthMock {
         setAsDefault = false
         alwaysAuthenticated = true
         staticSecurityLevel = LEVEL_4
@@ -40,12 +40,12 @@ viktig å ha med navnet på autentikatoren.
 ```kotlin
 fun Application.mainModule() {
 
-    installIdportenAuth {
+    installIdPortenAuth {
         setAsDefault = false
     }
     
     routing {
-        authenticate(IdportenAuthenticator.name) {
+        authenticate(IdPortenAuthenticator.name) {
             get("/sikret") {
                 call.respond(HttpStatusCode.OK)
             }

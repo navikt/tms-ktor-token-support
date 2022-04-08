@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     `maven-publish`
     `java-library`
@@ -7,7 +9,7 @@ plugins {
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
-    implementation(project(":token-support-idporten-validation"))
+    implementation(project(":token-support-idporten-sidecar"))
     implementation(Logback.classic)
     implementation(Kotlin.reflect)
     implementation(Ktor.auth)
@@ -50,14 +52,11 @@ publishing {
     }
 }
 
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
+}
 
 tasks {
-    compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
-    }
 
     withType<Test> {
         useJUnitPlatform()
