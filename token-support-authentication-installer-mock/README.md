@@ -11,18 +11,18 @@ autentikatorer som skal installeres.
 
 ## Oppsett
 
-Biblioteket tilbyr en funksjon `Application.installAuthenticators` lar en installere autentikatorer slik det gjøres 
+Biblioteket tilbyr en funksjon `Application.installMockedAuthenticators` lar en installere autentikatorer slik det gjøres 
 i andre moduler:
 
 ```kotlin
 fun Application.mainModule() {
-    
-    installMockAuthenticators {
-        installIdPortenAuth {
+
+    installMockedAuthenticators {
+        installIdPortenAuthMock {
             ...
         }
 
-        installTokenXAuth {
+        installTokenXAuthMock {
             ...
         }
     }
@@ -100,5 +100,4 @@ fun Application.mainModule() {
 
 ## Bruk av biblioteket ved lokal kjøring 
 
-Denne modulen krever ingen ting ekstra for å kunne kjøres lokalt. Referer til README for autentikatorer som skal 
-installeres for mer info.
+Som andre mock-moduler skal denne ikke kjøres i miljø.

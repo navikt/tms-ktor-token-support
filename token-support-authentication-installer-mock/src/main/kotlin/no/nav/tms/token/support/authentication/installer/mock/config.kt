@@ -6,7 +6,7 @@ import no.nav.tms.token.support.azure.validation.mock.AzureMockedAuthenticatorCo
 import no.nav.tms.token.support.idporten.sidecar.mock.IdPortenMockedAuthenticatorConfig
 import no.nav.tms.token.support.tokenx.validation.mock.TokenXMockedAuthenticatorConfig
 
-fun Application.installAuthenticators(configure: MockedAuthenticatorConfig.() -> Unit = {}) {
+fun Application.installMockedAuthenticators(configure: MockedAuthenticatorConfig.() -> Unit = {}) {
     val config = MockedAuthenticatorConfig().also(configure)
 
     performInstallation(config)
