@@ -1,7 +1,6 @@
 # token-support-authentication-installer
 
-Denne modulen tilbyr en måte å installere flere av bibliotekets autentikatorer i parallell. Det er ikke nødvendig å 
-bruke denne modulen dersom en kun ønsker å installere én autentikator.
+Denne modulen tilbyr en måte å installere flere av bibliotekets autentikator-mocks i parallell.
 
 
 ## Nais-yaml
@@ -35,11 +34,11 @@ Dette gjør det mulig å velge autentikator for beskyttede endepunkt som følger
 fun Application.mainModule() {
 
     installAuthenticators {
-        installIdPortenAuth {
+        installIdPortenAuthMock {
             ...
         }
 
-        installTokenXAuth {
+        installTokenXAuthMock {
             ...
         }
     }
@@ -72,12 +71,12 @@ Eksempel for oppsett og bruk:
 fun Application.mainModule() {
 
     installAuthenticators {
-        installIdPortenAuth {
+        installIdPortenAuthMock {
             ...
             setAsDefault = true
         }
 
-        installTokenXAuth {
+        installTokenXAuthMock {
             ...
         }
     }
