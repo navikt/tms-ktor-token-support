@@ -1,3 +1,5 @@
+[![](https://jitpack.io/v/navikt/tms-ktor-token-support.svg)](https://jitpack.io/#navikt/tms-ktor-token-support)
+
 # tms-ktor-token-support
 
 ## Henvendelser
