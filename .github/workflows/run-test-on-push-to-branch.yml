@@ -6,12 +6,17 @@ on:
       - main
 
 jobs:
-  build-and-create-release-on-main:
+  build-and-run-tests-on-other-branches:
     runs-on: ubuntu-latest
     steps:
 
       - name: Sjekk ut koden
         uses: actions/checkout@v2
+
+      - name: Setup java
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17.x'
 
       - name: Kompiler og kjør tester
         run: ./gradlew clean build
