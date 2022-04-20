@@ -13,7 +13,7 @@ internal object AuthInfoValidator {
                 else -> validateJwtOverride(config)
             }
         } else {
-            AuthInfo(true, null, null, null)
+            AuthInfo(false, null, null, null)
         }
     }
 

@@ -112,7 +112,7 @@ object Logback {
 }
 
 object Mockk {
-    private const val version = "1.10.0"
+    private const val version = "1.12.3"
     const val mockk = "io.mockk:mockk:$version"
 }
 

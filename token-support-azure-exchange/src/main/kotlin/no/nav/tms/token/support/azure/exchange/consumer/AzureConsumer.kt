@@ -19,14 +19,14 @@ internal class AzureConsumer(
     suspend fun fetchToken(clientAssertion: String, targetApp: String): AzureTokenResponse {
 
         return withContext(Dispatchers.IO) {
-            val urlParameters = ParametersBuilder().apply {
-                append("tenant", tentantId)
-                append("client_id", clientId)
-                append("scope", "api://$targetApp/.default")
-                append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
-                append("client_assertion", clientAssertion)
-                append("grant_type", "client_credentials")
-            }.build()
+            val urlParameters = listOf (
+                "tenant" to tentantId,
+                "client_id" to clientId,
+                "scope" to "api://$targetApp/.default",
+                "client_assertion_type" to "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion" to clientAssertion,
+                "grant_type" to "client_credentials"
+            )
 
             httpClient.post {
                 url(endpoint)

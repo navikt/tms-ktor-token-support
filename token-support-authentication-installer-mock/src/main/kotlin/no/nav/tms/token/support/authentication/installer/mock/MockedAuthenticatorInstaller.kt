@@ -26,19 +26,19 @@ internal object MockedAuthenticatorInstaller {
             val authContext = this
 
             if (idPortenConfig != null) {
-                InstallerProxy.invokeIdPortenInstaller(application, idPortenConfig, authContext)
+                MockedInstallerProxy.invokeIdPortenMockInstaller(application, idPortenConfig, authContext)
             }
 
             val tokenXConfig = config.tokenXConfig
 
             if (tokenXConfig != null) {
-                InstallerProxy.invokeTokenXInstaller(application, tokenXConfig, authContext)
+                MockedInstallerProxy.invokeTokenXMockInstaller(application, tokenXConfig, authContext)
             }
 
             val azureConfig = config.azureConfig
 
             if (azureConfig != null) {
-                InstallerProxy.invokeAzureInstaller(application, azureConfig, authContext)
+                MockedInstallerProxy.invokeAzureMockInstaller(application, azureConfig, authContext)
             }
         }
     }
@@ -63,8 +63,8 @@ internal object MockedAuthenticatorInstaller {
 }
 
 // The primary purpose of this simple proxy is to enable testing without compromising on legibility too much
-internal object InstallerProxy {
-    internal fun invokeIdPortenInstaller(
+internal object MockedInstallerProxy {
+    internal fun invokeIdPortenMockInstaller(
             application: Application,
             idPortenConfig: IdPortenMockedAuthenticatorConfig,
             existingAuthContext: Authentication.Configuration) {
@@ -72,7 +72,7 @@ internal object InstallerProxy {
         return application.performIdPortenMockInstallation(idPortenConfig, existingAuthContext)
     }
 
-    internal fun invokeTokenXInstaller(
+    internal fun invokeTokenXMockInstaller(
             application: Application,
             tokenXConfig: TokenXMockedAuthenticatorConfig,
             existingAuthContext: Authentication.Configuration) {
@@ -80,7 +80,7 @@ internal object InstallerProxy {
         application.performTokenXMockInstallation(tokenXConfig, existingAuthContext)
     }
 
-    internal fun invokeAzureInstaller(
+    internal fun invokeAzureMockInstaller(
             application: Application,
             azureConfig: AzureMockedAuthenticatorConfig,
             existingAuthContext: Authentication.Configuration) {
