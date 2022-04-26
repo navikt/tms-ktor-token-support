@@ -1,5 +1,4 @@
 rootProject.name = "tms-ktor-token-support"
-include("token-support-idporten")
 include("token-support-idporten-sidecar")
 include("token-support-idporten-sidecar-mock")
 include("token-support-tokendings-exchange")
