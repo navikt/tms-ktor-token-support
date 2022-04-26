@@ -70,7 +70,7 @@ object Kluent {
 }
 
 object Kotlin {
-    const val version = "1.4.10"
+    const val version = "1.6.20"
     private const val groupId = "org.jetbrains.kotlin"
 
     const val reflect = "$groupId:kotlin-reflect:$version"
@@ -112,7 +112,7 @@ object Logback {
 }
 
 object Mockk {
-    private const val version = "1.10.0"
+    private const val version = "1.12.3"
     const val mockk = "io.mockk:mockk:$version"
 }
 

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test
 
 internal class AzureServiceTest {
 
-    private val azureConsumer = mockk<AzureConsumer>()
+    private val azureConsumer: AzureConsumer = mockk()
     private val jwtAudience = "https://azure.url/token"
     private val clientId = "cluster.namespace.thisApi"
     private val privateJwk = JwkBuilder.generateJwk()
@@ -25,7 +25,6 @@ internal class AzureServiceTest {
     @AfterEach
     fun cleanup() {
         clearMocks(azureConsumer)
-
     }
 
     @Test

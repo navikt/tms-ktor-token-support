@@ -17,14 +17,14 @@ internal class TokendingsConsumer(
     suspend fun exchangeToken(subjectToken: String, clientAssertion: String, audience: String): TokendingsTokenResponse {
 
         return withContext(Dispatchers.IO) {
-            val urlParameters = ParametersBuilder().apply {
-                append("grant_type", "urn:ietf:params:oauth:grant-type:token-exchange")
-                append("client_assertion_type", "urn:ietf:params:oauth:client-assertion-type:jwt-bearer")
-                append("client_assertion", clientAssertion)
-                append("subject_token_type", "urn:ietf:params:oauth:token-type:jwt")
-                append("subject_token", subjectToken)
-                append("audience", audience)
-            }.build()
+            val urlParameters = listOf(
+                "grant_type" to "urn:ietf:params:oauth:grant-type:token-exchange",
+                "client_assertion_type" to "urn:ietf:params:oauth:client-assertion-type:jwt-bearer",
+                "client_assertion" to clientAssertion,
+                "subject_token_type" to "urn:ietf:params:oauth:token-type:jwt",
+                "subject_token" to subjectToken,
+                "audience" to audience
+            )
 
             httpClient.post {
                 url(endpoint)
