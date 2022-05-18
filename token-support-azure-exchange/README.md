@@ -61,12 +61,12 @@ Caching gjøres med clientnavn på målapp som nøkkel.
 Eksempel på tokenveksling for å nå en app i samme cluster og namespace:
 
 ```kotlin
-fun getTokenForOtherApi(subjectToken: String): String {
+fun getTokenForOtherApi(): String {
     val appName = "cluster.namespace.other-api"
 
     val azureService = AzureServiceBuilder.buildAzureService()
    
-    return azureService.exchangeToken(subjectToken, appName)
+    return azureService.exchangeToken(appName)
 }
 ```
 
