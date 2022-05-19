@@ -10,7 +10,7 @@ object AzureServiceBuilder {
             cachingEnabled: Boolean = true,
             maxCachedEntries: Long = 1000L,
             cacheExpiryMarginSeconds: Int = 5,
-            enableDefaultProxy: Boolean
+            enableDefaultProxy: Boolean = false
     ): AzureService {
 
         val context = AzureContext(enableDefaultProxy)

@@ -47,6 +47,7 @@ Default instillinger i `AzureServiceBuilder` er som følger:
 cachingEnabled = true
 maxCachedEntries = 1000
 cacheMarginSeconds = 5
+enableDefaultProxy = false
 ```
 
 `cacheMarginSeconds` bestemmer hvor lenge før access-tokenet egentlig utløper at vi invaliderer det fra cachen, for 
