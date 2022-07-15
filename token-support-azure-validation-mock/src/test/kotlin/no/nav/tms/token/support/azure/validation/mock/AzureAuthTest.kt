@@ -1,10 +1,12 @@
 package no.nav.tms.token.support.azure.validation.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticator
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
@@ -17,64 +19,72 @@ internal class AzureAuthTest {
     private val jwtOverrideString = jwtOverride.token
 
     @Test
-    fun `Should respond with status 401 if alwaysAuthenticated is false`() = withTestApplication<Unit>({
-        testApi {
-            installAzureAuthMock {
-                alwaysAuthenticated = false
+    fun `Should respond with status 401 if alwaysAuthenticated is false`() = testApplication {
+
+        application {
+            testApi {
+                installAzureAuthMock {
+                    alwaysAuthenticated = false
+                }
             }
         }
-    }) {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        val response = client.get("/test")
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
+        response.status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
-    fun `Should respond ok if alwaysAuthenticated is true and principal info is defined`() = withTestApplication<Unit>({
-        testApi {
-            installAzureAuthMock {
-                alwaysAuthenticated = true
-                staticJwtOverride = jwtOverrideString
+    fun `Should respond ok if alwaysAuthenticated is true and principal info is defined`() = testApplication {
+
+        application {
+            testApi {
+                installAzureAuthMock {
+                    alwaysAuthenticated = true
+                    staticJwtOverride = jwtOverrideString
+                }
             }
         }
-    }) {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        val response = client.get("/test")
 
-        response.status() `should be equal to` HttpStatusCode.OK
-        response.content `should be equal to` jwtOverrideString
+        response.status `should be equal to` HttpStatusCode.OK
+        response.body<String>() `should be equal to` jwtOverrideString
     }
 
     @Test
-    fun `Should provide stub jwt if override was not specified`() = withTestApplication<Unit>({
-        testApi {
-            installAzureAuthMock {
-                alwaysAuthenticated = true
-                staticJwtOverride = null
+    fun `Should provide stub jwt if override was not specified`() = testApplication {
+
+        application {
+            testApi {
+                installAzureAuthMock {
+                    alwaysAuthenticated = true
+                    staticJwtOverride = null
+                }
             }
         }
-    }) {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        val response = client.get("/test")
 
-        response.status() `should be equal to` HttpStatusCode.OK
-        response.content?.isNotBlank() `should be equal to` true
+        response.status `should be equal to` HttpStatusCode.OK
+        response.body<String>().isNotBlank() `should be equal to` true
     }
 
     @Test
-    fun `Should enable setting authenticator as default`() = withTestApplication<Unit>({
-        testApiWithDefault {
-            installAzureAuthMock {
-                setAsDefault = true
-                alwaysAuthenticated = false
+    fun `Should enable setting authenticator as default`() = testApplication {
+
+        application {
+            testApiWithDefault {
+                installAzureAuthMock {
+                    setAsDefault = true
+                    alwaysAuthenticated = false
+                }
             }
         }
-    }) {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        val response = client.get("/test")
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
+        response.status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     private fun Application.testApi(authConfig: Application.() -> Unit) {

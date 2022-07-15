@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.authentication.installer.mock
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import no.nav.tms.token.support.authentication.installer.mock.MockedAuthenticatorInstaller.performInstallation
 import no.nav.tms.token.support.azure.validation.mock.AzureMockedAuthenticatorConfig
 import no.nav.tms.token.support.idporten.sidecar.mock.IdPortenMockedAuthenticatorConfig

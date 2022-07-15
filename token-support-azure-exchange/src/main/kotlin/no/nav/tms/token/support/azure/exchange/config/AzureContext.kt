@@ -1,7 +1,6 @@
 package no.nav.tms.token.support.azure.exchange.config
 
 import no.nav.tms.token.support.azure.exchange.consumer.AzureConsumer
-import no.nav.tms.token.support.azure.exchange.service.NonCachingAzureService
 
 internal class AzureContext(enableDefaultProxy: Boolean) {
 

@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.idporten.sidecar
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenInstaller.performIdPortenAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.sidecar.LoginLevel.LEVEL_4
 

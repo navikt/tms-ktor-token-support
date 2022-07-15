@@ -2,11 +2,13 @@ package no.nav.tms.token.support.tokenx.validation
 
 
 import io.kotest.extensions.system.withEnvironment
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
@@ -48,152 +50,185 @@ internal class TokenXAuthIT {
     }
 
     @Test
-    fun `Should respond with status 401 if no bearer token was provided`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond with status 401 if no bearer token was provided`() = testApplication {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        application {
+            testApi()
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "No bearer token found."
+        val response = client.get("/test")
+
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "No bearer token found."
     }
 
     @Test
-    fun `Should respond with status 401 if bearer token is malformed`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond with status 401 if bearer token is malformed`() = testApplication {
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer <dummy>")
-        }.response
+        application {
+            testApi()
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "Invalid or expired token."
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer <dummy>")
+        }
+
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "Invalid or expired token."
     }
 
     @Test
-    fun `Should respond ok if valid bearer token is provided`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond ok if valid bearer token is provided`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.OK
+        response.status `should be equal to` HttpStatusCode.OK
     }
 
 
     @Test
-    fun `Should respond ok if valid bearer token is provided in auth header`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond ok if valid bearer token is provided in auth header`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.OK
+        response.status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
-    fun `Should prioritize well-formed tokenx-auth header over regular auth header`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should prioritize well-formed tokenx-auth header over regular auth header`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(TokenXHeader.Authorization, "Bearer $bearerToken")
-            addHeader(HttpHeaders.Authorization, "Bearer othertoken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(TokenXHeader.Authorization, "Bearer $bearerToken")
+            headers.append(HttpHeaders.Authorization, "Bearer othertoken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.OK
+        response.status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
-    fun `Should fall back to regular auth header if tokenx-auth header is malformed`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should fall back to regular auth header if tokenx-auth header is malformed`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(TokenXHeader.Authorization, "Malformed")
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(TokenXHeader.Authorization, "Malformed")
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.OK
+        response.status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
-    fun `Should return 401 if tokenx token is welformed but invalid, even with valid auth token`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should return 401 if tokenx token is welformed but invalid, even with valid auth token`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(TokenXHeader.Authorization, "Bearer invalid")
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(TokenXHeader.Authorization, "Bearer invalid")
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
+        response.status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
-    fun `Should respond with status 401 if bearer belongs to different app`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond with status 401 if bearer belongs to different app`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val targetApp = "cluster:namespace:otherApp"
 
         val bearerToken = JwtBuilder.generateJwtString(targetApp, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "Invalid or expired token."
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "Invalid or expired token."
     }
 
     @Test
-    fun `Should respond with status 401 if bearer token has unexpected issuer`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond with status 401 if bearer token has unexpected issuer`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val differentIssuer = "http://different-issuer/provider"
 
         val bearerToken = JwtBuilder.generateJwtString(clientId, differentIssuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "Invalid or expired token."
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "Invalid or expired token."
     }
 
     @Test
-    fun `Should respond with status 401 if bearer token is expired`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond with status 401 if bearer token is expired`() = testApplication {
+
+        application {
+            testApi()
+        }
 
         val targetApp = "cluster:namespace:otherApp"
 
         val bearerToken = JwtBuilder.generateJwtString(targetApp, idportenMetadata.issuer, privateJwk)
 
-        val response = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Authorization, "Bearer $bearerToken")
-        }.response
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "Invalid or expired token."
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "Invalid or expired token."
     }
 
     @Test
-    fun `Should enable setting authenticator as default`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
+    fun `Should enable setting authenticator as default`() = testApplication {
 
-        val response = handleRequest(HttpMethod.Get, "/test").response
+        application {
+            testApiWithDefault()
+        }
 
-        response.status() `should be equal to` HttpStatusCode.Unauthorized
-        response.content `should be equal to` "No bearer token found."
+        val response = client.get("/test")
+
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.body<String>() `should be equal to` "No bearer token found."
     }
 
     private fun Application.testApi() = withEnvironment(envVars) {

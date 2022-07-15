@@ -2,20 +2,18 @@ package no.nav.tms.token.support.idporten.sidecar
 
 import io.ktor.client.*
 import io.ktor.client.engine.mock.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.OK
-import io.ktor.util.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.encodeToString
-import no.nav.tms.token.support.idporten.sidecar.ObjectMapper.objectMapper
+import no.nav.tms.token.support.idporten.sidecar.ObjectMapper.kotlinxMapper
 import no.nav.tms.token.support.idporten.sidecar.authentication.OauthServerConfigurationMetadata
 
 
-@KtorExperimentalAPI
 val mockedClient = HttpClient(MockEngine) {
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(objectMapper)
+    install(ContentNegotiation) {
+        json(kotlinxMapper)
     }
 
     engine {
@@ -41,7 +39,7 @@ internal val idportenMetadata = OauthServerConfigurationMetadata(
 )
 
 private val metadataJson: String = idportenMetadata.let { metadata ->
-    objectMapper.encodeToString(metadata)
+    kotlinxMapper.encodeToString(metadata)
 }
 
 private val Url.hostWithPortIfRequired: String get() = if (port == protocol.defaultPort) host else hostWithPort

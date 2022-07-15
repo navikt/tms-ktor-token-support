@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.tokenx.validation.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticator
 import no.nav.tms.token.support.tokenx.validation.mock.tokendings.AuthInfoValidator.validateAuthInfo
 import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock
@@ -9,7 +9,7 @@ import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock
 object TokenXMockInstaller {
     fun Application.performTokenXMockInstallation(
         config: TokenXMockedAuthenticatorConfig,
-        existingAuthContext: Authentication.Configuration? = null
+        existingAuthContext: AuthenticationConfig? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 

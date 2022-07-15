@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":token-support-azure-validation"))
     implementation(project(":token-support-tokenx-validation"))
     implementation(project(":token-support-idporten-sidecar"))
-    implementation(Ktor.auth)
+    implementation(Ktor.serverAuth)
     testImplementation(kotlin("test-junit5"))
     testImplementation(Jjwt.api)
     testImplementation(Jjwt.impl)

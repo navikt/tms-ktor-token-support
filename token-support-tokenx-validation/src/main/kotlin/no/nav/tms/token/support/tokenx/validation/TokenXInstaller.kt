@@ -1,14 +1,14 @@
 package no.nav.tms.token.support.tokenx.validation
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
 import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken
 
 object TokenXInstaller {
     fun Application.performTokenXAuthenticatorInstallation(
             config: TokenXAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration? = null
+            existingAuthContext: AuthenticationConfig? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 

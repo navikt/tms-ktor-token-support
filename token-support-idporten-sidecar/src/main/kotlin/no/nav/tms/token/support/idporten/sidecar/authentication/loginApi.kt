@@ -1,9 +1,9 @@
 package no.nav.tms.token.support.idporten.sidecar.authentication
 
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.ktor.application.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import no.nav.tms.token.support.idporten.sidecar.authentication.config.Idporten
 import no.nav.tms.token.support.idporten.sidecar.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory

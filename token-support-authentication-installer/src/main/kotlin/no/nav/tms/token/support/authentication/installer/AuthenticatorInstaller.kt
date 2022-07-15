@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.authentication.installer
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticatorConfig
 import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.sidecar.IdPortenInstaller.performIdPortenAuthenticatorInstallation
@@ -76,7 +76,7 @@ internal object InstallerProxy {
     internal fun invokeIdPortenInstaller(
             application: Application,
             idPortenConfig: IdportenAuthenticationConfig,
-            existingAuthContext: Authentication.Configuration): IdPortenRoutesConfig {
+            existingAuthContext: AuthenticationConfig): IdPortenRoutesConfig {
 
         return application.performIdPortenAuthenticatorInstallation(idPortenConfig, existingAuthContext)
     }
@@ -84,7 +84,7 @@ internal object InstallerProxy {
     internal fun invokeTokenXInstaller(
             application: Application,
             tokenXConfig: TokenXAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration) {
+            existingAuthContext: AuthenticationConfig) {
 
         application.performTokenXAuthenticatorInstallation(tokenXConfig, existingAuthContext)
     }
@@ -92,7 +92,7 @@ internal object InstallerProxy {
     internal fun invokeAzureInstaller(
             application: Application,
             azureConfig: AzureAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration) {
+            existingAuthContext: AuthenticationConfig) {
 
         application.performAzureAuthenticatorInstallation(azureConfig, existingAuthContext)
     }
