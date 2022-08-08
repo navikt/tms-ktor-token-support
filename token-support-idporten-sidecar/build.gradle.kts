@@ -10,7 +10,6 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
-    implementation(Kotlin.reflect)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)
     implementation(Ktor.clientApache)
@@ -18,16 +17,10 @@ dependencies {
     implementation(Ktor.serialization)
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.serializationKotlinxJson)
-    implementation(Ktor.clientSerializationJvm)
     implementation(Ktor.serverForwardedHeaders)
     implementation(Ktor.serverNetty)
-    implementation(Nimbusds.joseJwt)
     implementation(Nimbusds.oauth2OidcSdk)
     testImplementation(kotlin("test-junit5"))
-    testImplementation(Jjwt.api)
-    testImplementation(Jjwt.impl)
-    testImplementation(Jjwt.jackson)
-    testImplementation(Junit.engine)
     testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
@@ -35,6 +28,7 @@ dependencies {
     testImplementation(Kotest.runnerJunit)
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.extensions)
+    testImplementation(Nimbusds.joseJwt)
 }
 
 repositories {
