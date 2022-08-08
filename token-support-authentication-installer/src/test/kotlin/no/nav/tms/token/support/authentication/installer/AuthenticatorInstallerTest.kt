@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.authentication.installer
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
@@ -36,7 +36,11 @@ internal class AuthenticatorInstallerTest {
             }
         }
 
-        withTestApplication({ setup() }, {})
+        testApplication {
+            application {
+                setup()
+            }
+        }
 
         verify(exactly = 1) { InstallerProxy.invokeIdPortenInstaller(any(), any(), any()) }
         verify(exactly = 0) { InstallerProxy.invokeTokenXInstaller(any(), any(), any()) }
@@ -53,7 +57,11 @@ internal class AuthenticatorInstallerTest {
             }
         }
 
-        withTestApplication({ setup() }, {})
+        testApplication {
+            application {
+                setup()
+            }
+        }
 
         verify(exactly = 0) { InstallerProxy.invokeIdPortenInstaller(any(), any(), any()) }
         verify(exactly = 1) { InstallerProxy.invokeTokenXInstaller(any(), any(), any()) }
@@ -70,7 +78,11 @@ internal class AuthenticatorInstallerTest {
             }
         }
 
-        withTestApplication({ setup() }, {})
+        testApplication {
+            application {
+                setup()
+            }
+        }
 
         verify(exactly = 0) { InstallerProxy.invokeIdPortenInstaller(any(), any(), any()) }
         verify(exactly = 0) { InstallerProxy.invokeTokenXInstaller(any(), any(), any()) }
@@ -91,7 +103,11 @@ internal class AuthenticatorInstallerTest {
             }
         }
 
-        withTestApplication({ setup() }, {})
+        testApplication {
+            application {
+                setup()
+            }
+        }
 
         verify(exactly = 1) { InstallerProxy.invokeIdPortenInstaller(any(), any(), any()) }
         verify(exactly = 1) { InstallerProxy.invokeTokenXInstaller(any(), any(), any()) }
@@ -112,7 +128,11 @@ internal class AuthenticatorInstallerTest {
             }
         }
 
-        withTestApplication({ setup() }, {})
+        testApplication {
+            application {
+                setup()
+            }
+        }
     }
 
     @Test
@@ -130,7 +150,11 @@ internal class AuthenticatorInstallerTest {
         }
 
         invoking {
-            withTestApplication({ setup() }, {})
+            testApplication {
+                application {
+                    setup()
+                }
+            }
         } `should throw` IllegalArgumentException::class
     }
 }

@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.idporten.sidecar.authentication
 
 import io.ktor.http.*
-import io.ktor.request.*
+import io.ktor.server.request.*
 
 internal fun fetchAccessToken(request: ApplicationRequest, config: AuthConfiguration): String? {
     val token = request.bearerToken

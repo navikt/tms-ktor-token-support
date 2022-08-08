@@ -1,6 +1,7 @@
 package no.nav.tms.token.support.azure.exchange.consumer
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -30,8 +31,8 @@ internal class AzureConsumer(
 
             httpClient.post {
                 url(endpoint)
-                body = TextContent(urlParameters.formUrlEncode(), ContentType.Application.FormUrlEncoded)
-            }
+                setBody(TextContent(urlParameters.formUrlEncode(), ContentType.Application.FormUrlEncoded))
+            }.body()
         }
     }
 }

@@ -74,6 +74,9 @@ fun Application.mainModule() {
 Alle endepunkt som er sikret på denne måten vil kreve at http-kall sender et gyldig jwt som Bearer-token
 i Authorization headeren. Cookie støttes ikke. Ugyldige kall vil alltid svares med en 401-feilkode.
 
+Validatoren sjekker egen header "token-x-authorization" før vanlig Authorization-header. Dersom idporten-sidecar 
+er aktivert i den autentiserte appen er det nødvendig å sende token i denne headeren.
+
 ## TokenXUser
 
 Biblioteket tilbyr også en måte å pakke ut informasjon fra en autorisert brukers token.

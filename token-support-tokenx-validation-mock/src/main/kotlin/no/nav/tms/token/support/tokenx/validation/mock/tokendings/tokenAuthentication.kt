@@ -1,21 +1,33 @@
 package no.nav.tms.token.support.tokenx.validation.mock.tokendings
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.util.pipeline.*
-import no.nav.tms.token.support.tokenx.validation.TokenXHeader
-import no.nav.tms.token.support.tokenx.validation.mock.tokendings.AuthInfo
+import io.ktor.server.response.*
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.tokenXAuthMock(authenticatorName: String?, authInfo: AuthInfo) {
+internal fun AuthenticationConfig.tokenXAuthMock(authenticatorName: String?, authInfo: AuthInfo) {
 
-    val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
+    val provider = AccessTokenAuthenticationProvider.build(authInfo, authenticatorName)
 
-    val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
+    register(provider)
+}
 
-    provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
+private fun AuthenticationContext.respondUnauthorized(message: String) {
+
+    challenge("Unauthenticated", AuthenticationFailedCause.InvalidCredentials) { challenge, call ->
+        call.respond(HttpStatusCode.Unauthorized, message)
+        challenge.complete()
+    }
+}
+
+private class AccessTokenAuthenticationProvider constructor(
+    val authInfo: AuthInfo,
+    config: Configuration
+) : AuthenticationProvider(config) {
+
+    private val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
+
+    override suspend fun onAuthenticate(context: AuthenticationContext) {
         if (authInfo.alwaysAuthenticated) {
             log.debug("Auth is valid as tokenx-mock is set to never authorized.")
             context.principal(TokenxPrincipalBuilder.createPrincipal(authInfo))
@@ -24,22 +36,10 @@ internal fun Authentication.Configuration.tokenXAuthMock(authenticatorName: Stri
             context.respondUnauthorized("Never authorized.")
         }
     }
-    register(provider)
-}
 
-private fun AuthenticationContext.respondUnauthorized(message: String) {
-
-    challenge("Unauthenticated", AuthenticationFailedCause.InvalidCredentials) {
-        call.respond(HttpStatusCode.Unauthorized, message)
-        it.complete()
-    }
-}
-
-private class AccessTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
-
-    class Configuration(name: String?) : AuthenticationProvider.Configuration(name)
+    class Configuration(name: String?) : AuthenticationProvider.Config(name)
 
     companion object {
-        fun build(name: String?) = AccessTokenAuthenticationProvider(Configuration(name))
+        fun build(authInfo: AuthInfo, name: String?) = AccessTokenAuthenticationProvider(authInfo, Configuration(name))
     }
 }

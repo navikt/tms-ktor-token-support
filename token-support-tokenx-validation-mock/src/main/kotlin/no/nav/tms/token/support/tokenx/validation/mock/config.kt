@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.tokenx.validation.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticator
 import no.nav.tms.token.support.tokenx.validation.mock.tokendings.AuthInfoValidator
 import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock

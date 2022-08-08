@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.authentication.installer.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.azure.validation.mock.AzureMockInstaller.performAzureMockAuthenticatorInstallation
 import no.nav.tms.token.support.azure.validation.mock.AzureMockedAuthenticatorConfig
 import no.nav.tms.token.support.idporten.sidecar.mock.IdPortenMockInstaller.performIdPortenMockInstallation
@@ -67,7 +67,7 @@ internal object MockedInstallerProxy {
     internal fun invokeIdPortenMockInstaller(
             application: Application,
             idPortenConfig: IdPortenMockedAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration) {
+            existingAuthContext: AuthenticationConfig) {
 
         return application.performIdPortenMockInstallation(idPortenConfig, existingAuthContext)
     }
@@ -75,7 +75,7 @@ internal object MockedInstallerProxy {
     internal fun invokeTokenXMockInstaller(
             application: Application,
             tokenXConfig: TokenXMockedAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration) {
+            existingAuthContext: AuthenticationConfig) {
 
         application.performTokenXMockInstallation(tokenXConfig, existingAuthContext)
     }
@@ -83,7 +83,7 @@ internal object MockedInstallerProxy {
     internal fun invokeAzureMockInstaller(
             application: Application,
             azureConfig: AzureMockedAuthenticatorConfig,
-            existingAuthContext: Authentication.Configuration) {
+            existingAuthContext: AuthenticationConfig) {
 
         application.performAzureMockAuthenticatorInstallation(azureConfig, existingAuthContext)
     }

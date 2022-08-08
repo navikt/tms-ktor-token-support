@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.idporten.sidecar.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenCookieAuthenticator
 import no.nav.tms.token.support.idporten.sidecar.mock.authentication.AuthInfoValidator
 import no.nav.tms.token.support.idporten.sidecar.mock.authentication.idPortenAuthMock

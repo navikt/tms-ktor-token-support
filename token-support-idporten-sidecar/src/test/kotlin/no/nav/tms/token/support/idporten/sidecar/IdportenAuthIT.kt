@@ -2,11 +2,12 @@ package no.nav.tms.token.support.idporten.sidecar
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.kotest.extensions.system.withEnvironment
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.client.request.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.tms.token.support.idporten.sidecar.authentication.TokenVerifier
@@ -47,82 +48,106 @@ internal class IdportenAuthIT {
     }
 
     @Test
-    fun `Should respond unauthorized when no valid token header provided`()
-            = withTestApplication<Unit>({ testApi() }) {
+    fun `Should respond unauthorized when no valid token header provided`() = testApplication {
 
-        val status = handleRequest(HttpMethod.Get, "/test")
-                .response.status()
+        application {
+            testApi()
+        }
 
-        status `should be equal to` HttpStatusCode.Unauthorized
-    }
-
-    @Test
-    fun `Should respond unauthorized when no valid token headr provided and authenticator is default`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
-
-        val status = handleRequest(HttpMethod.Get, "/test")
-            .response.status()
+        val status = client.get("/test")
+            .status
 
         status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
-    fun `Should return ok if token is valid`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
+    fun `Should respond unauthorized when no valid token headr provided and authenticator is default`() = testApplication {
+
+        application {
+            testApiWithDefault()
+        }
+
+        val status = client.get("/test").status
+
+        status `should be equal to` HttpStatusCode.Unauthorized
+    }
+
+    @Test
+    fun `Should return ok if token is valid`() = testApplication {
+
+        application {
+            testApiWithDefault()
+        }
 
         every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
 
-        val status = handleRequest(HttpMethod.Get, "/test"){
-            addHeader(HttpHeaders.Authorization, "Bearer $dummyToken")
-        }.response.status()
+        val status = client.get("/test"){
+            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
+        }.status
 
         status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
-    fun `Should return unauthorized if token is invalid`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
+    fun `Should return unauthorized if token is invalid`() = testApplication {
+
+        application {
+            testApiWithDefault()
+        }
 
         every { verifier.verifyAccessToken(dummyToken) } throws RuntimeException()
 
-        val status = handleRequest(HttpMethod.Get, "/test"){
-            addHeader(HttpHeaders.Authorization, "Bearer $dummyToken")
-        }.response.status()
+        val status = client.get("/test"){
+            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
+        }.status
 
         status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
-    fun `Should ignore fallback cookie when not enabled`()
-            = withTestApplication<Unit>({ testApiWithDefault(fallbackEnabled = false) }) {
+    fun `Should ignore fallback cookie when not enabled`() = testApplication {
+
+        application {
+            testApiWithDefault(fallbackEnabled = false)
+        }
 
         every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
 
-        val status = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Cookie, "$fallbackCookieName=$dummyToken")
-        }.response.status()
+        val status = client.get("/test") {
+            headers.append(HttpHeaders.Cookie, "$fallbackCookieName=$dummyToken")
+        }.status
 
         status `should be equal to` HttpStatusCode.Unauthorized
     }
 
     @Test
-    fun `Should use fallback cookie when enabled`()
-            = withTestApplication<Unit>({ testApiWithDefault(fallbackEnabled = true) }) {
+    fun `Should use fallback cookie when enabled`() = testApplication {
+
+        application {
+            testApiWithDefault(fallbackEnabled = true)
+        }
 
         every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
 
-        val status = handleRequest(HttpMethod.Get, "/test") {
-            addHeader(HttpHeaders.Cookie, "$fallbackCookieName=$dummyToken")
-        }.response.status()
+        val status = client.get("/test") {
+            headers.append(HttpHeaders.Cookie, "$fallbackCookieName=$dummyToken")
+        }.status
 
         status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
-    fun `Requesting logout should redirect to logout url`()
-            = withTestApplication<Unit>({ testApiWithDefault() }) {
+    fun `Requesting logout should redirect to logout url`() = testApplication {
 
-        val response = handleRequest(HttpMethod.Get, "/logout").response
+        application {
+            testApiWithDefault()
+        }
+
+        val clientOverride = createClient {
+            followRedirects = false
+        }
+
+        val response = clientOverride.get("/logout")
 
         response.headers["Location"]!! `should be equal to` "/oauth2/logout"
     }

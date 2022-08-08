@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.tokenx.validation
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
 import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken

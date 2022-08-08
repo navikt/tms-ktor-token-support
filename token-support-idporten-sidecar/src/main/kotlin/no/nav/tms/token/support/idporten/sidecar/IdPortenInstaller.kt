@@ -1,9 +1,10 @@
 package no.nav.tms.token.support.idporten.sidecar
 
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
+
+import io.ktor.server.plugins.forwardedheaders.*
+import io.ktor.server.routing.*
 import no.nav.tms.token.support.idporten.sidecar.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.sidecar.authentication.idPortenAccessToken
 import no.nav.tms.token.support.idporten.sidecar.authentication.idPortenLoginApi
@@ -12,7 +13,7 @@ import no.nav.tms.token.support.idporten.sidecar.authentication.logout.idPortenL
 object IdPortenInstaller {
     fun Application.performIdPortenAuthenticatorInstallation(
             config: IdportenAuthenticationConfig,
-            existingAuthContext: Authentication.Configuration? = null
+            existingAuthContext: AuthenticationConfig? = null
     ): IdPortenRoutesConfig {
         validateIdPortenConfig(config)
 
@@ -58,7 +59,7 @@ object IdPortenInstaller {
         }
     }
 
-    private fun Authentication.Configuration.setupAuthenticators(config: IdportenAuthenticationConfig, runtimeContext: RuntimeContext) {
+    private fun AuthenticationConfig.setupAuthenticators(config: IdportenAuthenticationConfig, runtimeContext: RuntimeContext) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
         // Register authenticator for id-porten tokens
@@ -67,8 +68,8 @@ object IdPortenInstaller {
     }
 
     private fun Application.installXForwardedHeaderSupportIfMissing() {
-        if (featureOrNull(XForwardedHeaderSupport) == null) {
-            install(XForwardedHeaderSupport)
+        if (pluginOrNull(XForwardedHeaders) == null) {
+            install(XForwardedHeaders)
         }
     }
 

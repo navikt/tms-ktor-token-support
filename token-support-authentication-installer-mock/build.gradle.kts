@@ -9,14 +9,11 @@ plugins {
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
-    implementation(Logback.classic)
-    implementation(Kotlin.reflect)
     implementation(project(":token-support-azure-validation-mock"))
     implementation(project(":token-support-tokenx-validation-mock"))
     implementation(project(":token-support-idporten-sidecar-mock"))
-    implementation(Ktor.auth)
+    implementation(Ktor.serverAuth)
     testImplementation(kotlin("test-junit5"))
-    testImplementation(Junit.engine)
     testImplementation(Kluent.kluent)
     testImplementation(Ktor.serverTestHost)
     testImplementation(Mockk.mockk)

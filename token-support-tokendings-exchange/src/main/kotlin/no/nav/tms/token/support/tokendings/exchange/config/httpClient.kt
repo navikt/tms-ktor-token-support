@@ -1,6 +1,7 @@
 package no.nav.tms.token.support.tokendings.exchange.config
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
@@ -12,5 +13,5 @@ internal suspend fun HttpClient.getTokendingsConfigurationMetadata(url: String)
         method = HttpMethod.Get
         url(url)
         accept(ContentType.Application.Json)
-    }
+    }.body()
 }

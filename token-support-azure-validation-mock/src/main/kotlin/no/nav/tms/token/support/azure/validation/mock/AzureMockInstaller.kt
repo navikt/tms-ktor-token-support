@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.azure.validation.mock
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticator
 import no.nav.tms.token.support.azure.validation.mock.intercept.AuthInfo
 import no.nav.tms.token.support.azure.validation.mock.intercept.azureAuthMock
@@ -9,7 +9,7 @@ import no.nav.tms.token.support.azure.validation.mock.intercept.azureAuthMock
 object AzureMockInstaller {
     fun Application.performAzureMockAuthenticatorInstallation(
         config: AzureMockedAuthenticatorConfig,
-        existingAuthContext: Authentication.Configuration? = null
+        existingAuthContext: AuthenticationConfig? = null
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 

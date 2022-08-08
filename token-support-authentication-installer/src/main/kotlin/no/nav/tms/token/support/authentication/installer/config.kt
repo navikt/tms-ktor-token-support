@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.authentication.installer
 
-import io.ktor.application.*
+import io.ktor.server.application.*
 import no.nav.tms.token.support.authentication.installer.AuthenticatorInstaller.performInstallation
 import no.nav.tms.token.support.azure.validation.AzureAuthenticatorConfig
 import no.nav.tms.token.support.idporten.sidecar.IdportenAuthenticationConfig

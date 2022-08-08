@@ -2,24 +2,24 @@ package no.nav.tms.token.support.tokendings.exchange.config
 
 import io.ktor.client.*
 import io.ktor.client.engine.apache.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 
 internal object HttpClientBuilder {
     internal fun buildHttpClient(): HttpClient {
         return HttpClient(Apache) {
-            install(JsonFeature) {
-                serializer = buildJsonSerializer()
+            install(ContentNegotiation) {
+                json(kotlinxSerializer())
             }
             install(HttpTimeout)
         }
     }
 
-    private fun buildJsonSerializer() = KotlinxSerializer (
-            kotlinx.serialization.json.Json {
-                ignoreUnknownKeys = true
-            }
-    )
+    private fun kotlinxSerializer() =
+        Json {
+            ignoreUnknownKeys = true
+        }
 }
 

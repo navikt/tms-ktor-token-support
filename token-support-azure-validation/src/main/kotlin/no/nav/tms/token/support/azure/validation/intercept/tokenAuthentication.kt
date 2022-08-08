@@ -1,22 +1,30 @@
 package no.nav.tms.token.support.azure.validation.intercept
 
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.response.*
 import io.ktor.util.pipeline.*
 import no.nav.tms.token.support.azure.validation.AzureHeader
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
 import org.slf4j.LoggerFactory
 
-internal fun Authentication.Configuration.azureAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
+internal fun AuthenticationConfig.azureAccessToken(authenticatorName: String?, verifier: TokenVerifier) {
 
-    val provider = AccessTokenAuthenticationProvider.build(authenticatorName)
+    val provider = AccessTokenAuthenticationProvider.build(verifier, authenticatorName)
+
+    register(provider)
+}
+
+private class AccessTokenAuthenticationProvider constructor(
+    val verifier: TokenVerifier,
+    config: Config
+) : AuthenticationProvider(config) {
 
     val log = LoggerFactory.getLogger(AccessTokenAuthenticationProvider::class.java)
 
-    provider.pipeline.intercept(AuthenticationPipeline.RequestAuthentication) { context ->
-        val accessToken = bearerToken
+    override suspend fun onAuthenticate(context: AuthenticationContext) {
+        val accessToken = context.call.bearerToken
         if (accessToken != null) {
             try {
                 val decodedJWT = verifier.verify(accessToken)
@@ -31,41 +39,36 @@ internal fun Authentication.Configuration.azureAccessToken(authenticatorName: St
             context.respondUnauthorized("No bearer token found.")
         }
     }
-    register(provider)
+
+    class Configuration(name: String?) : AuthenticationProvider.Config(name)
+
+    companion object {
+        fun build(verifier: TokenVerifier, name: String?) = AccessTokenAuthenticationProvider(verifier, Configuration(name))
+    }
 }
 
 private fun AuthenticationContext.respondUnauthorized(message: String) {
-
-    challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) {
+    challenge("JWTAuthKey", AuthenticationFailedCause.InvalidCredentials) { challenge, call ->
         call.respond(HttpStatusCode.Unauthorized, message)
-        it.complete()
+        challenge.complete()
     }
 }
 
 private val bearerRegex = "Bearer .+".toRegex()
 
-private val PipelineContext<*, ApplicationCall>.bearerToken: String? get() {
-    return tokenFromAzureHeader(call)
-        ?: tokenFromAuthHeader(call)
+private val ApplicationCall.bearerToken: String? get() {
+    return tokenFromAzureHeader()
+        ?: tokenFromAuthHeader()
 }
 
-private fun tokenFromAzureHeader(call: ApplicationCall): String? {
-    return call.request.headers[AzureHeader.Authorization]
+private fun ApplicationCall.tokenFromAzureHeader(): String? {
+    return request.headers[AzureHeader.Authorization]
         ?.takeIf { bearerRegex.matches(it) }
         ?.let { it.split(" ")[1] }
 }
 
-private fun tokenFromAuthHeader(call: ApplicationCall): String? {
-    return call.request.headers[HttpHeaders.Authorization]
+private fun ApplicationCall.tokenFromAuthHeader(): String? {
+    return request.headers[HttpHeaders.Authorization]
         ?.takeIf { bearerRegex.matches(it) }
         ?.let { it.split(" ")[1] }
-}
-
-private class AccessTokenAuthenticationProvider constructor(config: Configuration) : AuthenticationProvider(config) {
-
-    class Configuration(name: String?) : AuthenticationProvider.Configuration(name)
-
-    companion object {
-        fun build(name: String?) = AccessTokenAuthenticationProvider(Configuration(name))
-    }
 }

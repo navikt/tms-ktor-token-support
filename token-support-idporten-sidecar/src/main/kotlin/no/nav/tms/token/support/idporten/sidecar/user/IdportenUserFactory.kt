@@ -1,8 +1,8 @@
 package no.nav.tms.token.support.idporten.sidecar.user
 
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.ktor.application.*
-import io.ktor.auth.*
+import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import no.nav.tms.token.support.idporten.sidecar.authentication.IdPortenTokenPrincipal
 import java.time.Instant
 
