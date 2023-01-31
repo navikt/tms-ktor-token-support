@@ -10,6 +10,16 @@ import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
 
 internal fun Routing.idPortenLoginApi(runtimeContext: RuntimeContext) {
 
+    if (runtimeContext.contextPath.isBlank()) {
+        loginEndPoints(runtimeContext)
+    } else {
+        route("/${runtimeContext.contextPath}") {
+            loginEndPoints(runtimeContext)
+        }
+    }
+}
+
+private fun Route.loginEndPoints(runtimeContext: RuntimeContext) {
     get("/login") {
         val redirectUri = call.redirectUri
 

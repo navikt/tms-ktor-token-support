@@ -19,7 +19,7 @@ object IdPortenInstaller {
 
         val runtimeContext = RuntimeContext(
             postLoginRedirectUri = config.postLoginRedirectUri,
-            contextPath = environment.rootPath,
+            contextPath = rootPath(config),
             loginLevel = numericLoginLevel(config.loginLevel),
             enableDefaultProxy = config.enableDefaultProxy,
             fallbackTokenCookieEnabled = config.fallbackCookieEnabled,
@@ -43,6 +43,14 @@ object IdPortenInstaller {
                 idPortenLoginApi(runtimeContext)
                 idPortenLogoutApi(runtimeContext)
             }
+        }
+    }
+
+    private fun Application.rootPath(config: IdportenAuthenticationConfig): String {
+        return if (config.inheritProjectRootPath) {
+            environment.rootPath
+        } else {
+            config.rootPath
         }
     }
 

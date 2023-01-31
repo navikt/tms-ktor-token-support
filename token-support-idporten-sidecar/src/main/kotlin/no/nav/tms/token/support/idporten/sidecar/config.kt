@@ -21,6 +21,9 @@ class IdportenAuthenticationConfig {
     var loginLevel: LoginLevel = LEVEL_4
     var enableDefaultProxy: Boolean = false
 
+    var inheritProjectRootPath: Boolean = false
+    var rootPath: String = ""
+
     var fallbackCookieEnabled: Boolean = false
     var fallbackTokenCookieName: String = ""
 }
