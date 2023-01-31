@@ -7,8 +7,14 @@ import no.nav.tms.token.support.idporten.sidecar.authentication.config.RuntimeCo
 
 internal fun Routing.idPortenLogoutApi(context: RuntimeContext) {
 
-    get("/logout") {
-        call.respondRedirect(getLogoutUrl(context.contextPath))
+    if (context.contextPath.isBlank()) {
+        get("/logout") {
+            call.respondRedirect(getLogoutUrl(context.contextPath))
+        }
+    } else {
+        get("/${context.contextPath}/logout") {
+            call.respondRedirect(getLogoutUrl(context.contextPath))
+        }
     }
 }
 
