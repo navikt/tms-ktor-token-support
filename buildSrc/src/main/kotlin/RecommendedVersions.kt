@@ -10,7 +10,7 @@ object Kluent {
 }
 
 object Kotlin {
-    const val version = "1.6.20"
+    const val version = "1.8.10"
     private const val groupId = "org.jetbrains.kotlin"
 }
 
@@ -24,7 +24,7 @@ object Kotest {
 }
 
 object Ktor {
-    private const val version = "2.0.3"
+    private const val version = "2.3.0"
     private const val groupId = "io.ktor"
 
     const val serverAuth = "$groupId:ktor-server-auth:$version"
