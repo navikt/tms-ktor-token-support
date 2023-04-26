@@ -11,13 +11,14 @@ import java.net.URL
 import java.util.concurrent.TimeUnit
 
 internal class RuntimeContext(
-        val postLoginRedirectUri: String,
-        val contextPath: String,
-        fallbackTokenCookieEnabled: Boolean,
-        fallbackTokenCookieName: String,
-        loginLevel: Int,
+    val postLoginRedirectUri: String,
+    val usesRootPath: Boolean,
+    val contextPath: String,
+    fallbackTokenCookieEnabled: Boolean,
+    fallbackTokenCookieName: String,
+    loginLevel: Int,
 
-        enableDefaultProxy: Boolean
+    enableDefaultProxy: Boolean
 ) {
     val environment = Environment()
 

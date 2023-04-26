@@ -10,7 +10,7 @@ import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
 
 internal fun Routing.idPortenLoginApi(runtimeContext: RuntimeContext) {
 
-    if (runtimeContext.contextPath.isBlank()) {
+    if (runtimeContext.usesRootPath || runtimeContext.contextPath.isBlank()) {
         loginEndPoints(runtimeContext)
     } else {
         route("/${runtimeContext.contextPath}") {

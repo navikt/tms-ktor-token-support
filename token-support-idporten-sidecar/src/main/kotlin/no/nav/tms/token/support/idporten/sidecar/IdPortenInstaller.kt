@@ -19,6 +19,7 @@ object IdPortenInstaller {
 
         val runtimeContext = RuntimeContext(
             postLoginRedirectUri = config.postLoginRedirectUri,
+            usesRootPath = config.inheritProjectRootPath,
             contextPath = rootPath(config),
             loginLevel = numericLoginLevel(config.loginLevel),
             enableDefaultProxy = config.enableDefaultProxy,
