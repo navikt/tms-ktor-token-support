@@ -26,7 +26,8 @@ private fun Route.loginEndPoints(runtimeContext: RuntimeContext) {
         if (redirectUri != null) {
             call.response.cookies.append(Idporten.postLoginRedirectCookie, redirectUri, path = "/${runtimeContext.contextPath}")
         }
-        call.respondRedirect(getLoginUrl(runtimeContext.contextPath))
+
+        call.respondRedirect(getLoginUrl(runtimeContext.contextPath, call.securityLevel))
     }
 
     get("/login/status") {
@@ -60,12 +61,20 @@ private fun ApplicationCall.validAccessTokenOrNull(config: AuthConfiguration): D
     }
 }
 
-private fun getLoginUrl(contextPath: String): String {
-    return if (contextPath.isBlank()) {
+private fun getLoginUrl(contextPath: String, securityLevel: String?): String {
+    val redirectPath = if (contextPath.isBlank()) {
         "/oauth2/login?redirect=/login/callback"
     } else {
         "/$contextPath/oauth2/login?redirect=/$contextPath/login/callback"
     }
+
+    return if (securityLevel != null) {
+        "$redirectPath&level=$securityLevel"
+    } else {
+        redirectPath
+    }
 }
 
 private val ApplicationCall.redirectUri: String? get() = request.queryParameters["redirect_uri"]
+
+private val ApplicationCall.securityLevel: String? get() = request.queryParameters["level"]
