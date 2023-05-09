@@ -63,7 +63,7 @@ internal object TokenStringUtil {
         val decodedToken = JWT.decode(tokenString)
 
         val subject = decodedToken.subject
-        val securityLevel = decodedToken.getClaim("acr_values").asString()
+        val securityLevel = decodedToken.getClaim("acr").asString()
 
         return AccessTokenKey(subject, securityLevel, targetApp)
     }
