@@ -40,9 +40,7 @@ class CachingTokendingsService internal constructor(
     private val privateRsaKey = RSAKey.parse(privateJwk)
 
     override suspend fun exchangeToken(token: String, targetApp: String): String {
-        val subject = TokenStringUtil.extractSubject(token)
-
-        val cacheKey = AccessTokenKey(subject, targetApp)
+        val cacheKey = TokenStringUtil.createCacheKey(token, targetApp)
 
         return cache.get(cacheKey) {
             runBlocking {
@@ -61,7 +59,12 @@ class CachingTokendingsService internal constructor(
 }
 
 internal object TokenStringUtil {
-    fun extractSubject(tokenString: String): String {
-        return JWT.decode(tokenString).subject
+    fun createCacheKey(tokenString: String, targetApp: String): AccessTokenKey {
+        val decodedToken = JWT.decode(tokenString)
+
+        val subject = decodedToken.subject
+        val securityLevel = decodedToken.getClaim("acr").asString()
+
+        return AccessTokenKey(subject, securityLevel, targetApp)
     }
 }
