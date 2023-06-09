@@ -69,7 +69,7 @@ internal class TokendingsServiceTest {
 
         every {
             TokenStringUtil.createCacheKey(token, target)
-        } returns AccessTokenKey(subject, "Level3", target)
+        } returns AccessTokenKey(subject, "idporten-loa-substantial", target)
 
         coEvery {
             tokendingsConsumer.exchangeToken(any(), capture(assertion), target)
@@ -101,7 +101,7 @@ internal class TokendingsServiceTest {
 
         every {
             TokenStringUtil.createCacheKey(token, target)
-        } returns AccessTokenKey(subject, "Level3", target)
+        } returns AccessTokenKey(subject, "idporten-loa-substantial", target)
 
         coEvery {
             tokendingsConsumer.exchangeToken(any(), capture(assertion), target)
@@ -128,7 +128,7 @@ internal class TokendingsServiceTest {
 
         every {
             TokenStringUtil.createCacheKey(token, target)
-        } returns AccessTokenKey(subject, "Level3", target)
+        } returns AccessTokenKey(subject, "idporten-loa-substantial", target)
 
         coEvery {
             tokendingsConsumer.exchangeToken(any(), capture(assertion), target)
@@ -157,11 +157,11 @@ internal class TokendingsServiceTest {
 
         every {
             TokenStringUtil.createCacheKey(token, target1)
-        } returns AccessTokenKey(subject, "Level3", target1)
+        } returns AccessTokenKey(subject, "idporten-loa-substantial", target1)
 
         every {
             TokenStringUtil.createCacheKey(token, target2)
-        } returns AccessTokenKey(subject, "Level3", target2)
+        } returns AccessTokenKey(subject, "idporten-loa-substantial", target2)
 
         coEvery {
             tokendingsConsumer.exchangeToken(any(), capture(assertion), target1)
@@ -199,18 +199,18 @@ internal class TokendingsServiceTest {
         val exchangedToken1 = "<exchanged token 1>"
         val exchangedToken2 = "<exchanged token 2>"
         val target = "cluster:namespace:otherApi"
-        val level3 = "Level3"
-        val level4 = "Level4"
+        val substantial = "idporten-loa-substantial"
+        val high = "idporten-loa-high"
 
         mockkObject(TokenStringUtil)
 
         every {
             TokenStringUtil.createCacheKey(token1, target)
-        } returns AccessTokenKey(subject, level3, target)
+        } returns AccessTokenKey(subject, substantial, target)
 
         every {
             TokenStringUtil.createCacheKey(token2, target)
-        } returns AccessTokenKey(subject, level4, target)
+        } returns AccessTokenKey(subject, high, target)
 
         coEvery {
             tokendingsConsumer.exchangeToken(token1, capture(assertion), target)

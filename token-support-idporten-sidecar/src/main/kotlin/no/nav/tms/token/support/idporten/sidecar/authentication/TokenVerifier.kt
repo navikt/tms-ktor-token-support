@@ -11,47 +11,35 @@ import java.security.interfaces.RSAPublicKey
 internal class TokenVerifier(
         private val jwkProvider: JwkProvider,
         private val issuer: String,
-        private val minLoginLevel: Int
+        private val minLevelOfAssurance: LevelOfAssuranceInternal
 ) {
 
-    private val claimContainingLoginLevel = "acr"
+    private val acrClaim = "acr"
 
     fun verifyAccessToken(accessToken: String): DecodedJWT {
-        val decodedToken = JWT.decode(accessToken).keyId
-            .let { kid -> jwkProvider.get(kid) }
-            .run { accessTokenVerifier(issuer) }
-            .run { verify(accessToken) }
-
-        verifyLoginLevel(decodedToken)
-
-        return decodedToken
+        return buildVerifier(accessToken)
+            .verify(accessToken)
+            .also { verifyLevelOfAssurance(it) }
     }
 
-    private fun Jwk.accessTokenVerifier(issuer: String): JWTVerifier =
-            JWT.require(this.RSA256())
-                .withIssuer(issuer)
-                .build()
+    private fun buildVerifier(accessToken: String): JWTVerifier {
+        return JWT.decode(accessToken).keyId
+            .let { kid -> jwkProvider.get(kid) }
+            .let { JWT.require(it.RSA256()) }
+            .withIssuer(issuer)
+            .build()
+    }
 
     private fun Jwk.RSA256() = Algorithm.RSA256(publicKey as RSAPublicKey, null)
 
-    private fun verifyLoginLevel(decodedToken: DecodedJWT) {
-        val acrClaim = decodedToken.getClaim(claimContainingLoginLevel)
+    private fun verifyLevelOfAssurance(decodedToken: DecodedJWT) {
+        val acrClaim = decodedToken.getClaim(acrClaim)
 
-        val loginLevel = extractNumericValue(acrClaim.asString())
+        val levelOfAssurance = LevelOfAssuranceInternal.fromAcr(acrClaim.asString())
 
-        if (loginLevel < minLoginLevel) {
-            throw RuntimeException("Login level too low")
+        if (levelOfAssurance.relativeValue < minLevelOfAssurance.relativeValue) {
+            throw RuntimeException("Level of assurance too low.")
         }
-    }
-
-    private val acrRegex = "^Level([0-9]+)$".toRegex()
-
-    private fun extractNumericValue(loginLevelClaim: String): Int {
-        val loginLevel = acrRegex.find(loginLevelClaim)
-            ?.destructured
-            ?.let { (level) -> level.toInt() }
-
-        return loginLevel ?: throw RuntimeException("Could not extract login level from claim")
     }
 }
 

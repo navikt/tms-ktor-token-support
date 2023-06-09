@@ -3,6 +3,7 @@ package no.nav.tms.token.support.tokenx.validation
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
+import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal
 import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken
 
 object TokenXInstaller {
@@ -12,7 +13,9 @@ object TokenXInstaller {
     ) {
         val authenticatorName = getAuthenticatorName(config.setAsDefault)
 
-        val runtimeContext = RuntimeContext()
+        val runtimeContext = RuntimeContext(
+            minLevelOfAssurance = getMinLoa(config.levelOfAssurance)
+        )
 
         if (existingAuthContext == null) {
             install(Authentication) {
@@ -28,6 +31,13 @@ object TokenXInstaller {
             null
         } else {
             TokenXAuthenticator.name
+        }
+    }
+
+    private fun getMinLoa(loa: LevelOfAssurance): LevelOfAssuranceInternal {
+        return when (loa) {
+            LevelOfAssurance.SUBSTANTIAL -> LevelOfAssuranceInternal.Substantial
+            LevelOfAssurance.HIGH -> LevelOfAssuranceInternal.High
         }
     }
 }

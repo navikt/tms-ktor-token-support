@@ -5,6 +5,7 @@ import com.auth0.jwk.JwkProviderBuilder
 import io.ktor.client.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.idporten.sidecar.authentication.AuthConfiguration
+import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal
 import no.nav.tms.token.support.idporten.sidecar.authentication.OauthServerConfigurationMetadata
 import no.nav.tms.token.support.idporten.sidecar.authentication.config.HttpClientBuilder.buildHttpClient
 import java.net.URL
@@ -16,7 +17,7 @@ internal class RuntimeContext(
     val contextPath: String,
     fallbackTokenCookieEnabled: Boolean,
     fallbackTokenCookieName: String,
-    loginLevel: Int,
+    minLevelOfAssurance: LevelOfAssuranceInternal,
 
     enableDefaultProxy: Boolean
 ) {
@@ -32,7 +33,7 @@ internal class RuntimeContext(
         issuer = metadata.issuer,
         fallbackTokenCookieEnabled = fallbackTokenCookieEnabled,
         fallbackTokenCookieName = fallbackTokenCookieName,
-        loginLevel = loginLevel
+        minLevelOfAssurance = minLevelOfAssurance
     )
 }
 

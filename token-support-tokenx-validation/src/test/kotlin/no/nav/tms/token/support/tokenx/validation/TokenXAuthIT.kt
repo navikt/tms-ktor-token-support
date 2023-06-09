@@ -13,8 +13,12 @@ import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
+import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.HIGH
+import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
 import no.nav.tms.token.support.tokenx.validation.config.HttpClientBuilder
 import no.nav.tms.token.support.tokenx.validation.config.JwkProviderBuilder
+import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal
+import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal.*
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -84,7 +88,7 @@ internal class TokenXAuthIT {
             testApi()
         }
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
@@ -101,7 +105,7 @@ internal class TokenXAuthIT {
             testApi()
         }
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
@@ -117,7 +121,7 @@ internal class TokenXAuthIT {
             testApi()
         }
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(TokenXHeader.Authorization, "Bearer $bearerToken")
@@ -134,7 +138,7 @@ internal class TokenXAuthIT {
             testApi()
         }
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(TokenXHeader.Authorization, "Malformed")
@@ -145,13 +149,13 @@ internal class TokenXAuthIT {
     }
 
     @Test
-    fun `Should return 401 if tokenx token is welformed but invalid, even with valid auth token`() = testApplication {
+    fun `Should return 401 if tokenx token is well formed but invalid, even with valid auth token`() = testApplication {
 
         application {
             testApi()
         }
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(TokenXHeader.Authorization, "Bearer invalid")
@@ -170,7 +174,7 @@ internal class TokenXAuthIT {
 
         val targetApp = "cluster:namespace:otherApp"
 
-        val bearerToken = JwtBuilder.generateJwtString(targetApp, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(targetApp, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
@@ -189,7 +193,7 @@ internal class TokenXAuthIT {
 
         val differentIssuer = "http://different-issuer/provider"
 
-        val bearerToken = JwtBuilder.generateJwtString(clientId, differentIssuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(clientId, High, differentIssuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
@@ -208,7 +212,7 @@ internal class TokenXAuthIT {
 
         val targetApp = "cluster:namespace:otherApp"
 
-        val bearerToken = JwtBuilder.generateJwtString(targetApp, idportenMetadata.issuer, privateJwk)
+        val bearerToken = JwtBuilder.generateJwtString(targetApp, High, idportenMetadata.issuer, privateJwk)
 
         val response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
@@ -216,6 +220,72 @@ internal class TokenXAuthIT {
 
         response.status `should be equal to` HttpStatusCode.Unauthorized
         response.body<String>() `should be equal to` "Invalid or expired token."
+    }
+
+    @Test
+    fun `Should respond with status 401 if level of assurance is too low`() = testApplication {
+
+        application {
+            testApi(minLoa = HIGH)
+        }
+
+        val bearerToken = JwtBuilder.generateJwtString(clientId, Low, idportenMetadata.issuer, privateJwk)
+
+        val response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
+        }
+
+        response.status `should be equal to` HttpStatusCode.Unauthorized
+    }
+
+    @Test
+    fun `acr value Level4 should be equivalent to idporten-loa-high`() = testApplication {
+        application {
+            testApi(minLoa = HIGH)
+        }
+
+        val loaHighToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
+        val level4Token = JwtBuilder.generateJwtString(clientId, Level4, idportenMetadata.issuer, privateJwk)
+        val loaLowToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
+        val level3Token = JwtBuilder.generateJwtString(clientId, Level3, idportenMetadata.issuer, privateJwk)
+
+        val loaHighResponse = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $loaHighToken")
+        }
+        val level4Response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $level4Token")
+        }
+        val loaLowResponse = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $loaLowToken")
+        }
+        val level3Response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
+        }
+
+        loaHighResponse.status `should be equal to` HttpStatusCode.OK
+        level4Response.status `should be equal to` HttpStatusCode.OK
+        loaLowResponse.status `should be equal to` HttpStatusCode.Unauthorized
+        level3Response.status `should be equal to` HttpStatusCode.Unauthorized
+    }
+
+    @Test
+    fun `acr value Level3 should be equivalent to idporten-loa-substantial`() = testApplication {
+        application {
+            testApi(minLoa = SUBSTANTIAL)
+        }
+
+        val loaLowToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
+        val level3Token = JwtBuilder.generateJwtString(clientId, Level3, idportenMetadata.issuer, privateJwk)
+
+        val loaLowResponse = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $loaLowToken")
+        }
+        val level3Response = client.get("/test") {
+            headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
+        }
+
+        loaLowResponse.status `should be equal to` HttpStatusCode.OK
+        level3Response.status `should be equal to` HttpStatusCode.OK
     }
 
     @Test
@@ -231,9 +301,14 @@ internal class TokenXAuthIT {
         response.body<String>() `should be equal to` "No bearer token found."
     }
 
-    private fun Application.testApi() = withEnvironment(envVars) {
+    private fun Application.testApi(minLoa: LevelOfAssurance? = null) = withEnvironment(envVars) {
 
-        installTokenXAuth()
+        installTokenXAuth {
+            if (minLoa != null) {
+                levelOfAssurance = minLoa
+            }
+        }
+
 
         routing {
             authenticate(TokenXAuthenticator.name) {

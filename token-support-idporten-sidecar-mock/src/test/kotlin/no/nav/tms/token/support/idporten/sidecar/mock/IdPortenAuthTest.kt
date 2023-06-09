@@ -41,7 +41,7 @@ internal class IdPortenAuthTest {
                 installIdPortenAuthMock {
                     alwaysAuthenticated = true
                     staticUserPid = userPid
-                    staticSecurityLevel = SecurityLevel.LEVEL_4
+                    staticLevelOfAssurance = LevelOfAssurance.HIGH
                 }
             }
         }
