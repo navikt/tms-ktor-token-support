@@ -11,23 +11,38 @@ import java.security.interfaces.RSAPublicKey
 internal class TokenVerifier(
         private val jwkProvider: JwkProvider,
         private val clientId: String,
-        private val issuer: String
+        private val issuer: String,
+        private val minLevelOfAssurance: LevelOfAssuranceInternal
 ) {
 
+    private val acrClaim = "acr"
+
     fun verify(accessToken: String): DecodedJWT {
-        return JWT.decode(accessToken).keyId
-                .let { kid -> jwkProvider.get(kid) }
-                .run { idTokenVerifier(clientId, issuer) }
-                .run { verify(accessToken) }
+        return buildVerifier(accessToken)
+            .verify(accessToken)
+            .also { verifyLevelOfAssurance(it) }
     }
 
-    private fun Jwk.idTokenVerifier(clientId: String, issuer: String): JWTVerifier =
-            JWT.require(this.RSA256())
-                    .withAudience(clientId)
-                    .withIssuer(issuer)
-                    .build()
+    private fun buildVerifier(accessToken: String): JWTVerifier {
+        return JWT.decode(accessToken).keyId
+            .let { kid -> jwkProvider.get(kid) }
+            .let { JWT.require(it.RSA256()) }
+            .withIssuer(issuer)
+            .withAudience(clientId)
+            .build()
+    }
 
     private fun Jwk.RSA256() = Algorithm.RSA256(publicKey as RSAPublicKey, null)
+
+    private fun verifyLevelOfAssurance(decodedToken: DecodedJWT) {
+        val acrClaim = decodedToken.getClaim(acrClaim)
+
+        val levelOfAssurance = LevelOfAssuranceInternal.fromAcr(acrClaim.asString())
+
+        if (levelOfAssurance.relativeValue < minLevelOfAssurance.relativeValue) {
+            throw RuntimeException("Level of assurance too low")
+        }
+    }
 }
 
 

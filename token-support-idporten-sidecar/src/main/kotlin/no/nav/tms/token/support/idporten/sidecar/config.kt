@@ -2,7 +2,7 @@ package no.nav.tms.token.support.idporten.sidecar
 
 import io.ktor.server.application.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenInstaller.performIdPortenAuthenticatorInstallation
-import no.nav.tms.token.support.idporten.sidecar.LoginLevel.LEVEL_4
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.HIGH
 
 // This method is responsible for wiring up all the necessary endpoints and registering the authenticators.
 // Users of this library should only have to make use of this method to enable idporten auth.
@@ -18,7 +18,11 @@ fun Application.installIdPortenAuth(configure: IdportenAuthenticationConfig.() -
 class IdportenAuthenticationConfig {
     var setAsDefault: Boolean = false
     var postLoginRedirectUri: String = ""
-    var loginLevel: LoginLevel = LEVEL_4
+
+    @Deprecated("Numbered login levels are deprecated as of Q4 2023. Set levelOfAssurance instead")
+    var loginLevel: LoginLevel? = null
+    var levelOfAssurance: LevelOfAssurance = HIGH
+
     var enableDefaultProxy: Boolean = false
 
     var inheritProjectRootPath: Boolean = true
@@ -26,6 +30,11 @@ class IdportenAuthenticationConfig {
 
     var fallbackCookieEnabled: Boolean = false
     var fallbackTokenCookieName: String = ""
+}
+
+enum class LevelOfAssurance {
+    SUBSTANTIAL, // Equivalent to old Level3
+    HIGH // Equivalent to old Level4
 }
 
 enum class LoginLevel {

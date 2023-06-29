@@ -7,10 +7,10 @@ internal object TokenVerifierBuilder {
     fun buildTokenVerifier(
         jwkProvider: JwkProvider,
         issuer: String,
-        loginLevel: Int,
+        minLevelOfAssurance: LevelOfAssuranceInternal,
     ) = TokenVerifier(
         jwkProvider = jwkProvider,
         issuer = issuer,
-        minLoginLevel = loginLevel
+        minLevelOfAssurance = minLevelOfAssurance
     )
 }

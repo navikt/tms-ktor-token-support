@@ -36,7 +36,7 @@ private fun Route.loginEndPoints(runtimeContext: RuntimeContext) {
         if (idToken == null) {
             call.respond(LoginStatus.unauthenticated())
         } else {
-            call.respond(LoginStatus.authenticated(IdportenUserFactory.extractLoginLevel(idToken)))
+            call.respond(LoginStatus.authenticated(IdportenUserFactory.extractLevelOfAssurance(idToken)))
         }
     }
 

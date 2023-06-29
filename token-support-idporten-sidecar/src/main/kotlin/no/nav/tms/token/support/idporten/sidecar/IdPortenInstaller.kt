@@ -5,12 +5,16 @@ import io.ktor.server.auth.*
 
 import io.ktor.server.plugins.forwardedheaders.*
 import io.ktor.server.routing.*
+import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal
 import no.nav.tms.token.support.idporten.sidecar.authentication.config.RuntimeContext
 import no.nav.tms.token.support.idporten.sidecar.authentication.idPortenAccessToken
 import no.nav.tms.token.support.idporten.sidecar.authentication.idPortenLoginApi
 import no.nav.tms.token.support.idporten.sidecar.authentication.logout.idPortenLogoutApi
+import org.slf4j.LoggerFactory
 
 object IdPortenInstaller {
+    private val log = LoggerFactory.getLogger(IdPortenInstaller::class.java)
+
     fun Application.performIdPortenAuthenticatorInstallation(
             config: IdportenAuthenticationConfig,
             existingAuthContext: AuthenticationConfig? = null
@@ -21,7 +25,7 @@ object IdPortenInstaller {
             postLoginRedirectUri = config.postLoginRedirectUri,
             usesRootPath = config.inheritProjectRootPath,
             contextPath = rootPath(config),
-            loginLevel = numericLoginLevel(config.loginLevel),
+            minLevelOfAssurance = getMinLoa(config.levelOfAssurance, config.loginLevel),
             enableDefaultProxy = config.enableDefaultProxy,
             fallbackTokenCookieEnabled = config.fallbackCookieEnabled,
             fallbackTokenCookieName = config.fallbackTokenCookieName
@@ -55,10 +59,18 @@ object IdPortenInstaller {
         }
     }
 
-    private fun numericLoginLevel(loginLevel: LoginLevel): Int {
-        return when(loginLevel) {
-            LoginLevel.LEVEL_3 -> 3
-            LoginLevel.LEVEL_4 -> 4
+    private fun getMinLoa(loa: LevelOfAssurance, loginLevel: LoginLevel?): LevelOfAssuranceInternal {
+        return if (loginLevel != null) {
+            log.warn("loginLevel will be deprecated as of Q4 2023. Use levelOfAssurance setting instead.")
+            when (loginLevel) {
+                LoginLevel.LEVEL_3 -> LevelOfAssuranceInternal.Substantial
+                LoginLevel.LEVEL_4 -> LevelOfAssuranceInternal.High
+            }
+        } else {
+            when (loa) {
+                LevelOfAssurance.SUBSTANTIAL -> LevelOfAssuranceInternal.Substantial
+                LevelOfAssurance.HIGH -> LevelOfAssuranceInternal.High
+            }
         }
     }
 

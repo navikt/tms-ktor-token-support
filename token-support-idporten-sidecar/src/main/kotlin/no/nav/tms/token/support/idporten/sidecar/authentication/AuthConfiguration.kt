@@ -5,13 +5,13 @@ import com.auth0.jwk.JwkProvider
 internal class AuthConfiguration(
         jwkProvider: JwkProvider,
         issuer: String,
-        loginLevel: Int,
+        minLevelOfAssurance: LevelOfAssuranceInternal,
         val fallbackTokenCookieEnabled: Boolean,
         val fallbackTokenCookieName: String
 ) {
         val tokenVerifier = TokenVerifierBuilder.buildTokenVerifier(
                 jwkProvider = jwkProvider,
                 issuer = issuer,
-                loginLevel = loginLevel
+                minLevelOfAssurance = minLevelOfAssurance
         )
 }

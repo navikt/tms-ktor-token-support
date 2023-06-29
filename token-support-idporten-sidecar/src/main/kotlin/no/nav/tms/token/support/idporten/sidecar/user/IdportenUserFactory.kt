@@ -3,7 +3,11 @@ package no.nav.tms.token.support.idporten.sidecar.user
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.*
 import no.nav.tms.token.support.idporten.sidecar.authentication.IdPortenTokenPrincipal
+import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal
+import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal.*
 import java.time.Instant
 
 // This creates an IdportenUser based on user jwt claims
@@ -18,25 +22,42 @@ object IdportenUserFactory {
         return createIdportenUser(principal, identClaim)
     }
 
+    internal fun extractLevelOfAssurance(accessToken: DecodedJWT): LevelOfAssuranceInternal {
+        return LevelOfAssuranceInternal.fromAcr(accessToken.getClaim("acr").asString())
+    }
+
     private fun createIdportenUser(principal: IdPortenTokenPrincipal, identClaim: String): IdportenUser {
         val accessToken = principal.accessToken
 
         val ident: String = accessToken.getClaim(identClaim).asString()
-        val loginLevel = extractLoginLevel(accessToken)
+
+
+        val acrLoA = extractLevelOfAssurance(accessToken)
+        val loginLevel = mapLoginLevel(acrLoA)
+        val levelOfAssurance = mapLevelOfAssurance(acrLoA)
+
         val expirationTime =
             getTokenExpirationLocalDateTime(
                 accessToken
             )
 
-        return IdportenUser(ident, loginLevel, expirationTime, accessToken)
+        return IdportenUser(ident, loginLevel, levelOfAssurance, expirationTime, accessToken)
     }
 
-    internal fun extractLoginLevel(token: DecodedJWT): Int {
+    private fun mapLoginLevel(levelOfAssurance: LevelOfAssuranceInternal): Int {
 
-        return when (token.getClaim("acr").asString()) {
-            "Level3" -> 3
-            "Level4" -> 4
-            else -> throw Exception("Innloggingsnivå ble ikke funnet. Dette skal ikke kunne skje.")
+        return when (levelOfAssurance) {
+            Level3, Substantial -> 3
+            Level4, High -> 4
+            Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
+        }
+    }
+
+    private fun mapLevelOfAssurance(levelOfAssurance: LevelOfAssuranceInternal): LevelOfAssurance {
+        return when (levelOfAssurance) {
+            Level3, Substantial -> SUBSTANTIAL
+            Level4, High -> HIGH
+            Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
         }
     }
 

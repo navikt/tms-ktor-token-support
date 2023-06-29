@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.tokenx.validation.mock.tokendings
 
 import com.auth0.jwt.JWT
-import no.nav.tms.token.support.tokenx.validation.mock.SecurityLevel
+import no.nav.tms.token.support.tokenx.validation.mock.LevelOfAssurance
 import no.nav.tms.token.support.tokenx.validation.mock.TokenXMockedAuthenticatorConfig
 
 internal object AuthInfoValidator {
@@ -22,23 +22,23 @@ internal object AuthInfoValidator {
 
         val claims = decodedJWT.claims
 
-        require(claims.contains("acr_values")) { "jwtOverride må ha claim 'acr_values' med security level" }
+        require(claims.contains("acr")) { "jwtOverride må ha claim 'acr' med security level" }
         require(claims.contains("pid")) { "jwtOverride må ha claim 'pid' med ident" }
 
-        val securityLevel = claims["acr_values"]!!.asString()
+        val securityLevel = claims["acr"]!!.asString()
         val ident = claims["pid"]!!.asString()
 
-        val validSecurityLevels = SecurityLevel.values().map { it.claim }
+        val validLevels = LevelOfAssurance.values().map { it.claim }
 
-        require(securityLevel in validSecurityLevels) { "'acr_values' må være en av [${validSecurityLevels}]" }
+        require(securityLevel in validLevels) { "'acr' må være en av [${validLevels}]" }
 
         return AuthInfo(true, securityLevel, ident, config.staticJwtOverride)
     }
 
     private fun validateIdentAndSecurityLevel(config: TokenXMockedAuthenticatorConfig): AuthInfo {
         require(config.staticUserPid != null) { "Statisk ident må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
-        require(config.staticSecurityLevel != null) { "Statisk securityLevel må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
+        require(config.staticLevelOfAssurance != null) { "Statisk securityLevel må være satt hvis alwaysAuthenticated=true og jwtOverride ikke er satt" }
 
-        return AuthInfo(true, config.staticSecurityLevel?.claim, config.staticUserPid, null)
+        return AuthInfo(true, config.staticLevelOfAssurance?.claim, config.staticUserPid, null)
     }
 }

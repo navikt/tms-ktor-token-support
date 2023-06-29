@@ -27,16 +27,18 @@ private fun getAuthenticatorName(isDefault: Boolean): String? {
     }
 }
 
-enum class SecurityLevel(val claim: String) {
+enum class LevelOfAssurance(val claim: String) {
     LEVEL_3("Level3"),
-    LEVEL_4("Level4")
+    LEVEL_4("Level4"),
+    SUBSTANTIAL("idporten-loa-substantial"),
+    HIGH("idporten-loa-high")
 }
 
 // Configuration provided by library user. See readme for example of use
 class IdPortenMockedAuthenticatorConfig {
     var setAsDefault: Boolean = false
     var alwaysAuthenticated: Boolean = false
-    var staticSecurityLevel: SecurityLevel? = null
+    var staticLevelOfAssurance: LevelOfAssurance? = null
     var staticUserPid: String? = null
     var staticJwtOverride: String? = null
 }

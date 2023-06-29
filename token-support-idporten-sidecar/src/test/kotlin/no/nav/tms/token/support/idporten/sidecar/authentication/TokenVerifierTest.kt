@@ -21,7 +21,7 @@ import java.util.*
 internal class TokenVerifierTest {
     private val jwk = JwkBuilder.generateJwk()
     private val issuer = "issuer"
-    private val level4 = "Level4"
+    private val loaHigh = "idporten-loa-high"
 
     private val now = Instant.now()
     private val hourFromNow = now.plus(1, HOURS)
@@ -38,14 +38,14 @@ internal class TokenVerifierTest {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
             issuer = issuer,
-            minLoginLevel = 4
+            minLevelOfAssurance = LevelOfAssuranceInternal.High
         )
 
         val token = JwtBuilder.generateJwtString(
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = issuer,
-            loginLevel = level4,
+            levelOfAssurance = loaHigh,
             rsaKey = jwk
         )
 
@@ -61,7 +61,7 @@ internal class TokenVerifierTest {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
             issuer = issuer,
-            minLoginLevel = 4
+            minLevelOfAssurance = LevelOfAssuranceInternal.High
         )
 
 
@@ -69,7 +69,7 @@ internal class TokenVerifierTest {
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = "invalid",
-            loginLevel = level4,
+            levelOfAssurance = loaHigh,
             rsaKey = jwk
         )
 
@@ -85,7 +85,7 @@ internal class TokenVerifierTest {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
             issuer = issuer,
-            minLoginLevel = 4
+            minLevelOfAssurance = LevelOfAssuranceInternal.High
         )
 
 
@@ -93,7 +93,7 @@ internal class TokenVerifierTest {
             issueTime = now.minus(2, HOURS).toDate(),
             expiryTime = now.minus(1, HOURS).toDate(),
             issuer = issuer,
-            loginLevel = level4,
+            levelOfAssurance = loaHigh,
             rsaKey = jwk
         )
 
@@ -109,7 +109,7 @@ internal class TokenVerifierTest {
         val verifier = TokenVerifier(
             jwkProvider = jwkProvider,
             issuer = issuer,
-            minLoginLevel = 4
+            minLevelOfAssurance = LevelOfAssuranceInternal.High
         )
 
 
@@ -117,7 +117,7 @@ internal class TokenVerifierTest {
             issueTime = now.toDate(),
             expiryTime = hourFromNow.toDate(),
             issuer = issuer,
-            loginLevel = "Level3",
+            levelOfAssurance = "idporten-loa-substantial",
             rsaKey = jwk
         )
 
