@@ -6,9 +6,9 @@ import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.HIGH
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
-import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal
-import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal.*
-import no.nav.tms.token.support.tokenx.validation.tokendings.TokenXPrincipal
+import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance
+import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance.*
+import no.nav.tms.token.support.tokenx.validation.TokenXPrincipal
 import java.time.Instant
 
 object TokenXUserFactory {
@@ -27,7 +27,7 @@ object TokenXUserFactory {
 
         val ident: String = token.getClaim(identClaim).asString()
 
-        val acrLoA = LevelOfAssuranceInternal.fromAcr(token.getClaim("acr").asString())
+        val acrLoA = IdPortenLevelOfAssurance.fromAcr(token.getClaim("acr").asString())
 
         val loginLevel = mapLoginLevel(acrLoA)
         val levelOfAssurance = mapLevelOfAssurance(acrLoA)
@@ -40,7 +40,7 @@ object TokenXUserFactory {
         return TokenXUser(ident, loginLevel, levelOfAssurance, expirationTime, token)
     }
 
-    private fun mapLoginLevel(levelOfAssurance: LevelOfAssuranceInternal): Int {
+    private fun mapLoginLevel(levelOfAssurance: IdPortenLevelOfAssurance): Int {
 
         return when (levelOfAssurance) {
             Level3, Substantial -> 3
@@ -49,7 +49,7 @@ object TokenXUserFactory {
         }
     }
 
-    private fun mapLevelOfAssurance(levelOfAssurance: LevelOfAssuranceInternal): LevelOfAssurance {
+    private fun mapLevelOfAssurance(levelOfAssurance: IdPortenLevelOfAssurance): LevelOfAssurance {
         return when (levelOfAssurance) {
             Level3, Substantial -> SUBSTANTIAL
             Level4, High -> HIGH

@@ -20,7 +20,7 @@ Biblioteket tilbyr ett interface `AzureService` med to implementasjoner, `Cachin
 Disse bygges ved hjelp av `AzureServiceBuilder`: 
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
     val serviceWithCache = AzureServiceBuilder.buildAzureService(
         cachingEnabled = true,

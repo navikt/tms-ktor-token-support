@@ -19,6 +19,7 @@ dependencies {
     implementation(Ktor.serverAuthJwt)
     implementation(Ktor.serverNetty)
     implementation(Logback.classic)
+    implementation(KotlinLogging.logging)
     implementation(Nimbusds.joseJwt)
     testImplementation(kotlin("test-junit5"))
     testImplementation(Kluent.kluent)

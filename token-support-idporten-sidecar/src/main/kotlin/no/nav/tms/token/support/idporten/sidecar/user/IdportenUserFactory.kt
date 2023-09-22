@@ -5,9 +5,9 @@ import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance
 import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.*
-import no.nav.tms.token.support.idporten.sidecar.authentication.IdPortenTokenPrincipal
-import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal
-import no.nav.tms.token.support.idporten.sidecar.authentication.LevelOfAssuranceInternal.*
+import no.nav.tms.token.support.idporten.sidecar.IdPortenTokenPrincipal
+import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
+import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance.*
 import java.time.Instant
 
 // This creates an IdportenUser based on user jwt claims
@@ -22,8 +22,8 @@ object IdportenUserFactory {
         return createIdportenUser(principal, identClaim)
     }
 
-    internal fun extractLevelOfAssurance(accessToken: DecodedJWT): LevelOfAssuranceInternal {
-        return LevelOfAssuranceInternal.fromAcr(accessToken.getClaim("acr").asString())
+    internal fun extractLevelOfAssurance(accessToken: DecodedJWT): IdPortenLevelOfAssurance {
+        return IdPortenLevelOfAssurance.fromAcr(accessToken.getClaim("acr").asString())
     }
 
     private fun createIdportenUser(principal: IdPortenTokenPrincipal, identClaim: String): IdportenUser {
@@ -44,7 +44,7 @@ object IdportenUserFactory {
         return IdportenUser(ident, loginLevel, levelOfAssurance, expirationTime, accessToken)
     }
 
-    private fun mapLoginLevel(levelOfAssurance: LevelOfAssuranceInternal): Int {
+    private fun mapLoginLevel(levelOfAssurance: IdPortenLevelOfAssurance): Int {
 
         return when (levelOfAssurance) {
             Level3, Substantial -> 3
@@ -53,7 +53,7 @@ object IdportenUserFactory {
         }
     }
 
-    private fun mapLevelOfAssurance(levelOfAssurance: LevelOfAssuranceInternal): LevelOfAssurance {
+    private fun mapLevelOfAssurance(levelOfAssurance: IdPortenLevelOfAssurance): LevelOfAssurance {
         return when (levelOfAssurance) {
             Level3, Substantial -> SUBSTANTIAL
             Level4, High -> HIGH

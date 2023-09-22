@@ -23,8 +23,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = false
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = false
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -39,9 +42,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = true
-                    staticJwtOverride = jwtOverrideString
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = true
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -57,9 +62,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = true
-                    staticJwtOverride = null
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = true
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -75,9 +82,12 @@ internal class AzureAuthTest {
 
         application {
             testApiWithDefault {
-                installAzureAuthMock {
-                    setAsDefault = true
-                    alwaysAuthenticated = false
+                authentication {
+                    azureMock {
+                        setAsDefault = true
+                        alwaysAuthenticated = false
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }

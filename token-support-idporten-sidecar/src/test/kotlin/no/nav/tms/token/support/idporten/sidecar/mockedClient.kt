@@ -8,7 +8,7 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.encodeToString
 import no.nav.tms.token.support.idporten.sidecar.ObjectMapper.kotlinxMapper
-import no.nav.tms.token.support.idporten.sidecar.authentication.OauthServerConfigurationMetadata
+import no.nav.tms.token.support.idporten.sidecar.install.OauthServerConfigurationMetadata
 
 
 val mockedClient = HttpClient(MockEngine) {

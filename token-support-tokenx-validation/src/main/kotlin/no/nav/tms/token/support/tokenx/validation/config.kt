@@ -1,15 +1,11 @@
 package no.nav.tms.token.support.tokenx.validation
 
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
-import no.nav.tms.token.support.tokenx.validation.TokenXInstaller.performTokenXAuthenticatorInstallation
-import no.nav.tms.token.support.tokenx.validation.config.RuntimeContext
-import no.nav.tms.token.support.tokenx.validation.tokendings.tokenXAccessToken
+import no.nav.tms.token.support.tokenx.validation.install.TokenXInstaller.performTokenXAuthenticatorInstallation
 
 
-fun Application.installTokenXAuth(configure: TokenXAuthenticatorConfig.() -> Unit = {}) {
+fun AuthenticationConfig.tokenX(configure: TokenXAuthenticatorConfig.() -> Unit = {}) {
     val config = TokenXAuthenticatorConfig().also(configure)
 
     performTokenXAuthenticatorInstallation(config)
@@ -17,12 +13,13 @@ fun Application.installTokenXAuth(configure: TokenXAuthenticatorConfig.() -> Uni
 
 // Configuration provided by library user. See readme for example of use
 class TokenXAuthenticatorConfig {
+    var authenticatorName: String = TokenXAuthenticator.name
     var setAsDefault: Boolean = false
     var levelOfAssurance: LevelOfAssurance = SUBSTANTIAL
 }
 
 object TokenXAuthenticator {
-    const val name = "tokenx_bearer_access_token"
+    const val name = "tokenx_access_token"
 }
 
 object TokenXHeader {

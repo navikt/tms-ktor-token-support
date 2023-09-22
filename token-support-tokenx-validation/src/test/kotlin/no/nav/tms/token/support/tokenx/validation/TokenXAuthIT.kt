@@ -15,10 +15,9 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.HIGH
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
-import no.nav.tms.token.support.tokenx.validation.config.HttpClientBuilder
-import no.nav.tms.token.support.tokenx.validation.config.JwkProviderBuilder
-import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal
-import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal.*
+import no.nav.tms.token.support.tokenx.validation.install.HttpClientBuilder
+import no.nav.tms.token.support.tokenx.validation.install.JwkProviderBuilder
+import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance.*
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -29,8 +28,8 @@ internal class TokenXAuthIT {
     private val clientId = "cluster:namespace:appname"
 
     private val envVars = listOf(
-            "TOKEN_X_CLIENT_ID" to clientId,
-            "TOKEN_X_WELL_KNOWN_URL" to "http://tokendings-url/config"
+        "TOKEN_X_CLIENT_ID" to clientId,
+        "TOKEN_X_WELL_KNOWN_URL" to "http://tokendings-url/config"
     ).toMap()
 
     private val privateJwk = JwkJwtBuilder.generateJwk()
@@ -274,11 +273,11 @@ internal class TokenXAuthIT {
             testApi(minLoa = SUBSTANTIAL)
         }
 
-        val loaLowToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
+        val loaSubstantialToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
         val level3Token = JwtBuilder.generateJwtString(clientId, Level3, idportenMetadata.issuer, privateJwk)
 
         val loaLowResponse = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $loaLowToken")
+            headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
         }
         val level3Response = client.get("/test") {
             headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
@@ -301,14 +300,57 @@ internal class TokenXAuthIT {
         response.body<String>() `should be equal to` "No bearer token found."
     }
 
-    private fun Application.testApi(minLoa: LevelOfAssurance? = null) = withEnvironment(envVars) {
+    @Test
+    fun `Allows verifying different apis with different configurations`() = testApplication {
 
-        installTokenXAuth {
-            if (minLoa != null) {
-                levelOfAssurance = minLoa
+        application {
+            withEnvironment(envVars) {
+                authentication {
+                    tokenX {
+                        setAsDefault = true
+                        levelOfAssurance = HIGH
+                    }
+                    tokenX {
+                        setAsDefault = false
+                        authenticatorName = "substantial"
+                        levelOfAssurance = SUBSTANTIAL
+                    }
+                }
+            }
+            routing {
+                authenticate {
+                    get("/test/one") {
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
+                authenticate("substantial") {
+                    get("test/two") {
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
             }
         }
 
+        val loaSubstantialToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
+
+        client.get("/test/one") {
+            headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
+        }.status `should be equal to` HttpStatusCode.Unauthorized
+
+        client.get("/test/two") {
+            headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
+        }.status `should be equal to` HttpStatusCode.OK
+    }
+
+    private fun Application.testApi(minLoa: LevelOfAssurance? = null) = withEnvironment(envVars) {
+
+        authentication{
+            tokenX {
+                if (minLoa != null) {
+                    levelOfAssurance = minLoa
+                }
+            }
+        }
 
         routing {
             authenticate(TokenXAuthenticator.name) {
@@ -321,8 +363,10 @@ internal class TokenXAuthIT {
 
     private fun Application.testApiWithDefault() = withEnvironment(envVars) {
 
-        installTokenXAuth {
-            setAsDefault = true
+        authentication {
+            tokenX {
+                setAsDefault = true
+            }
         }
 
         routing {

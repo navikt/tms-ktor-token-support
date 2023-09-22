@@ -22,9 +22,12 @@ internal class TokenXAuthTest {
 
         application {
             testApi {
-                installTokenXAuthMock {
-                    alwaysAuthenticated = false
+                authentication {
+                    tokenXMock {
+                        alwaysAuthenticated = false
+                    }
                 }
+
             }
         }
 
@@ -38,10 +41,12 @@ internal class TokenXAuthTest {
 
         application {
             testApi {
-                installTokenXAuthMock {
-                    alwaysAuthenticated = true
-                    staticUserPid = userPid
-                    staticLevelOfAssurance = LevelOfAssurance.LEVEL_4
+                authentication {
+                    tokenXMock {
+                        alwaysAuthenticated = true
+                        staticUserPid = userPid
+                        staticLevelOfAssurance = LevelOfAssurance.LEVEL_4
+                    }
                 }
             }
         }
@@ -57,9 +62,11 @@ internal class TokenXAuthTest {
 
         application {
             testApiWithDefault {
-                installTokenXAuthMock {
-                    setAsDefault = true
-                    alwaysAuthenticated = false
+                authentication {
+                    tokenXMock {
+                        setAsDefault = true
+                        alwaysAuthenticated = false
+                    }
                 }
             }
         }

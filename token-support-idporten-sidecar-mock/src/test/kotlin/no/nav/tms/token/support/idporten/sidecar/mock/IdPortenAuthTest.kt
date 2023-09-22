@@ -8,7 +8,7 @@ import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import no.nav.tms.token.support.idporten.sidecar.IdPortenCookieAuthenticator
+import no.nav.tms.token.support.idporten.sidecar.IdPortenAuthenticator
 import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Test
@@ -22,8 +22,10 @@ internal class IdPortenAuthTest {
 
         application {
             testApi {
-                installIdPortenAuthMock {
-                    alwaysAuthenticated = false
+                authentication {
+                    idPortenMock {
+                        alwaysAuthenticated = false
+                    }
                 }
             }
         }
@@ -38,10 +40,12 @@ internal class IdPortenAuthTest {
 
         application {
             testApi {
-                installIdPortenAuthMock {
-                    alwaysAuthenticated = true
-                    staticUserPid = userPid
-                    staticLevelOfAssurance = LevelOfAssurance.HIGH
+                authentication {
+                    idPortenMock {
+                        alwaysAuthenticated = true
+                        staticUserPid = userPid
+                        staticLevelOfAssurance = LevelOfAssurance.HIGH
+                    }
                 }
             }
         }
@@ -57,9 +61,11 @@ internal class IdPortenAuthTest {
 
         application {
             testApiWithDefault {
-                installIdPortenAuthMock {
-                    setAsDefault = true
-                    alwaysAuthenticated = false
+                authentication {
+                    idPortenMock {
+                        setAsDefault = true
+                        alwaysAuthenticated = false
+                    }
                 }
             }
         }
@@ -74,7 +80,7 @@ internal class IdPortenAuthTest {
         authConfig()
 
         routing {
-            authenticate(IdPortenCookieAuthenticator.name) {
+            authenticate(IdPortenAuthenticator.name) {
                 get("/test") {
                     val user = IdportenUserFactory.createIdportenUser(call)
                     call.respondText(user.ident)

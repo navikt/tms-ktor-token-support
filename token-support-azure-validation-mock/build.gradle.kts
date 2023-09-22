@@ -10,6 +10,8 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(project(":token-support-azure-validation"))
+    implementation(Logback.classic)
+    implementation(KotlinLogging.logging)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)
     implementation(Ktor.clientJson)

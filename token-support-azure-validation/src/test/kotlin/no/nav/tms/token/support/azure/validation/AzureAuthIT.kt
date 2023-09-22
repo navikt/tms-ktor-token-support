@@ -4,17 +4,17 @@ package no.nav.tms.token.support.azure.validation
 import io.kotest.extensions.system.withEnvironment
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.every
 import io.mockk.mockkObject
 import io.mockk.unmockkObject
-import no.nav.tms.token.support.azure.validation.config.HttpClientBuilder
-import no.nav.tms.token.support.azure.validation.config.JwkProviderBuilder
+import no.nav.tms.token.support.azure.validation.install.HttpClientBuilder
+import no.nav.tms.token.support.azure.validation.install.JwlProviderBuilder
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -38,15 +38,15 @@ internal class AzureAuthIT {
     @BeforeEach
     fun setupMock() {
         mockkObject(HttpClientBuilder)
-        mockkObject(JwkProviderBuilder)
+        mockkObject(JwlProviderBuilder)
         every { HttpClientBuilder.build(any()) } returns mockedClient
-        every { JwkProviderBuilder.createJwkProvider(any()) } returns mockedJwkProvider
+        every { JwlProviderBuilder.createJwkProvider(any()) } returns mockedJwkProvider
     }
 
     @AfterEach
     fun cleanUp() {
         unmockkObject(HttpClientBuilder)
-        unmockkObject(JwkProviderBuilder)
+        unmockkObject(JwlProviderBuilder)
     }
 
     @Test
@@ -232,7 +232,9 @@ internal class AzureAuthIT {
 
     private fun Application.testApi() = withEnvironment(envVars) {
 
-        installAzureAuth()
+        authentication {
+            azure()
+        }
 
         routing {
             authenticate(AzureAuthenticator.name) {
@@ -245,8 +247,10 @@ internal class AzureAuthIT {
 
     private fun Application.testApiWithDefault() = withEnvironment(envVars) {
 
-        installAzureAuth {
-            setAsDefault = true
+        authentication {
+            azure {
+                setAsDefault = true
+            }
         }
 
         routing {

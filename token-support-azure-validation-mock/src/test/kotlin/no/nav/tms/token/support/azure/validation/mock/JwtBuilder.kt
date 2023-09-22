@@ -8,7 +8,7 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.tms.token.support.azure.validation.mock.intercept.JwkBuilder
+import no.nav.tms.token.support.azure.validation.mock.install.JwkBuilder
 import java.time.Instant
 import java.util.*
 

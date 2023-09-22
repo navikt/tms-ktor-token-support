@@ -34,7 +34,7 @@ Biblioteket tilbyr ett interface `TokendingsService` med to implementasjoner, `C
 Disse bygges ved hjelp av `TokendingsServiceBuilder`: 
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
     val serviceWithCache = TokendingsServiceBuilder.buildTokendingsService(
         cachingEnabled = true,

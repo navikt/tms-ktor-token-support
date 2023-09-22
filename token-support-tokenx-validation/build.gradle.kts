@@ -10,6 +10,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
+    implementation(KotlinLogging.logging)
     implementation(Ktor.clientApache)
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.clientJson)
@@ -18,6 +19,9 @@ dependencies {
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)
     implementation(Nimbusds.joseJwt)
+    implementation("io.ktor:ktor-server-auth-jvm:2.3.0")
+    implementation("io.ktor:ktor-server-core-jvm:2.3.0")
+    implementation("io.ktor:ktor-server-auth-ldap-jvm:2.3.0")
     testImplementation(kotlin("test-junit5"))
     testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
