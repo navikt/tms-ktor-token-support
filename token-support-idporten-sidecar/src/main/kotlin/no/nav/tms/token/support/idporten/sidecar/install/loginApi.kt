@@ -13,26 +13,27 @@ import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
 
 private const val postLoginRedirectCookie = "redirect_uri"
 
-internal fun Routing.idPortenLoginApi(tokenVerifier: TokenVerifier, routesPrefix: String?) {
+internal fun Routing.idPortenLoginApi(tokenVerifier: TokenVerifier, rootpath: String, routesPrefix: String?) {
 
     if (routesPrefix != null) {
         route("/$routesPrefix") {
-            loginEndPoints(tokenVerifier, routesPrefix)
+            loginEndPoints(tokenVerifier, rootpath, routesPrefix)
         }
     } else {
-        loginEndPoints(tokenVerifier, routesPrefix)
+        loginEndPoints(tokenVerifier, rootpath, routesPrefix)
     }
 }
 
-private fun Route.loginEndPoints(tokenVerifier: TokenVerifier, routesPrefix: String?) {
-    get("/login") {
-        val redirectUri = call.redirectUri
+private fun Route.loginEndPoints(tokenVerifier: TokenVerifier, rootpath: String, routesPrefix: String?) {
 
-        if (redirectUri != null) {
+    get("/login") {
+        call.redirectUri?.let { redirectUri ->
             call.response.cookies.append(postLoginRedirectCookie, redirectUri)
         }
 
-        call.respondRedirect(getLoginUrl(routesPrefix, call.levelOfAssurance))
+        findRelativePath(rootpath, routesPrefix)
+            .let { relativePath -> getLoginUrl(relativePath, call.levelOfAssurance) }
+            .let { loginUrl -> call.respondRedirect(loginUrl) }
     }
 
     get("/login/status") {
@@ -58,13 +59,49 @@ private fun Route.loginEndPoints(tokenVerifier: TokenVerifier, routesPrefix: Str
     }
 }
 
-private val objectMapper = Json
+private fun getLoginUrl(relativePath: String, levelOfAssurance: String?): String {
+
+    val redirectPath = "${relativePath}/oauth2/login?redirect=${relativePath}/login/callback"
+
+    return if (levelOfAssurance != null) {
+        "$redirectPath&level=$levelOfAssurance"
+    } else {
+        redirectPath
+    }
+}
+
+private fun findRelativePath(rootpath: String, prefix: String?): String {
+    val rootPathPart = when {
+        rootpath.isStub() -> ""
+        else -> rootpath.trim('/')
+    }
+
+    val prefixPart = when {
+        prefix == null -> ""
+        prefix.isStub() -> ""
+        else -> prefix.trim('/')
+    }
+
+    return when {
+        rootPathPart.isBlank() && prefixPart.isBlank() -> ""
+        prefixPart.isBlank() -> "/$rootPathPart"
+        rootPathPart.isBlank() -> "/$prefixPart"
+        else -> "/$rootPathPart/$prefixPart"
+    }
+}
+
+private fun String.isStub() = when(this) {
+    "" -> true
+    "/" -> true
+    else -> false
+}
+
 
 private suspend fun ApplicationCall.respondJson(status: LoginStatus) {
     response.headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     respond(
         status = HttpStatusCode.OK,
-        message = objectMapper.encodeToString(status)
+        message = Json.encodeToString(status)
     )
 }
 
@@ -96,20 +133,6 @@ private fun ApplicationCall.validAccessTokenOrNull(tokenVerifier: TokenVerifier)
         }
     } else {
         null
-    }
-}
-
-private fun getLoginUrl(contextPath: String?, levelOfAssurance: String?): String {
-    val redirectPath = if (contextPath != null) {
-        "/$contextPath/oauth2/login?redirect=/$contextPath/login/callback"
-    } else {
-        "/oauth2/login?redirect=/login/callback"
-    }
-
-    return if (levelOfAssurance != null) {
-        "$redirectPath&level=$levelOfAssurance"
-    } else {
-        redirectPath
     }
 }
 
