@@ -1,11 +1,10 @@
 package no.nav.tms.token.support.azure.validation.mock.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.server.auth.*
 import io.ktor.http.*
 import io.ktor.serialization.*
+import io.ktor.server.auth.*
 import io.ktor.server.response.*
-import org.slf4j.LoggerFactory
 
 internal fun AuthenticationConfig.registerAzureProviderMock(authenticatorName: String?, authInfo: AuthInfo) {
 

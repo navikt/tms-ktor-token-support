@@ -3,9 +3,10 @@ package no.nav.tms.token.support.idporten.sidecar.user
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance
-import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenTokenPrincipal
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.HIGH
+import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.SUBSTANTIAL
 import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
 import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance.*
 import java.time.Instant

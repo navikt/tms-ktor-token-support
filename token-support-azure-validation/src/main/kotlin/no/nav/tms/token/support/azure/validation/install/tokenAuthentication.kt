@@ -1,13 +1,12 @@
 package no.nav.tms.token.support.azure.validation.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import no.nav.tms.token.support.azure.validation.AzureHeader
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
-import org.slf4j.LoggerFactory
 
 internal fun AuthenticationConfig.registerAzureValidationProvider(authenticatorName: String?, tokenVerifier: TokenVerifier) {
 

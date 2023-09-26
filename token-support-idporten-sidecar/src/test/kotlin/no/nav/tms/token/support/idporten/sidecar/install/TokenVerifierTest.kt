@@ -8,11 +8,11 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tms.token.support.idporten.sidecar.JwkBuilder
 import no.nav.tms.token.support.idporten.sidecar.JwtBuilder
+import org.amshove.kluent.invoking
 import org.amshove.kluent.`should not throw`
 import org.amshove.kluent.`should throw`
-import org.amshove.kluent.invoking
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.time.temporal.ChronoUnit.HOURS
 import java.util.*

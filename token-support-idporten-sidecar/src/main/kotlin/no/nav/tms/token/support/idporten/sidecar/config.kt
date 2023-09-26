@@ -1,8 +1,8 @@
 package no.nav.tms.token.support.idporten.sidecar
 
 import io.ktor.server.auth.*
-import no.nav.tms.token.support.idporten.sidecar.install.IdPortenInstaller.performIdPortenAuthenticatorInstallation
 import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance.HIGH
+import no.nav.tms.token.support.idporten.sidecar.install.IdPortenInstaller.performIdPortenAuthenticatorInstallation
 
 
 // This method is responsible for registering the authenticators.

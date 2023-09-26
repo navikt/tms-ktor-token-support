@@ -1,6 +1,5 @@
 package no.nav.tms.token.support.azure.validation.mock
 
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticator
 import no.nav.tms.token.support.azure.validation.mock.install.AzureMockInstaller.performAzureMockAuthenticatorInstallation

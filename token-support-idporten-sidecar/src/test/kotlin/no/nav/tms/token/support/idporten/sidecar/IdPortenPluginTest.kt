@@ -11,7 +11,6 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.*
-import io.mockk.InternalPlatformDsl.toStr
 import kotlinx.serialization.json.*
 import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
 import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance

@@ -16,8 +16,8 @@ import io.mockk.unmockkObject
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.HIGH
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
 import no.nav.tms.token.support.tokenx.validation.install.HttpClientBuilder
-import no.nav.tms.token.support.tokenx.validation.install.JwkProviderBuilder
 import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance.*
+import no.nav.tms.token.support.tokenx.validation.install.JwkProviderBuilder
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

@@ -3,15 +3,15 @@ package no.nav.tms.token.support.idporten.sidecar
 import com.auth0.jwt.interfaces.DecodedJWT
 import io.kotest.extensions.system.withEnvironment
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.*
-import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
 import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
+import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

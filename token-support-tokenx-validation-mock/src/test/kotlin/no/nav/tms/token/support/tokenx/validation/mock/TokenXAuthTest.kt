@@ -2,13 +2,13 @@ package no.nav.tms.token.support.tokenx.validation.mock
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import no.nav.tms.token.support.tokenx.validation.*
+import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticator
 import no.nav.tms.token.support.tokenx.validation.user.TokenXUserFactory
 import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Test

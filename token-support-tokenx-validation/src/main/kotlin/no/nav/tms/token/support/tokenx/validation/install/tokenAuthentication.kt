@@ -1,9 +1,9 @@
 package no.nav.tms.token.support.tokenx.validation.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import no.nav.tms.token.support.tokenx.validation.TokenXHeader
 import no.nav.tms.token.support.tokenx.validation.TokenXPrincipal

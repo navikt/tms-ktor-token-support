@@ -31,7 +31,7 @@ Eksempel på konfigurasjon:
 
 ```kotlin
 fun Application.setup() {
-
+    
     authentication {
         idPorten {
             setAsDefault = false
@@ -80,6 +80,40 @@ fun Application.setup() {
     routing {
         authenticate {
             get("/sikret") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+    }
+}
+```
+
+Eksempel på bruk der ulike endepunkt krever ulike nivå:
+
+```kotlin
+fun Application.setup() {
+
+    authentication {
+        idPorten {
+            setAsDefault = true
+            levelOfAssurance = LevelOfAssurance.HIGH
+        }
+        
+        idPorten {
+            authenticatorName = "lavere_krav"
+            levelOfAssurance = LevelOfAssurance.SUBSTANTIAL
+            setAsDefault = false
+        }
+    }
+    
+    routing {
+        authenticate {
+            get("/sikret") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+        
+        authenticate("lavere_krav") {
+            get("/sikret/lavere") {
                 call.respond(HttpStatusCode.OK)
             }
         }

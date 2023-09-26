@@ -6,9 +6,9 @@ import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.HIGH
 import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
+import no.nav.tms.token.support.tokenx.validation.TokenXPrincipal
 import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance
 import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance.*
-import no.nav.tms.token.support.tokenx.validation.TokenXPrincipal
 import java.time.Instant
 
 object TokenXUserFactory {

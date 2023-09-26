@@ -1,11 +1,10 @@
 package no.nav.tms.token.support.idporten.sidecar.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.server.auth.*
 import io.ktor.http.*
+import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenTokenPrincipal
-import org.slf4j.LoggerFactory
 
 private val log = KotlinLogging.logger { }
 
