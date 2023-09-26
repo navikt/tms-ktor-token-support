@@ -17,17 +17,20 @@ spec:
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
-Denne har 1 variabel:
+Denne har 2 variabler:
 
-`setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
+- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `TokenXAuthenticator.name`
+- `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
  
 Eksempel på konfigurasjon:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installTokenXAuth {
-        setAsDefault = false
+    authentication {
+        tokenX {
+            setAsDefault = false
+        }
     }
 }
 ```
@@ -36,10 +39,12 @@ Deretter kan man autentisere bestemte endepunkt som følger. Hvis ikke denne aut
 viktig å ha med navnet på autentikatoren.
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installTokenXAuth {
-        setAsDefault = false
+    authentication {
+        tokenX {
+            setAsDefault = false
+        }
     }
     
     routing {
@@ -55,10 +60,12 @@ fun Application.mainModule() {
 Typisk eksempel på bruk i miljø og dette er default authenticator:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installTokenXAuth {
-        setAsDefault = true
+    authentication {
+        tokenX {
+            setAsDefault = true
+        }
     }
     
     routing {

@@ -7,12 +7,12 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.tms.token.support.tokenx.validation.tokendings.LevelOfAssuranceInternal
+import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance
 import java.time.Instant
 import java.util.*
 
 internal object JwtBuilder {
-    fun generateJwtString(clientId: String, loa: LevelOfAssuranceInternal, issuer: String, rsaKey: RSAKey): String {
+    fun generateJwtString(clientId: String, loa: IdPortenLevelOfAssurance, issuer: String, rsaKey: RSAKey): String {
         val now = Date.from(Instant.now())
         return JWTClaimsSet.Builder()
             .issuer(issuer)

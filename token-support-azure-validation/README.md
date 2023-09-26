@@ -19,16 +19,19 @@ For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
 Denne har 2 variabler:
 
+- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `AzureAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
 - `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
 
 Eksempel på konfigurasjon:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installAzureAuth {
-        setAsDefault = false
+    authentication {
+        azure {
+            setAsDefault = false
+        }
     }
 }
 ```
@@ -37,10 +40,12 @@ Deretter kan man autentisere bestemte endepunkt som følger. Hvis ikke denne aut
 viktig å ha med navnet på autentikatoren.
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installAzureAuth {
-        setAsDefault = false
+    authentication {
+        azure {
+            setAsDefault = false
+        }
     }
     
     routing {
@@ -56,10 +61,12 @@ fun Application.mainModule() {
 Typisk eksempel på bruk i miljø og dette er default authenticator:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installAzureAuth {
-        setAsDefault = true
+    authentication {
+        azure {
+            setAsDefault = true
+        }
     }
     
     routing {

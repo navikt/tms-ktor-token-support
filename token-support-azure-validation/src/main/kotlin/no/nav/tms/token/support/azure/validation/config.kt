@@ -1,17 +1,17 @@
 package no.nav.tms.token.support.azure.validation
 
-import io.ktor.server.application.*
-import no.nav.tms.token.support.azure.validation.AzureInstaller.performAzureAuthenticatorInstallation
+import io.ktor.server.auth.*
+import no.nav.tms.token.support.azure.validation.install.AzureInstaller.performAzureAuthenticatorInstallation
 
 
-fun Application.installAzureAuth(configure: AzureAuthenticatorConfig.() -> Unit = {}) {
-    val config = AzureAuthenticatorConfig().also(configure)
-
-    performAzureAuthenticatorInstallation(config)
-}
+fun AuthenticationConfig.azure(configure: AzureAuthenticatorConfig.() -> Unit = {}) =
+    AzureAuthenticatorConfig()
+        .also(configure)
+        .let { performAzureAuthenticatorInstallation(it) }
 
 // Configuration provided by library user. See readme for example of use
 class AzureAuthenticatorConfig {
+    var authenticatorName: String = AzureAuthenticator.name
     var setAsDefault: Boolean = false
     var enableDefaultProxy: Boolean = false
 }

@@ -1,30 +1,14 @@
 package no.nav.tms.token.support.tokenx.validation.mock
 
-import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticator
-import no.nav.tms.token.support.tokenx.validation.mock.tokendings.AuthInfoValidator
-import no.nav.tms.token.support.tokenx.validation.mock.tokendings.tokenXAuthMock
+import no.nav.tms.token.support.tokenx.validation.mock.install.TokenXMockInstaller.performTokenXMockInstallation
 
 
-fun Application.installTokenXAuthMock(configure: TokenXMockedAuthenticatorConfig.() -> Unit = {}) {
+fun AuthenticationConfig.tokenXMock(configure: TokenXMockedAuthenticatorConfig.() -> Unit = {}) {
     val config = TokenXMockedAuthenticatorConfig().also(configure)
 
-    val authenticatorName = getAuthenticatorName(config.setAsDefault)
-
-    val authInfo = AuthInfoValidator.validateAuthInfo(config)
-
-    install(Authentication) {
-        tokenXAuthMock(authenticatorName, authInfo)
-    }
-}
-
-private fun getAuthenticatorName(isDefault: Boolean): String? {
-    return if (isDefault) {
-        null
-    } else {
-        TokenXAuthenticator.name
-    }
+    performTokenXMockInstallation(config)
 }
 
 enum class LevelOfAssurance(val claim: String) {
@@ -36,6 +20,7 @@ enum class LevelOfAssurance(val claim: String) {
 
 // Configuration provided by library user. See readme for example of use
 class TokenXMockedAuthenticatorConfig {
+    var authenticatorName: String = TokenXAuthenticator.name
     var setAsDefault: Boolean = false
     var alwaysAuthenticated: Boolean = false
     var staticLevelOfAssurance: LevelOfAssurance? = null

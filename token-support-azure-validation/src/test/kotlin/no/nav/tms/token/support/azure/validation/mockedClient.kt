@@ -8,7 +8,7 @@ import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.encodeToString
 import no.nav.tms.token.support.azure.validation.ObjectMapper.kotlinxMapper
-import no.nav.tms.token.support.azure.validation.config.OauthServerConfigurationMetadata
+import no.nav.tms.token.support.azure.validation.install.OauthServerConfigurationMetadata
 
 
 

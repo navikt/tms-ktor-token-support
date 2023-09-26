@@ -2,9 +2,9 @@ name: Build and run tests
 
 on:
   push:
-    branches-ignore:
-      - main
-
+    paths-ignore:
+      - .github/workflows/**
+      - '**/README.md'
 jobs:
   build-and-run-tests-on-other-branches:
     runs-on: ubuntu-latest

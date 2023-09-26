@@ -10,6 +10,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
+    implementation(KotlinLogging.logging)
     implementation(Caffeine.caffeine)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)

@@ -2,9 +2,9 @@ package no.nav.tms.token.support.azure.validation.mock
 
 import io.ktor.client.call.*
 import io.ktor.client.request.*
+import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.http.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
@@ -23,8 +23,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = false
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = false
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -39,9 +42,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = true
-                    staticJwtOverride = jwtOverrideString
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = true
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -57,9 +62,11 @@ internal class AzureAuthTest {
 
         application {
             testApi {
-                installAzureAuthMock {
-                    alwaysAuthenticated = true
-                    staticJwtOverride = null
+                authentication {
+                    azureMock {
+                        alwaysAuthenticated = true
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }
@@ -75,9 +82,12 @@ internal class AzureAuthTest {
 
         application {
             testApiWithDefault {
-                installAzureAuthMock {
-                    setAsDefault = true
-                    alwaysAuthenticated = false
+                authentication {
+                    azureMock {
+                        setAsDefault = true
+                        alwaysAuthenticated = false
+                        staticJwtOverride = jwtOverrideString
+                    }
                 }
             }
         }

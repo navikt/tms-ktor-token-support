@@ -10,6 +10,7 @@ For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
 Denne har 3 variabler:
 
+- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `AzureAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
 - `alwaysAuthenticated`: (Optional) Bestemmer om alle kall skal være godkjent eller motsatt. Default 'false'
 - `staticJwtOverride`: (Optional) Bestemmer hvilket token som evt skal settes i AzurePrincipal. Default 'null'.
@@ -17,12 +18,14 @@ Denne har 3 variabler:
 Eksempel på konfigurasjon:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installAzureAuthMock {
-        setAsDefault = false
-        alwaysAuthenticated = false
-        staticJwtOverride = null
+    authentication {
+        azureMock {
+            setAsDefault = false
+            alwaysAuthenticated = false
+            staticJwtOverride = null
+        }
     }
 }
 ```
@@ -31,10 +34,12 @@ Deretter kan man autentisere bestemte endepunkt som følger. Hvis ikke denne aut
 viktig å ha med navnet på autentikatoren.
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installAzureAuthMock {
-        setAsDefault = false
+    authentication {
+        azureMock {
+            setAsDefault = false
+        }
     }
     
     routing {

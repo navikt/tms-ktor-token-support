@@ -21,23 +21,23 @@ For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
 Her er det en rekke variabler:
 
+- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `IdPortenAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
-- `loginLevel`: (Optional) Setter minimum sikkerhetsnivå for alle innlogginger. Default 'LEVEL_4'
-- `postLoginRedirectUri`: (Optional) Url der bruker havner etter login dersom vi ikke finner en "redirect_uri" cookie. Default ""
-- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
-- `fallbackCookieEnabled`: (Optional) Bestemmer om token kan hentes fra cookie dersom vi ikke finner auth-header. Ment for lokal kjøring. Default 'false'.
-- `fallbackCookieName`: (Optional/Required) Bestemmer hvilken cookie token skal leses fra. Må kun settes hvis fallback er enablet. 
+- `loginLevel`: Deprecated - Bruk `levelOfAssurance` i stedet.
+- `levelOfAssurance` (Optional) Setter minimum level-of-assurance for endepunkt. Default 'HIGH'
+- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy. Default 'false'.
  
 Eksempel på konfigurasjon:
 
 ```kotlin
-fun Application.mainModule() {
-
-    installIdPortenAuth {
-        postLoginRedirectUri = '/post/login'
-        setAsDefault = false
-        loginLevel = LoginLevel.LEVEL_3
-        enableDefaultProxy = false
+fun Application.setup() {
+    
+    authentication {
+        idPorten {
+            setAsDefault = false
+            levelOfAssurance = LevelOfAssurance.SUBSTANTIAL
+            enableDefaultProxy = false
+        }
     }
 }
 ```
@@ -45,13 +45,14 @@ fun Application.mainModule() {
 Deretter kan man autentisere bestemte endepunkt som følger. Det er viktig å ha med navnet på autentikatoren.
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installIdPortenAuth {
-        postLoginRedirectUri = '/post/login'
-        setAsDefault = false
-        loginLevel = LoginLevel.LEVEL_3
-        enableDefaultProxy = false
+    authentication {
+        idPorten {
+            setAsDefault = false
+            levelOfAssurance = LevelOfAssurance.SUBSTANTIAL
+            enableDefaultProxy = false
+        }
     }
     
     routing {
@@ -67,11 +68,13 @@ fun Application.mainModule() {
 Typisk eksempel på bruk i miljø i et fagområde som krever nivå 4 og dette er default authenticator:
 
 ```kotlin
-fun Application.mainModule() {
+fun Application.setup() {
 
-    installIdPortenAuth {
-        setAsDefault = true
-        loginLevel = LoginLevel.LEVEL_4
+    authentication {
+        idPorten {
+            setAsDefault = true
+            levelOfAssurance = LevelOfAssurance.HIGH
+        }
     }
     
     routing {
@@ -84,8 +87,90 @@ fun Application.mainModule() {
 }
 ```
 
-Etter bruker her har logget inn i idporten vil den få et jwt token lagret i cookie 'user_id_token'. 
-Denne cookien er scopet til domene og rootpath for appen.
+Eksempel på bruk der ulike endepunkt krever ulike nivå:
+
+```kotlin
+fun Application.setup() {
+
+    authentication {
+        idPorten {
+            setAsDefault = true
+            levelOfAssurance = LevelOfAssurance.HIGH
+        }
+        
+        idPorten {
+            authenticatorName = "lavere_krav"
+            levelOfAssurance = LevelOfAssurance.SUBSTANTIAL
+            setAsDefault = false
+        }
+    }
+    
+    routing {
+        authenticate {
+            get("/sikret") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+        
+        authenticate("lavere_krav") {
+            get("/sikret/lavere") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+    }
+}
+```
+
+## Login plugin
+
+Bilbioteket tilbyr en plugin som setter opp endepunkt for å fasilitere innloggingsflyt.
+
+Disse er 
+- `/login`: Setter i gang innlogging hos ID-porten via sidecar. 
+- `/login/status`: Viser status for innlogging - om bruker er innlogget og med hvilket nivå.
+
+Plugin har to variabler:
+
+- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Default 'false'.
+- `routesPrefix`: (Optional) Bestemmer en relativ path der endepunktene plasseres. Default 'null'.
+
+Eksempel på oppsett:
+
+```kotlin
+fun Application.setup() {
+    install(IdPortenLogin) {
+        routesPrefix = '/implicit/root/path'
+        enableDefaultProxy = false
+    }
+}
+```
+
+Eksempel på bruk:
+
+Installere Plugin:
+
+```kotlin
+fun Application.setup() {
+    install(IdPortenLogin)
+}
+```
+
+Initiere login på med 'substantial' level of assurance:
+
+`https://backend.nav.no/login?loa=substantial&redirect_uri=https://frontend.nav.no`
+
+Sjekke status etter innlogging
+
+`https://backend.nav.no/login/status`
+
+svarer med:
+```json
+{
+  "authenticated": true,
+  "level": 3,
+  "levelOfAssurance": "substantial"
+}
+```
 
 ## IdportenUser
 
@@ -97,7 +182,7 @@ Dette kan gjøres som følger:
 authenticate(IdPortenCookieAuthenticator.name) {
     get("/sikret") {
         val user = IdportenUserFactory.createNewAuthenticatedUser(call)
-        call.respond("Du er logger inn som $user.")
+        call.respond("Du er logget inn som $user.")
     }
 }
 ```
