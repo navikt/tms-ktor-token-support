@@ -1,4 +1,4 @@
-# token-support-tokenx-validation
+# tokenx-validation
 
 Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens vekslet fra tokendings.
 

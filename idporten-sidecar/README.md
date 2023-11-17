@@ -1,4 +1,4 @@
-# token-support-idporten-sidecar
+# idporten-sidecar
 
 Dette biblioteket tilbyr en måte for en ktor app å samhandle med idporten-sidecar for å autentisere brukere.
 

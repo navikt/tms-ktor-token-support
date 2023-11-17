@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `maven-publish`
     `java-library`
@@ -18,9 +16,7 @@ dependencies {
     implementation(Ktor.serialization)
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.serializationKotlinxJson)
-    implementation(Ktor.serverForwardedHeaders)
-    implementation(Ktor.serverNetty)
-    implementation(Nimbusds.oauth2OidcSdk)
+    implementation(Nimbusds.joseJwt)
     testImplementation(kotlin("test-junit5"))
     testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
@@ -29,7 +25,6 @@ dependencies {
     testImplementation(Kotest.runnerJunit)
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.extensions)
-    testImplementation(Nimbusds.joseJwt)
 }
 
 repositories {
@@ -37,24 +32,39 @@ repositories {
     mavenLocal()
 }
 
+val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+
 publishing {
     repositories{
         mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/navikt/tms-ktor-token-support")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     publications {
-        create<MavenPublication>("local") {
+        create<MavenPublication>("gpr") {
+            groupId = "no.nav.tms.token.support"
+            artifactId = "azure-validation"
+            version = libraryVersion
             from(components["java"])
         }
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 tasks {
-    withType<Test> {
+    test {
         useJUnitPlatform()
     }
 }
+

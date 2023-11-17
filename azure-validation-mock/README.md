@@ -1,4 +1,4 @@
-# token-support-azure-validation-mock
+# azure-validation-mock
 
 Dette biblioteket kan installeres i stedet for `token-support-azure-validation` for å simulere innlogging.
 

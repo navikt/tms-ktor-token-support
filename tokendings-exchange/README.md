@@ -1,4 +1,4 @@
-# token-support-idporten
+# tokendings-exchange
 
 Dette biblioteket tilbyr en måte for en ktor app å veksle id_tokens og access_tokens mot tokendings.
 

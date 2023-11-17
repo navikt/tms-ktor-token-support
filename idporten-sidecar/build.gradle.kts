@@ -1,0 +1,72 @@
+plugins {
+    `maven-publish`
+    `java-library`
+    kotlin("jvm")
+    kotlin("plugin.serialization")
+}
+
+dependencies {
+    api(kotlin("stdlib-jdk8"))
+    implementation(Logback.classic)
+    implementation(KotlinLogging.logging)
+    implementation(Ktor.serverAuth)
+    implementation(Ktor.serverAuthJwt)
+    implementation(Ktor.clientApache)
+    implementation(Ktor.clientJson)
+    implementation(Ktor.serialization)
+    implementation(Ktor.clientContentNegotiation)
+    implementation(Ktor.serializationKotlinxJson)
+    implementation(Ktor.serverForwardedHeaders)
+    implementation(Ktor.serverNetty)
+    implementation(Nimbusds.oauth2OidcSdk)
+    testImplementation(kotlin("test-junit5"))
+    testImplementation(Kluent.kluent)
+    testImplementation(Mockk.mockk)
+    testImplementation(Ktor.clientMock)
+    testImplementation(Ktor.serverTestHost)
+    testImplementation(Kotest.runnerJunit)
+    testImplementation(Kotest.assertionsCore)
+    testImplementation(Kotest.extensions)
+    testImplementation(Nimbusds.joseJwt)
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+
+publishing {
+    repositories{
+        mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/navikt/tms-ktor-token-support")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("gpr") {
+            groupId = "no.nav.tms.token.support"
+            artifactId = "idporten-sidecar"
+            version = libraryVersion
+            from(components["java"])
+        }
+    }
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+}

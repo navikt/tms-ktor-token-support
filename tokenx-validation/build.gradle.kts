@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `maven-publish`
     `java-library`
@@ -11,16 +9,17 @@ dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
     implementation(KotlinLogging.logging)
-    implementation(Caffeine.caffeine)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
     implementation(Ktor.clientApache)
     implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.serializationKotlinxJson)
     implementation(Ktor.clientJson)
     implementation(Ktor.serialization)
-    implementation(Ktor.serverNetty)
+    implementation(Ktor.serializationKotlinxJson)
+    implementation(Ktor.serverAuth)
+    implementation(Ktor.serverAuthJwt)
     implementation(Nimbusds.joseJwt)
+    implementation("io.ktor:ktor-server-auth-jvm:2.3.0")
+    implementation("io.ktor:ktor-server-core-jvm:2.3.0")
+    implementation("io.ktor:ktor-server-auth-ldap-jvm:2.3.0")
     testImplementation(kotlin("test-junit5"))
     testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
@@ -36,25 +35,38 @@ repositories {
     mavenLocal()
 }
 
+val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+
 publishing {
     repositories{
         mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/navikt/tms-ktor-token-support")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     publications {
-        create<MavenPublication>("local") {
+        create<MavenPublication>("gpr") {
+            groupId = "no.nav.tms.token.support"
+            artifactId = "tokenx-validation"
+            version = libraryVersion
             from(components["java"])
         }
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 tasks {
-
-    withType<Test> {
+    test {
         useJUnitPlatform()
     }
 }
