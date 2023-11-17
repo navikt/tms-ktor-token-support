@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     `maven-publish`
     `java-library`
@@ -9,7 +7,7 @@ plugins {
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
-    implementation(project(":token-support-idporten-sidecar"))
+    implementation(project(":tokenx-validation"))
     implementation(Logback.classic)
     implementation(KotlinLogging.logging)
     implementation(Ktor.serverAuth)
@@ -30,25 +28,39 @@ repositories {
     mavenLocal()
 }
 
+val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+
 publishing {
     repositories{
         mavenLocal()
+        maven {
+            url = uri("https://maven.pkg.github.com/navikt/tms-ktor-token-support")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 
     publications {
-        create<MavenPublication>("local") {
+        create<MavenPublication>("gpr") {
+            groupId = "no.nav.tms.token.support"
+            artifactId = "tokenx-validation-mock"
+            version = libraryVersion
             from(components["java"])
         }
     }
 }
 
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "17"
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
 }
 
 tasks {
-
-    withType<Test> {
+    test {
         useJUnitPlatform()
     }
 }
+

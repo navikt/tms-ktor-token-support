@@ -1,4 +1,4 @@
-# token-support-azure-validation
+# azure-validation
 
 Dette biblioteket tilbyr en måte for en ktor app å verifisere bearer tokens utstedt fra azure.
 

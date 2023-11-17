@@ -1,6 +1,6 @@
-# token-support-tokenx-validation
+# idporten-sidecar-mock
 
-Dette biblioteket kan installeres i stedet for `token-support-tokenx-validation` for å simulere innlogging.
+Dette biblioteket kan installeres i stedet for `idporten-sidecar` for å simulere innlogging.
 
 Kun ment å brukes for testing, og bør ikke havne i miljø.
 
@@ -8,9 +8,9 @@ Kun ment å brukes for testing, og bør ikke havne i miljø.
 
 For å kunne autentisere et endepunkt må man først installere autentikatoren.
 
-Denne har en rekke = variabler:
+Denne har en rekke variabler:
 
-- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `TokenXAuthenticator.name`
+- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `IdPortenAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
 - `alwaysAuthenticated`: (Optional) Bestemmer om alle kall skal være godkjent eller motsatt. Default 'false'
 - `staticLevelOfAssurance`: Bestemmer hvilket innloggingsnivå bruker er logget inn med. Default 'null'.
@@ -18,7 +18,7 @@ Denne har en rekke = variabler:
 - `staticJwtOverride`: Bestemmer hvilket token som evt skal settes i AzurePrincipal. Default 'null'.
 
 Dersom alwaysAuthenticated er 'true', må enten 'staticLevelOfAssurance' og 'staticUserPid' være satt, eller så
-må 'staticJwtOverride' være satt. 'staticJwtOverride' må ha claims 'acr' (satt til `idporten-loa-substantial` eller `idporten-loa-high`) og 'pid'.
+må 'staticJwtOverride' være satt. 'staticJwtOverride' må ha claims 'acr_values' (satt til `idporten-loa-substantial` eller `idporten-loa-high`) og 'pid'.
 Dersom alle feltene er satt er det 'staticJwtOverride' som er gjeldende.
 
 Eksempel på konfigurasjon:
@@ -26,13 +26,11 @@ Eksempel på konfigurasjon:
 ```kotlin
 fun Application.setup() {
 
-    authentication {
-        tokenXMock { 
-            setAsDefault = false
-            alwaysAuthenticated = true
-            staticLevelOfAssurance = LEVEL_4
-            staticUserPid = '123'
-        }
+    installIdPortenAuthMock {
+        setAsDefault = false
+        alwaysAuthenticated = true
+        staticLevelOfAssurance = LEVEL_4
+        staticUserPid = '123'
     }
 }
 ```
@@ -43,14 +41,12 @@ viktig å ha med navnet på autentikatoren.
 ```kotlin
 fun Application.setup() {
 
-    authentication {
-        tokenX {
-            setAsDefault = false
-        }
+    installIdPortenAuth {
+        setAsDefault = false
     }
     
     routing {
-        authenticate(TokenXAuthenticator.name) {
+        authenticate(IdPortenAuthenticator.name) {
             get("/sikret") {
                 call.respond(HttpStatusCode.OK)
             }
@@ -62,3 +58,5 @@ fun Application.setup() {
 ## Bruk av biblioteket ved lokal kjøring 
 
 Dette biblioteket krever ingen miljøvariabler. Dette biblioteket skal ikke brukes i miljø.
+
+Biblioteket legger ikke til ekstra endepunkt som f. eks. '/login'
