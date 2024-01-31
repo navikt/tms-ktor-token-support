@@ -10,7 +10,7 @@ object Kluent {
 }
 
 object Kotlin {
-    const val version = "1.8.10"
+    const val version = "1.9.0"
 }
 
 object Kotest {
@@ -23,7 +23,7 @@ object Kotest {
 }
 
 object Ktor {
-    private const val version = "2.3.0"
+    private const val version = "2.3.7"
     private const val groupId = "io.ktor"
 
     const val serverAuth = "$groupId:ktor-server-auth:$version"
@@ -41,14 +41,14 @@ object Ktor {
 
 object KotlinLogging {
     private const val groupId = "io.github.oshai"
-    private const val version = "5.0.2"
+    private const val version = "6.0.3"
 
     const val logging = "$groupId:kotlin-logging:$version"
 }
 
 
 object Logback {
-    private const val version = "1.4.11"
+    private const val version = "1.4.14"
     const val classic = "ch.qos.logback:logback-classic:$version"
 }
 
@@ -58,7 +58,7 @@ object Mockk {
 }
 
 object Nimbusds {
-    private const val version = "9.19"
+    private const val version = "9.37.3"
     private const val groupId = "com.nimbusds"
 
     const val joseJwt = "$groupId:nimbus-jose-jwt:$version"
