@@ -54,6 +54,13 @@ publishing {
             artifactId = "tokendings-exchange"
             version = libraryVersion
             from(components["java"])
+
+            val sourcesJar by tasks.creating(Jar::class) {
+                archiveClassifier.set("sources")
+                from(sourceSets.main.get().allSource)
+            }
+
+            artifact(sourcesJar)
         }
     }
 }
