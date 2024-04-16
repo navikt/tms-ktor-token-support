@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.azure.validation
 
 
-import io.kotest.extensions.system.withEnvironment
+import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -15,7 +15,6 @@ import io.mockk.mockkObject
 import io.mockk.unmockkObject
 import no.nav.tms.token.support.azure.validation.install.HttpClientBuilder
 import no.nav.tms.token.support.azure.validation.install.JwlProviderBuilder
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -47,6 +46,7 @@ internal class AzureAuthIT {
     fun cleanUp() {
         unmockkObject(HttpClientBuilder)
         unmockkObject(JwlProviderBuilder)
+        AzureEnvironment.reset()
     }
 
     @Test
@@ -58,8 +58,8 @@ internal class AzureAuthIT {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "No bearer token found."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "No bearer token found."
     }
 
     @Test
@@ -73,8 +73,8 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer <dummy>")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -90,7 +90,7 @@ internal class AzureAuthIT {
             headers.append(AzureHeader.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -106,7 +106,7 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -123,7 +123,7 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer othertoken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -140,7 +140,7 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -157,7 +157,7 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -175,8 +175,8 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -194,8 +194,8 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -213,8 +213,8 @@ internal class AzureAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -226,11 +226,13 @@ internal class AzureAuthIT {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "No bearer token found."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "No bearer token found."
     }
 
-    private fun Application.testApi() = withEnvironment(envVars) {
+    private fun Application.testApi() {
+
+        AzureEnvironment.extend(envVars)
 
         authentication {
             azure()
@@ -245,7 +247,9 @@ internal class AzureAuthIT {
         }
     }
 
-    private fun Application.testApiWithDefault() = withEnvironment(envVars) {
+    private fun Application.testApiWithDefault() {
+
+        AzureEnvironment.extend(envVars)
 
         authentication {
             azure {

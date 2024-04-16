@@ -1,5 +1,6 @@
 package no.nav.tms.token.support.tokenx.validation.mock
 
+import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -10,7 +11,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import no.nav.tms.token.support.tokenx.validation.TokenXAuthenticator
 import no.nav.tms.token.support.tokenx.validation.user.TokenXUserFactory
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Test
 
 internal class TokenXAuthTest {
@@ -33,7 +33,7 @@ internal class TokenXAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -53,8 +53,8 @@ internal class TokenXAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.OK
-        response.body<String>() `should be equal to` userPid
+        response.status shouldBe HttpStatusCode.OK
+        response.body<String>() shouldBe userPid
     }
 
     @Test
@@ -73,7 +73,7 @@ internal class TokenXAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     private fun Application.testApi(authConfig: Application.() -> Unit) {

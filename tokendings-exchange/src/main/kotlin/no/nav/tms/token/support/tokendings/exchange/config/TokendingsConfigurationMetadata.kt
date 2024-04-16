@@ -1,11 +1,9 @@
 package no.nav.tms.token.support.tokendings.exchange.config
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.fasterxml.jackson.annotation.JsonAlias
 
-@Serializable
 internal data class TokendingsConfigurationMetadata(
-        @SerialName("issuer") val issuer: String,
-        @SerialName("token_endpoint") val tokenEndpoint: String,
-        @SerialName("jwks_uri") val jwksUri: String
+    @JsonAlias("issuer") val issuer: String,
+    @JsonAlias("token_endpoint") val tokenEndpoint: String,
+    @JsonAlias("jwks_uri") val jwksUri: String
 )

@@ -1,5 +1,6 @@
 package no.nav.tms.token.support.idporten.sidecar.mock
 
+import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -10,7 +11,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import no.nav.tms.token.support.idporten.sidecar.IdPortenAuthenticator
 import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Test
 
 internal class IdPortenAuthTest {
@@ -32,7 +32,7 @@ internal class IdPortenAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -52,8 +52,8 @@ internal class IdPortenAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.OK
-        response.body<String>() `should be equal to` userPid
+        response.status shouldBe HttpStatusCode.OK
+        response.body<String>() shouldBe userPid
     }
 
     @Test
@@ -72,7 +72,7 @@ internal class IdPortenAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     private fun Application.testApi(authConfig: Application.() -> Unit) {

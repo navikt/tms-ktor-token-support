@@ -1,5 +1,6 @@
 package no.nav.tms.token.support.azure.validation.mock
 
+import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -10,7 +11,6 @@ import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import no.nav.tms.token.support.azure.validation.AzureAuthenticator
 import no.nav.tms.token.support.azure.validation.AzurePrincipal
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.Test
 
 internal class AzureAuthTest {
@@ -34,7 +34,7 @@ internal class AzureAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -53,8 +53,8 @@ internal class AzureAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.OK
-        response.body<String>() `should be equal to` jwtOverrideString
+        response.status shouldBe HttpStatusCode.OK
+        response.body<String>() shouldBe jwtOverrideString
     }
 
     @Test
@@ -73,8 +73,8 @@ internal class AzureAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.OK
-        response.body<String>().isNotBlank() `should be equal to` true
+        response.status shouldBe HttpStatusCode.OK
+        response.body<String>().isNotBlank() shouldBe true
     }
 
     @Test
@@ -94,7 +94,7 @@ internal class AzureAuthTest {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     private fun Application.testApi(authConfig: Application.() -> Unit) {

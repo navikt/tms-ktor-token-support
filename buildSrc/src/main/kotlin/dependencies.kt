@@ -1,66 +1,88 @@
-object Caffeine {
-    private const val version = "3.0.0"
-    private const val groupId = "com.github.ben-manes.caffeine"
+interface DependencyGroup {
+    val groupId: String? get() = null
+    val version: String? get() = null
 
-    const val caffeine = "$groupId:caffeine:$version"
+    fun dependency(name: String, groupId: String? = this.groupId, version: String? = this.version): String {
+        requireNotNull(groupId)
+        requireNotNull(version)
+
+        return "$groupId:$name:$version"
+    }
 }
-object Kluent {
-    private const val version = "1.68"
-    const val kluent = "org.amshove.kluent:kluent:$version"
+
+object Caffeine : DependencyGroup {
+    override val version = "3.1.8"
+    override val groupId = "com.github.ben-manes.caffeine"
+
+    val caffeine = dependency("caffeine")
+}
+
+object JacksonDatatype: DependencyGroup {
+    override val version get() = "2.17.0"
+
+    val datatypeJsr310 get() = dependency("jackson-datatype-jsr310", groupId = "com.fasterxml.jackson.datatype")
+    val moduleKotlin get() = dependency("jackson-module-kotlin", groupId = "com.fasterxml.jackson.module")
 }
 
 object Kotlin {
-    const val version = "1.9.0"
+     const val version = "1.9.0"
 }
 
-object Kotest {
-    private const val groupId = "io.kotest"
-    private const val version = "4.3.1"
+object Kotest : DependencyGroup {
+    override val groupId = "io.kotest"
+    override val version = "5.8.1"
 
-    const val runnerJunit = "$groupId:kotest-runner-junit5:$version"
-    const val assertionsCore = "$groupId:kotest-assertions-core:$version"
-    const val extensions = "$groupId:kotest-extensions:$version"
+    val runnerJunit = dependency("kotest-runner-junit5")
+    val assertionsCore = dependency("kotest-assertions-core")
+    val extensions = dependency("kotest-extensions")
 }
 
-object Ktor {
-    private const val version = "2.3.7"
-    private const val groupId = "io.ktor"
+object Ktor : DependencyGroup {
+    override val version = "2.3.10"
+    override val groupId = "io.ktor"
 
-    const val serverAuth = "$groupId:ktor-server-auth:$version"
-    const val serverAuthJwt = "$groupId:ktor-server-auth-jwt:$version"
-    const val serialization = "$groupId:ktor-serialization:$version"
-    const val serializationKotlinxJson = "$groupId:ktor-serialization-kotlinx-json:$version"
-    const val serverNetty = "$groupId:ktor-server-netty:$version"
-    const val clientApache = "$groupId:ktor-client-apache:$version"
-    const val clientJson = "$groupId:ktor-client-json:$version"
-    const val clientMock = "$groupId:ktor-client-mock:$version"
-    const val serverTestHost = "$groupId:ktor-server-test-host:$version"
-    const val clientContentNegotiation = "$groupId:ktor-client-content-negotiation:$version"
-    const val serverForwardedHeaders = "$groupId:ktor-server-forwarded-header:$version"
+    val serverAuth = dependency("ktor-server-auth")
+    val serverAuthJwt = dependency("ktor-server-auth-jwt")
+    val serialization = dependency("ktor-serialization")
+    val jackson = dependency("ktor-serialization-jackson")
+    val serverNetty = dependency("ktor-server-netty")
+    val clientApache = dependency("ktor-client-apache")
+    val clientJson = dependency("ktor-client-json")
+    val clientMock = dependency("ktor-client-mock")
+    val serverTestHost = dependency("ktor-server-test-host")
+    val clientContentNegotiation = dependency("ktor-client-content-negotiation")
+    val serverForwardedHeaders = dependency("ktor-server-forwarded-header")
+    val serverAuthJvm = dependency("ktor-server-auth-jvm")
+    val serverCoreJvm = dependency("ktor-server-core-jvm")
+    val serverAuthLdapJvm = dependency("ktor-server-auth-ldap-jvm")
 }
 
-object KotlinLogging {
-    private const val groupId = "io.github.oshai"
-    private const val version = "6.0.3"
+object KotlinLogging : DependencyGroup {
+    override val groupId = "io.github.oshai"
+    override val version = "6.0.4"
 
-    const val logging = "$groupId:kotlin-logging:$version"
+    val logging = dependency("kotlin-logging")
 }
 
 
-object Logback {
-    private const val version = "1.4.14"
-    const val classic = "ch.qos.logback:logback-classic:$version"
+object Logback : DependencyGroup {
+    override val version = "1.4.14"
+    override val groupId = "ch.qos.logback"
+
+    val classic = dependency("logback-classic")
 }
 
-object Mockk {
-    private const val version = "1.12.3"
-    const val mockk = "io.mockk:mockk:$version"
+object Mockk : DependencyGroup {
+    override val version = "1.13.10"
+    override val groupId = "io.mockk"
+
+    val mockk = dependency("mockk")
 }
 
-object Nimbusds {
-    private const val version = "9.37.3"
-    private const val groupId = "com.nimbusds"
+object Nimbusds : DependencyGroup {
+    override val version = "9.37.3"
+    override val groupId = "com.nimbusds"
 
-    const val joseJwt = "$groupId:nimbus-jose-jwt:$version"
-    const val oauth2OidcSdk =  "$groupId:oauth2-oidc-sdk:$version"
+    val joseJwt = dependency("nimbus-jose-jwt")
+    val oauth2OidcSdk = dependency("oauth2-oidc-sdk")
 }

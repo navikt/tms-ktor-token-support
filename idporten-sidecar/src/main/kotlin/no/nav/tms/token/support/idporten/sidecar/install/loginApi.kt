@@ -1,14 +1,12 @@
 package no.nav.tms.token.support.idporten.sidecar.install
 
 import com.auth0.jwt.interfaces.DecodedJWT
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.util.date.*
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import no.nav.tms.token.support.idporten.sidecar.user.IdportenUserFactory
 
 private const val postLoginRedirectCookie = "redirect_uri"
@@ -96,16 +94,16 @@ private fun String.isStub() = when(this) {
     else -> false
 }
 
+private val objectMapper = jacksonObjectMapper()
 
 private suspend fun ApplicationCall.respondJson(status: LoginStatus) {
     response.headers.append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
     respond(
         status = HttpStatusCode.OK,
-        message = Json.encodeToString(status)
+        message = objectMapper.writeValueAsString(status)
     )
 }
 
-@Serializable
 internal data class LoginStatus(
     val authenticated: Boolean,
     val level: Int?,

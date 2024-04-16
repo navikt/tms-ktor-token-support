@@ -2,7 +2,10 @@ package no.nav.tms.token.support.idporten.sidecar
 
 import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.kotest.extensions.system.withEnvironment
+import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import io.kotest.matchers.nulls.shouldBeNull
+import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -11,12 +14,9 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.util.*
 import io.mockk.*
-import kotlinx.serialization.json.*
 import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
 import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
 import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
-import org.amshove.kluent.`should be equal to`
-import org.amshove.kluent.`should be instance of`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -32,7 +32,7 @@ class IdPortenPluginTest {
 
     private val dummyToken = "token"
 
-    private val objectMapper = Json
+    private val objectMapper = jacksonObjectMapper()
 
     @BeforeEach
     fun setupMock() {
@@ -44,6 +44,7 @@ class IdPortenPluginTest {
 
     @AfterEach
     fun cleanUp() {
+        IdPortenEnvironment.reset()
         clearMocks(verifier)
         unmockkObject(HttpClientBuilder)
         unmockkObject(TokenVerifier)
@@ -53,8 +54,8 @@ class IdPortenPluginTest {
     fun `Enables login endpoint which redirects to callback`() = loginApiTest { client ->
 
         client.get("/login").let {
-            it.status `should be equal to` HttpStatusCode.Found
-            it.headers["location"] `should be equal to` "/oauth2/login?redirect=/login/callback"
+            it.status shouldBe HttpStatusCode.Found
+            it.headers["location"] shouldBe "/oauth2/login?redirect=/login/callback"
         }
     }
 
@@ -64,14 +65,13 @@ class IdPortenPluginTest {
         client.get("/login/status") {
             accept(ContentType.Application.Json)
         }.let { response ->
-            response.status `should be equal to` HttpStatusCode.OK
+            response.status shouldBe HttpStatusCode.OK
             response.bodyAsText()
-                .let(objectMapper::parseToJsonElement)
-                .let { it as JsonObject }
+                .let(objectMapper::readTree)
                 .let {
-                    it["authenticated"]?.jsonPrimitive?.boolean `should be equal to` false
-                    it["level"] `should be instance of` JsonNull::class
-                    it["levelOfAssurance"] `should be instance of` JsonNull::class
+                    it["authenticated"]?.asBoolean() shouldBe false
+                    it["level"].isNull shouldBe true
+                    it["levelOfAssurance"].isNull shouldBe true
                 }
         }
     }
@@ -96,24 +96,23 @@ class IdPortenPluginTest {
             bearerAuth(dummyToken)
             accept(ContentType.Application.Json)
         }.let { response ->
-            response.status `should be equal to` HttpStatusCode.OK
+            response.status shouldBe HttpStatusCode.OK
             response.bodyAsText()
-                .let(objectMapper::parseToJsonElement)
-                .let { it as JsonObject }
+                .let(objectMapper::readTree)
                 .let {
-                    it["authenticated"]?.jsonPrimitive?.boolean `should be equal to` true
-                    it["level"]?.jsonPrimitive?.int `should be equal to` 4
-                    it["levelOfAssurance"]?.jsonPrimitive?.content `should be equal to` IdPortenLevelOfAssurance.High.name
+                    it["authenticated"]?.asBoolean() shouldBe true
+                    it["level"]?.asInt() shouldBe 4
+                    it["levelOfAssurance"]?.asText() shouldBe IdPortenLevelOfAssurance.High.name
                 }
         }
     }
 
     @KtorDsl
     private fun loginApiTest(block: suspend TestApplicationBuilder.(HttpClient) -> Unit) = testApplication {
+        IdPortenEnvironment.extend(envVars)
+
         application {
-            withEnvironment(envVars) {
-                install(IdPortenLogin)
-            }
+            install(IdPortenLogin)
         }
 
         val client = createClient {

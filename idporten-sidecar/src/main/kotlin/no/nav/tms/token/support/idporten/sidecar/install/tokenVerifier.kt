@@ -7,18 +7,18 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.fasterxml.jackson.annotation.JsonAlias
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import no.nav.tms.token.support.idporten.sidecar.IdPortenEnvironment
 import java.net.URL
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit
 
-private fun getIdportenWellKnownUrl() = System.getenv("IDPORTEN_WELL_KNOWN_URL")
+private fun getIdportenWellKnownUrl() = IdPortenEnvironment.get("IDPORTEN_WELL_KNOWN_URL")
     ?: throw IllegalArgumentException("Fant ikke IDPORTEN_WELL_KNOWN_URL som brukes i token-support-idporten-sidecar. Påse at nais.yaml er konfigurert riktig.")
 
 internal fun initializeTokenVerifier(
@@ -91,10 +91,9 @@ internal class TokenVerifier private constructor(
     }
 }
 
-@Serializable
 internal data class OauthServerConfigurationMetadata(
-    @SerialName("issuer") val issuer: String,
-    @SerialName("jwks_uri") val jwksUri: String,
+    @JsonAlias("issuer") val issuer: String,
+    @JsonAlias("jwks_uri") val jwksUri: String,
 )
 
 private fun fetchMetadata(client: HttpClient, wellKnownUrl: String): OauthServerConfigurationMetadata = runBlocking {

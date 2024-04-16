@@ -1,13 +1,16 @@
+import org.gradle.internal.impldep.com.amazonaws.util.json.Jackson
+
 plugins {
     `maven-publish`
     `java-library`
     kotlin("jvm")
-    kotlin("plugin.serialization")
 }
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logback.classic)
+    implementation(JacksonDatatype.moduleKotlin)
+    implementation(JacksonDatatype.datatypeJsr310)
     implementation(KotlinLogging.logging)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)
@@ -15,10 +18,9 @@ dependencies {
     implementation(Ktor.clientJson)
     implementation(Ktor.serialization)
     implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.serializationKotlinxJson)
+    implementation(Ktor.jackson)
     implementation(Nimbusds.joseJwt)
     testImplementation(kotlin("test-junit5"))
-    testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
@@ -63,8 +65,8 @@ publishing {
     }
 }
 
-java {
-    toolchain {
+kotlin {
+    jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }

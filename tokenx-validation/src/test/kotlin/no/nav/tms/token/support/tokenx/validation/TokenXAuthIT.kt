@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.tokenx.validation
 
 
-import io.kotest.extensions.system.withEnvironment
+import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -18,7 +18,6 @@ import no.nav.tms.token.support.tokenx.validation.LevelOfAssurance.SUBSTANTIAL
 import no.nav.tms.token.support.tokenx.validation.install.HttpClientBuilder
 import no.nav.tms.token.support.tokenx.validation.install.IdPortenLevelOfAssurance.*
 import no.nav.tms.token.support.tokenx.validation.install.JwkProviderBuilder
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -48,6 +47,7 @@ internal class TokenXAuthIT {
 
     @AfterEach
     fun cleanUp() {
+        TokenXEnvironment.reset()
         unmockkObject(HttpClientBuilder)
         unmockkObject(JwkProviderBuilder)
     }
@@ -61,8 +61,8 @@ internal class TokenXAuthIT {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "No bearer token found."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "No bearer token found."
     }
 
     @Test
@@ -76,8 +76,8 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer <dummy>")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -93,7 +93,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
 
@@ -110,7 +110,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -127,7 +127,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer othertoken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -144,7 +144,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.OK
+        response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -161,7 +161,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -179,8 +179,8 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -198,8 +198,8 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -217,8 +217,8 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "Invalid or expired token."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "Invalid or expired token."
     }
 
     @Test
@@ -234,7 +234,7 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $bearerToken")
         }
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
+        response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -261,10 +261,10 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
         }
 
-        loaHighResponse.status `should be equal to` HttpStatusCode.OK
-        level4Response.status `should be equal to` HttpStatusCode.OK
-        loaLowResponse.status `should be equal to` HttpStatusCode.Unauthorized
-        level3Response.status `should be equal to` HttpStatusCode.Unauthorized
+        loaHighResponse.status shouldBe HttpStatusCode.OK
+        level4Response.status shouldBe HttpStatusCode.OK
+        loaLowResponse.status shouldBe HttpStatusCode.Unauthorized
+        level3Response.status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -283,8 +283,8 @@ internal class TokenXAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
         }
 
-        loaLowResponse.status `should be equal to` HttpStatusCode.OK
-        level3Response.status `should be equal to` HttpStatusCode.OK
+        loaLowResponse.status shouldBe HttpStatusCode.OK
+        level3Response.status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -296,27 +296,28 @@ internal class TokenXAuthIT {
 
         val response = client.get("/test")
 
-        response.status `should be equal to` HttpStatusCode.Unauthorized
-        response.body<String>() `should be equal to` "No bearer token found."
+        response.status shouldBe HttpStatusCode.Unauthorized
+        response.body<String>() shouldBe "No bearer token found."
     }
 
     @Test
     fun `Allows verifying different apis with different configurations`() = testApplication {
 
+        TokenXEnvironment.extend(envVars)
+
         application {
-            withEnvironment(envVars) {
-                authentication {
-                    tokenX {
-                        setAsDefault = true
-                        levelOfAssurance = HIGH
-                    }
-                    tokenX {
-                        setAsDefault = false
-                        authenticatorName = "substantial"
-                        levelOfAssurance = SUBSTANTIAL
-                    }
+            authentication {
+                tokenX {
+                    setAsDefault = true
+                    levelOfAssurance = HIGH
+                }
+                tokenX {
+                    setAsDefault = false
+                    authenticatorName = "substantial"
+                    levelOfAssurance = SUBSTANTIAL
                 }
             }
+
             routing {
                 authenticate {
                     get("/test/one") {
@@ -335,14 +336,16 @@ internal class TokenXAuthIT {
 
         client.get("/test/one") {
             headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
-        }.status `should be equal to` HttpStatusCode.Unauthorized
+        }.status shouldBe HttpStatusCode.Unauthorized
 
         client.get("/test/two") {
             headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
-        }.status `should be equal to` HttpStatusCode.OK
+        }.status shouldBe HttpStatusCode.OK
     }
 
-    private fun Application.testApi(minLoa: LevelOfAssurance? = null) = withEnvironment(envVars) {
+    private fun Application.testApi(minLoa: LevelOfAssurance? = null) {
+
+        TokenXEnvironment.extend(envVars)
 
         authentication{
             tokenX {
@@ -361,7 +364,9 @@ internal class TokenXAuthIT {
         }
     }
 
-    private fun Application.testApiWithDefault() = withEnvironment(envVars) {
+    private fun Application.testApiWithDefault() {
+
+        TokenXEnvironment.extend(envVars)
 
         authentication {
             tokenX {
