@@ -3,14 +3,13 @@ package no.nav.tms.token.support.idporten.sidecar.install
 import com.auth0.jwk.Jwk
 import com.auth0.jwk.JwkProvider
 import com.nimbusds.jose.jwk.RSAKey
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.tms.token.support.idporten.sidecar.JwkBuilder
 import no.nav.tms.token.support.idporten.sidecar.JwtBuilder
-import org.amshove.kluent.invoking
-import org.amshove.kluent.`should not throw`
-import org.amshove.kluent.`should throw`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -51,9 +50,9 @@ internal class TokenVerifierTest {
 
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
-        invoking {
+        shouldNotThrow<Exception> {
             verifier.verifyAccessToken(token)
-        } `should not throw` Exception::class
+        }
     }
 
     @Test
@@ -75,9 +74,9 @@ internal class TokenVerifierTest {
 
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
-        invoking {
+        shouldThrow<Exception> {
             verifier.verifyAccessToken(token)
-        } `should throw` Exception::class
+        }
     }
 
     @Test
@@ -99,9 +98,9 @@ internal class TokenVerifierTest {
 
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
-        invoking {
+        shouldThrow<Exception> {
             verifier.verifyAccessToken(token)
-        } `should throw` Exception::class
+        }
     }
 
     @Test
@@ -123,9 +122,9 @@ internal class TokenVerifierTest {
 
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
-        invoking {
+        shouldThrow<Exception> {
             verifier.verifyAccessToken(token)
-        } `should throw` Exception::class
+        }
     }
 }
 

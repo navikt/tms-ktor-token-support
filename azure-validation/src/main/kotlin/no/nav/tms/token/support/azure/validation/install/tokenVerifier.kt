@@ -6,13 +6,13 @@ import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
 import com.auth0.jwt.interfaces.JWTVerifier
+import com.fasterxml.jackson.annotation.JsonAlias
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import no.nav.tms.token.support.azure.validation.AzureEnvironment
 import java.net.URL
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit
@@ -61,12 +61,11 @@ internal class TokenVerifier(
 }
 
 
-@Serializable
 internal data class OauthServerConfigurationMetadata(
-    @SerialName("issuer") val issuer: String,
-    @SerialName("token_endpoint") val tokenEndpoint: String,
-    @SerialName("jwks_uri") val jwksUri: String,
-    @SerialName("authorization_endpoint") var authorizationEndpoint: String = ""
+    @JsonAlias("issuer") val issuer: String,
+    @JsonAlias("token_endpoint") val tokenEndpoint: String,
+    @JsonAlias("jwks_uri") val jwksUri: String,
+    @JsonAlias("authorization_endpoint") var authorizationEndpoint: String = ""
 )
 
 private fun fetchMetadata(client: HttpClient, wellKnownUrl: String): OauthServerConfigurationMetadata = runBlocking {
@@ -85,5 +84,5 @@ internal object JwlProviderBuilder {
             .build()
 }
 
-private fun getAzureEnvVar(varName: String) = System.getenv(varName)
+private fun getAzureEnvVar(varName: String) = AzureEnvironment.get(varName)
     ?: throw IllegalArgumentException("Fant ikke $varName for azure. Påse at nais.yaml er konfigurert riktig.")

@@ -2,7 +2,6 @@ plugins {
     `maven-publish`
     `java-library`
     kotlin("jvm")
-    kotlin("plugin.serialization")
 }
 
 dependencies {
@@ -13,15 +12,14 @@ dependencies {
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.clientJson)
     implementation(Ktor.serialization)
-    implementation(Ktor.serializationKotlinxJson)
+    implementation(Ktor.jackson)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)
+    implementation(Ktor.serverAuthJvm)
+    implementation(Ktor.serverCoreJvm)
+    implementation(Ktor.serverAuthLdapJvm)
     implementation(Nimbusds.joseJwt)
-    implementation("io.ktor:ktor-server-auth-jvm:2.3.0")
-    implementation("io.ktor:ktor-server-core-jvm:2.3.0")
-    implementation("io.ktor:ktor-server-auth-ldap-jvm:2.3.0")
     testImplementation(kotlin("test-junit5"))
-    testImplementation(Kluent.kluent)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
@@ -66,8 +64,8 @@ publishing {
     }
 }
 
-java {
-    toolchain {
+kotlin {
+    jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(17))
     }
 }

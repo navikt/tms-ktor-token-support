@@ -1,5 +1,7 @@
 package no.nav.tms.token.support.azure.exchange.config
 
+import no.nav.tms.token.support.azure.exchange.AzureEnvironment
+
 internal class Environment (
         val azureClientId: String = getAzureEnvVar("AZURE_APP_CLIENT_ID"),
         val azureTenantId: String = getAzureEnvVar("AZURE_APP_TENANT_ID"),
@@ -8,7 +10,5 @@ internal class Environment (
         val azureOpenidTokenEndpoint: String = getAzureEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
 )
 
-private fun getAzureEnvVar(varName: String): String {
-    return System.getenv(varName)
-            ?: throw IllegalArgumentException("Fant ikke $varName for azure. Påse at nais.yaml er konfigurert riktig.")
-}
+private fun getAzureEnvVar(varName: String) = AzureEnvironment.get(varName)
+    ?: throw IllegalArgumentException("Fant ikke $varName for azure. Påse at nais.yaml er konfigurert riktig.")

@@ -1,14 +1,14 @@
 package no.nav.tms.token.support.azure.exchange
 
 import com.nimbusds.jwt.SignedJWT
+import io.kotest.matchers.collections.shouldContain
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.azure.exchange.consumer.AzureConsumer
 import no.nav.tms.token.support.azure.exchange.service.CachingAzureService
 import no.nav.tms.token.support.azure.exchange.service.NonCachingAzureService
-import org.amshove.kluent.`should be equal to`
-import org.amshove.kluent.`should contain`
-import org.amshove.kluent.`should not be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
@@ -41,14 +41,14 @@ internal class AzureServiceTest {
             nonCachingazureService.getAccessToken(target)
         }
 
-        result `should be equal to` exchangedToken
+        result shouldBe exchangedToken
 
         val signedJwt = assertion.captured.let { SignedJWT.parse(it) }
         val claims = signedJwt.jwtClaimsSet
 
-        claims.audience `should contain` jwtAudience
-        claims.issuer `should be equal to` clientId
-        claims.subject `should be equal to` clientId
+        claims.audience shouldContain jwtAudience
+        claims.issuer shouldBe clientId
+        claims.subject shouldBe clientId
     }
 
     @Test
@@ -65,14 +65,14 @@ internal class AzureServiceTest {
             cachingAzureService.getAccessToken(target)
         }
 
-        result `should be equal to` exchangedToken
+        result shouldBe exchangedToken
 
         val signedJwt = assertion.captured.let { SignedJWT.parse(it) }
         val claims = signedJwt.jwtClaimsSet
 
-        claims.audience `should contain` jwtAudience
-        claims.issuer `should be equal to` clientId
-        claims.subject `should be equal to` clientId
+        claims.audience shouldContain jwtAudience
+        claims.issuer shouldBe clientId
+        claims.subject shouldBe clientId
     }
 
     @Test
@@ -137,9 +137,9 @@ internal class AzureServiceTest {
         coVerify(exactly = 1) {azureConsumer.fetchToken(any(), target1) }
         coVerify(exactly = 1) {azureConsumer.fetchToken(any(), target2) }
 
-        result1 `should be equal to` result3
-        result2 `should be equal to` result4
-        result1 `should not be equal to` result2
-        result3 `should not be equal to` result4
+        result1 shouldBe result3
+        result2 shouldBe result4
+        result1 shouldNotBe result2
+        result3 shouldNotBe result4
     }
 }

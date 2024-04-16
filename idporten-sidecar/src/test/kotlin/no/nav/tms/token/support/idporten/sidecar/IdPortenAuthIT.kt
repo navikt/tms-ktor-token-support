@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.idporten.sidecar
 
 import com.auth0.jwt.interfaces.DecodedJWT
-import io.kotest.extensions.system.withEnvironment
+import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.server.application.*
@@ -12,7 +12,6 @@ import io.ktor.server.testing.*
 import io.mockk.*
 import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
 import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
-import org.amshove.kluent.`should be equal to`
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -39,6 +38,7 @@ internal class IdPortenAuthIT {
 
     @AfterEach
     fun cleanUp() {
+        IdPortenEnvironment.reset()
         clearMocks(verifier)
         unmockkObject(HttpClientBuilder)
         unmockkObject(TokenVerifier)
@@ -54,7 +54,7 @@ internal class IdPortenAuthIT {
         val status = client.get("/test")
             .status
 
-        status `should be equal to` HttpStatusCode.Unauthorized
+        status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -66,7 +66,7 @@ internal class IdPortenAuthIT {
 
         val status = client.get("/test").status
 
-        status `should be equal to` HttpStatusCode.Unauthorized
+        status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
@@ -82,7 +82,7 @@ internal class IdPortenAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
         }.status
 
-        status `should be equal to` HttpStatusCode.OK
+        status shouldBe HttpStatusCode.OK
     }
 
     @Test
@@ -98,23 +98,23 @@ internal class IdPortenAuthIT {
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
         }.status
 
-        status `should be equal to` HttpStatusCode.Unauthorized
+        status shouldBe HttpStatusCode.Unauthorized
     }
 
     @Test
     fun `Allows installing multiple authorizers in parallel`() = testApplication {
 
+        IdPortenEnvironment.extend(envVars)
+
         application {
-            withEnvironment(envVars) {
-                authentication {
-                    idPorten {
-                        setAsDefault = true
-                        levelOfAssurance = LevelOfAssurance.HIGH
-                    }
-                    idPorten {
-                        setAsDefault = false
-                        authenticatorName = "other"
-                    }
+            authentication {
+                idPorten {
+                    setAsDefault = true
+                    levelOfAssurance = LevelOfAssurance.HIGH
+                }
+                idPorten {
+                    setAsDefault = false
+                    authenticatorName = "other"
                 }
             }
             routing {
@@ -135,14 +135,16 @@ internal class IdPortenAuthIT {
 
         client.get("/test/one") {
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-        }.status `should be equal to` HttpStatusCode.OK
+        }.status shouldBe HttpStatusCode.OK
 
         client.get("/test/two") {
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-        }.status `should be equal to` HttpStatusCode.OK
+        }.status shouldBe HttpStatusCode.OK
     }
 
-    private fun Application.testApi() = withEnvironment(envVars) {
+    private fun Application.testApi() {
+
+        IdPortenEnvironment.extend(envVars)
 
         authentication {
             idPorten { }
@@ -157,7 +159,9 @@ internal class IdPortenAuthIT {
         }
     }
 
-    private fun Application.testApiWithDefault() = withEnvironment(envVars) {
+    private fun Application.testApiWithDefault() {
+
+        IdPortenEnvironment.extend(envVars)
 
         authentication {
             idPorten {
