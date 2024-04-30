@@ -11,8 +11,11 @@ import no.nav.tms.token.support.tokendings.exchange.consumer.TokendingsConsumer
 import no.nav.tms.token.support.tokendings.exchange.service.CachingTokendingsService
 import no.nav.tms.token.support.tokendings.exchange.service.NonCachingTokendingsService
 import no.nav.tms.token.support.tokendings.exchange.service.TokenStringUtil
+import no.nav.tms.token.support.tokendings.exchange.service.TokendingsExchangeException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.net.SocketTimeoutException
 
 internal class TokendingsServiceTest {
 
@@ -21,8 +24,10 @@ internal class TokendingsServiceTest {
     private val clientId = "cluster:namespace:thisApi"
     private val privateJwk = JwkBuilder.generateJwk()
 
-    private val nonCachingtokendingsService = NonCachingTokendingsService(tokendingsConsumer, jwtAudience, clientId, privateJwk)
-    private val cachingTokendingsService = CachingTokendingsService(tokendingsConsumer, jwtAudience, clientId, privateJwk, 10, 5)
+    private val nonCachingtokendingsService =
+        NonCachingTokendingsService(tokendingsConsumer, jwtAudience, clientId, privateJwk)
+    private val cachingTokendingsService =
+        CachingTokendingsService(tokendingsConsumer, jwtAudience, clientId, privateJwk, 10, 5)
 
     @AfterEach
     fun cleanup() {
@@ -39,9 +44,9 @@ internal class TokendingsServiceTest {
         val exchangedToken = "<exchanged token>"
         val target = "cluster:namespace:otherApi"
 
-       coEvery {
-           tokendingsConsumer.exchangeToken(any(), capture(assertion), target)
-       } returns TokendingsResponseObjectMother.createTokendingsResponse(exchangedToken)
+        coEvery {
+            tokendingsConsumer.exchangeToken(any(), capture(assertion), target)
+        } returns TokendingsResponseObjectMother.createTokendingsResponse(exchangedToken)
 
         val result = runBlocking {
             nonCachingtokendingsService.exchangeToken(token, target)
@@ -113,7 +118,7 @@ internal class TokendingsServiceTest {
             cachingTokendingsService.exchangeToken(token, target)
         }
 
-        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target) }
+        coVerify(exactly = 1) { tokendingsConsumer.exchangeToken(any(), any(), target) }
     }
 
     @Test
@@ -140,7 +145,7 @@ internal class TokendingsServiceTest {
             cachingTokendingsService.exchangeToken(token, target)
         }
 
-        coVerify(exactly = 3) {tokendingsConsumer.exchangeToken(any(), any(), target) }
+        coVerify(exactly = 3) { tokendingsConsumer.exchangeToken(any(), any(), target) }
     }
 
     @Test
@@ -181,8 +186,8 @@ internal class TokendingsServiceTest {
         runBlocking { cachingTokendingsService.exchangeToken(token, target1) }
         runBlocking { cachingTokendingsService.exchangeToken(token, target2) }
 
-        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target1) }
-        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(any(), any(), target2) }
+        coVerify(exactly = 1) { tokendingsConsumer.exchangeToken(any(), any(), target1) }
+        coVerify(exactly = 1) { tokendingsConsumer.exchangeToken(any(), any(), target2) }
 
         result1 shouldBe result3
         result2 shouldBe result4
@@ -230,12 +235,52 @@ internal class TokendingsServiceTest {
         runBlocking { cachingTokendingsService.exchangeToken(token1, target) }
         runBlocking { cachingTokendingsService.exchangeToken(token2, target) }
 
-        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(token1, any(), target) }
-        coVerify(exactly = 1) {tokendingsConsumer.exchangeToken(token2, any(), target) }
+        coVerify(exactly = 1) { tokendingsConsumer.exchangeToken(token1, any(), target) }
+        coVerify(exactly = 1) { tokendingsConsumer.exchangeToken(token2, any(), target) }
 
         result1 shouldBe result3
         result2 shouldBe result4
         result1 shouldNotBe result2
         result3 shouldNotBe result4
+    }
+
+    @Test
+    fun `Should throw TokendingsExchangeException if exchangeprocess fails`() {
+        val testjwk = JwkBuilder.generateJwk()
+        assertNonCachingServiceThrows(testjwk) { IllegalArgumentException() }
+        assertNonCachingServiceThrows(testjwk) { SocketTimeoutException() }
+        assertNonCachingServiceThrows(testjwk) { Error() }
+        assertCachingServiceThrows(testjwk) { IllegalArgumentException() }
+        assertCachingServiceThrows(testjwk) { SocketTimeoutException() }
+        assertCachingServiceThrows(testjwk) { Error() }
+
+    }
+}
+
+fun assertNonCachingServiceThrows(testJwk: String, throwable: () -> Throwable) = run {
+    NonCachingTokendingsService(
+        tokendingsConsumer = mockk<TokendingsConsumer>().apply {
+            coEvery { exchangeToken(any(), any(), any()) } throws throwable()
+        },
+        jwtAudience = "some:aud",
+        clientId = "some:client",
+        privateJwk = testJwk
+    ).apply {
+        assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
+    }
+}
+
+fun assertCachingServiceThrows(testJwk: String, throwable: () -> Throwable) = run {
+    CachingTokendingsService(
+        tokendingsConsumer = mockk<TokendingsConsumer>().apply {
+            coEvery { exchangeToken(any(), any(), any()) } throws throwable()
+        },
+        jwtAudience = "some:aud",
+        clientId = "some:client",
+        privateJwk = testJwk,
+        maxCacheEntries = 1,
+        cacheExpiryMarginSeconds = 6
+    ).apply {
+        assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
     }
 }
