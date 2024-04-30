@@ -25,7 +25,7 @@ class NonCachingTokendingsService internal constructor(
 
             return tokendingsConsumer.exchangeToken(token, jwt, targetApp).accessToken
         } catch (throwable: Throwable) {
-            throw TokendingsExchangeException(throwable, clientId, jwtAudience)
+            throw TokendingsExchangeException(throwable, clientId)
         }
 
     }
@@ -78,12 +78,12 @@ internal object TokenStringUtil {
     }
 }
 
-class TokendingsExchangeException(val originalThrowable: Throwable, clientId: String, jwtAudience: String? = null) :
+class TokendingsExchangeException(val originalThrowable: Throwable, clientId: String) :
     Exception() {
 
     val stackTraceSummary =
         originalThrowable.stackTrace.firstOrNull()?.let { stacktraceElement ->
-            """    Tokendingsexchange feiler for $clientId ${jwtAudience?.let { "with audience $it" }?:""}
+            """    Tokendingsexchange feiler for $clientId
                    Origin: ${stacktraceElement.fileName ?: "---"} ${stacktraceElement.methodName ?: "----"} linenumber:${stacktraceElement.lineNumber}
                    Message: "${originalThrowable::class.simpleName} ${originalThrowable.message?.let { ":$it" }}"
                 """.trimIndent()

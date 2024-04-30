@@ -7,10 +7,13 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.azure.exchange.consumer.AzureConsumer
+import no.nav.tms.token.support.azure.exchange.service.AzureExchangeException
 import no.nav.tms.token.support.azure.exchange.service.CachingAzureService
 import no.nav.tms.token.support.azure.exchange.service.NonCachingAzureService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
+import java.net.SocketTimeoutException
 
 internal class AzureServiceTest {
 
@@ -91,7 +94,7 @@ internal class AzureServiceTest {
             cachingAzureService.getAccessToken(target)
         }
 
-        coVerify(exactly = 1) {azureConsumer.fetchToken(any(), target) }
+        coVerify(exactly = 1) { azureConsumer.fetchToken(any(), target) }
     }
 
     @Test
@@ -110,7 +113,7 @@ internal class AzureServiceTest {
             cachingAzureService.getAccessToken(target)
         }
 
-        coVerify(exactly = 3) {azureConsumer.fetchToken(any(), target) }
+        coVerify(exactly = 3) { azureConsumer.fetchToken(any(), target) }
     }
 
     @Test
@@ -134,12 +137,55 @@ internal class AzureServiceTest {
         val result3 = runBlocking { cachingAzureService.getAccessToken(target1) }
         val result4 = runBlocking { cachingAzureService.getAccessToken(target2) }
 
-        coVerify(exactly = 1) {azureConsumer.fetchToken(any(), target1) }
-        coVerify(exactly = 1) {azureConsumer.fetchToken(any(), target2) }
+        coVerify(exactly = 1) { azureConsumer.fetchToken(any(), target1) }
+        coVerify(exactly = 1) { azureConsumer.fetchToken(any(), target2) }
 
         result1 shouldBe result3
         result2 shouldBe result4
         result1 shouldNotBe result2
         result3 shouldNotBe result4
     }
+
+    @Test
+    fun `Should throw AzureExchangeException if exchangeprocess fails`() {
+        assertNonCachingServiceThrows { IllegalArgumentException() }
+        assertNonCachingServiceThrows { SocketTimeoutException() }
+        assertNonCachingServiceThrows { Error() }
+        assertCachingServiceThrows { IllegalArgumentException() }
+        assertCachingServiceThrows { SocketTimeoutException() }
+        assertCachingServiceThrows { Error() }
+
+    }
+
+    fun assertNonCachingServiceThrows( throwable: () -> Throwable) = run {
+        NonCachingAzureService(
+            azureConsumer = mockk<AzureConsumer>().apply {
+                coEvery { fetchToken(any(), any()) } throws throwable()
+            },
+            clientId = "some:client",
+            issuer = "some:issuer",
+            privateJwk = privateJwk,
+        ).apply {
+            assertThrows<AzureExchangeException> { runBlocking { getAccessToken("appappapp") } }
+        }
+    }
+
+    fun assertCachingServiceThrows(throwable: () -> Throwable) = run {
+        CachingAzureService(
+            azureConsumer = mockk<AzureConsumer>().apply {
+                coEvery { fetchToken(any(), any()) } throws throwable()
+            },
+            clientId = "some:client",
+            privateJwk = privateJwk,
+            issuer = "some:issuer",
+            maxCacheEntries = 1,
+            cacheExpiryMarginSeconds = 6
+
+        ).apply {
+            assertThrows<AzureExchangeException> { runBlocking { getAccessToken("token") } }
+        }
+    }
+
+
 }
+

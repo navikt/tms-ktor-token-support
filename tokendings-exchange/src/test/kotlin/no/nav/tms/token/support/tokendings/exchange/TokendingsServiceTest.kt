@@ -246,41 +246,41 @@ internal class TokendingsServiceTest {
 
     @Test
     fun `Should throw TokendingsExchangeException if exchangeprocess fails`() {
-        val testjwk = JwkBuilder.generateJwk()
-        assertNonCachingServiceThrows(testjwk) { IllegalArgumentException() }
-        assertNonCachingServiceThrows(testjwk) { SocketTimeoutException() }
-        assertNonCachingServiceThrows(testjwk) { Error() }
-        assertCachingServiceThrows(testjwk) { IllegalArgumentException() }
-        assertCachingServiceThrows(testjwk) { SocketTimeoutException() }
-        assertCachingServiceThrows(testjwk) { Error() }
+        assertNonCachingServiceThrows { IllegalArgumentException() }
+        assertNonCachingServiceThrows { SocketTimeoutException() }
+        assertNonCachingServiceThrows { Error() }
+        assertCachingServiceThrows { IllegalArgumentException() }
+        assertCachingServiceThrows { SocketTimeoutException() }
+        assertCachingServiceThrows { Error() }
 
+    }
+
+    fun assertNonCachingServiceThrows( throwable: () -> Throwable) = run {
+        NonCachingTokendingsService(
+            tokendingsConsumer = mockk<TokendingsConsumer>().apply {
+                coEvery { exchangeToken(any(), any(), any()) } throws throwable()
+            },
+            jwtAudience = "some:aud",
+            clientId = "some:client",
+            privateJwk = privateJwk
+        ).apply {
+            assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
+        }
+    }
+
+    fun assertCachingServiceThrows( throwable: () -> Throwable) = run {
+        CachingTokendingsService(
+            tokendingsConsumer = mockk<TokendingsConsumer>().apply {
+                coEvery { exchangeToken(any(), any(), any()) } throws throwable()
+            },
+            jwtAudience = "some:aud",
+            clientId = "some:client",
+            privateJwk = privateJwk,
+            maxCacheEntries = 1,
+            cacheExpiryMarginSeconds = 6
+        ).apply {
+            assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
+        }
     }
 }
 
-fun assertNonCachingServiceThrows(testJwk: String, throwable: () -> Throwable) = run {
-    NonCachingTokendingsService(
-        tokendingsConsumer = mockk<TokendingsConsumer>().apply {
-            coEvery { exchangeToken(any(), any(), any()) } throws throwable()
-        },
-        jwtAudience = "some:aud",
-        clientId = "some:client",
-        privateJwk = testJwk
-    ).apply {
-        assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
-    }
-}
-
-fun assertCachingServiceThrows(testJwk: String, throwable: () -> Throwable) = run {
-    CachingTokendingsService(
-        tokendingsConsumer = mockk<TokendingsConsumer>().apply {
-            coEvery { exchangeToken(any(), any(), any()) } throws throwable()
-        },
-        jwtAudience = "some:aud",
-        clientId = "some:client",
-        privateJwk = testJwk,
-        maxCacheEntries = 1,
-        cacheExpiryMarginSeconds = 6
-    ).apply {
-        assertThrows<TokendingsExchangeException> { runBlocking { exchangeToken("token", "token") } }
-    }
-}
