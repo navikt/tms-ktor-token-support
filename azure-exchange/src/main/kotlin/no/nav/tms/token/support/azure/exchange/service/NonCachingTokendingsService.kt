@@ -67,7 +67,7 @@ class AzureExchangeException(val originalThrowable: Throwable, targetApp: String
 
     val stackTraceSummary =
         originalThrowable.stackTrace.firstOrNull()?.let { stacktraceElement ->
-            """    Tokendingsexchange feiler for $targetApp 
+            """    Azureexchange feiler for $targetApp 
                    Origin: ${stacktraceElement.fileName ?: "---"} ${stacktraceElement.methodName ?: "----"} linenumber:${stacktraceElement.lineNumber}
                    Message: "${originalThrowable::class.simpleName} ${originalThrowable.message?.let { ":$it" }}"
                 """.trimIndent()
