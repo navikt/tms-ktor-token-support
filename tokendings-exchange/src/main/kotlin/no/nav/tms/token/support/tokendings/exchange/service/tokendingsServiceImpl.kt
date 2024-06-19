@@ -79,14 +79,11 @@ internal object TokenStringUtil {
 }
 
 class TokendingsExchangeException(val originalThrowable: Throwable, clientId: String) :
-    Exception() {
-
-    val stackTraceSummary =
-        originalThrowable.stackTrace.firstOrNull()?.let { stacktraceElement ->
-            """    Tokendingsexchange feiler for $clientId
+    Exception(originalThrowable.stackTrace.firstOrNull()?.let { stacktraceElement ->
+        """    Tokendingsexchange feiler for $clientId
                    Origin: ${stacktraceElement.fileName ?: "---"} ${stacktraceElement.methodName ?: "----"} linenumber:${stacktraceElement.lineNumber}
                    Message: "${originalThrowable::class.simpleName} ${originalThrowable.message?.let { ":$it" }}"
                 """.trimIndent()
-        } ?: "${originalThrowable::class.simpleName} ${originalThrowable.message?.let { ":$it" }}"
-}
+    } ?: "${originalThrowable::class.simpleName} ${originalThrowable.message?.let { ":$it" }}")
+
 
