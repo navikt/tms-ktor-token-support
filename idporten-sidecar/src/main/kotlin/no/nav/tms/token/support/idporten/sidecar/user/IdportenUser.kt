@@ -7,7 +7,6 @@ import java.time.temporal.ChronoUnit
 
 data class IdportenUser (
     val ident: String,
-    @Deprecated("Use levelOfAssurance instead.") val loginLevel: Int,
     val levelOfAssurance: LevelOfAssurance,
     val tokenExpirationTime: Instant,
     val jwt: DecodedJWT

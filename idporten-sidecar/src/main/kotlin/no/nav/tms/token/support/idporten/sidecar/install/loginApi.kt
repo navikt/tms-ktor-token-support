@@ -112,8 +112,8 @@ internal data class LoginStatus(
     companion object {
         fun unauthenticated() = LoginStatus(false, null, null)
         fun authenticated(levelOfAssuranceInternal: IdPortenLevelOfAssurance) = when (levelOfAssuranceInternal) {
-            IdPortenLevelOfAssurance.Level3, IdPortenLevelOfAssurance.Substantial -> LoginStatus(true, 3, IdPortenLevelOfAssurance.Substantial.name)
-            IdPortenLevelOfAssurance.Level4, IdPortenLevelOfAssurance.High -> LoginStatus(true, 4, IdPortenLevelOfAssurance.High.name)
+            IdPortenLevelOfAssurance.Substantial -> LoginStatus(true, 3, IdPortenLevelOfAssurance.Substantial.name)
+            IdPortenLevelOfAssurance.High -> LoginStatus(true, 4, IdPortenLevelOfAssurance.High.name)
             else -> throw IllegalStateException()
         }
     }

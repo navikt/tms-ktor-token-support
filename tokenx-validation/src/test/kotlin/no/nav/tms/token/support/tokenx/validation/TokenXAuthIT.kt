@@ -238,56 +238,6 @@ internal class TokenXAuthIT {
     }
 
     @Test
-    fun `acr value Level4 should be equivalent to idporten-loa-high`() = testApplication {
-        application {
-            testApi(minLoa = HIGH)
-        }
-
-        val loaHighToken = JwtBuilder.generateJwtString(clientId, High, idportenMetadata.issuer, privateJwk)
-        val level4Token = JwtBuilder.generateJwtString(clientId, Level4, idportenMetadata.issuer, privateJwk)
-        val loaLowToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
-        val level3Token = JwtBuilder.generateJwtString(clientId, Level3, idportenMetadata.issuer, privateJwk)
-
-        val loaHighResponse = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $loaHighToken")
-        }
-        val level4Response = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $level4Token")
-        }
-        val loaLowResponse = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $loaLowToken")
-        }
-        val level3Response = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
-        }
-
-        loaHighResponse.status shouldBe HttpStatusCode.OK
-        level4Response.status shouldBe HttpStatusCode.OK
-        loaLowResponse.status shouldBe HttpStatusCode.Unauthorized
-        level3Response.status shouldBe HttpStatusCode.Unauthorized
-    }
-
-    @Test
-    fun `acr value Level3 should be equivalent to idporten-loa-substantial`() = testApplication {
-        application {
-            testApi(minLoa = SUBSTANTIAL)
-        }
-
-        val loaSubstantialToken = JwtBuilder.generateJwtString(clientId, Substantial, idportenMetadata.issuer, privateJwk)
-        val level3Token = JwtBuilder.generateJwtString(clientId, Level3, idportenMetadata.issuer, privateJwk)
-
-        val loaLowResponse = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $loaSubstantialToken")
-        }
-        val level3Response = client.get("/test") {
-            headers.append(HttpHeaders.Authorization, "Bearer $level3Token")
-        }
-
-        loaLowResponse.status shouldBe HttpStatusCode.OK
-        level3Response.status shouldBe HttpStatusCode.OK
-    }
-
-    @Test
     fun `Should enable setting authenticator as default`() = testApplication {
 
         application {

@@ -23,7 +23,6 @@ Her er det en rekke variabler:
 
 - `authenticatorName`: Bestemmer navnet på autentikatoren. Default `IdPortenAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
-- `loginLevel`: Deprecated - Bruk `levelOfAssurance` i stedet.
 - `levelOfAssurance` (Optional) Setter minimum level-of-assurance for endepunkt. Default 'HIGH'
 - `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy. Default 'false'.
  

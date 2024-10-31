@@ -22,7 +22,7 @@ class IdPortenLogin {
 
             val config = IdPortenLoginConfig().also(configure)
 
-            val hello = pipeline.environment.rootPath
+            val hello = pipeline.rootPath
 
             pipeline.routing {
                 idPortenLoginApi(

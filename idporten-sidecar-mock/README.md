@@ -29,7 +29,7 @@ fun Application.setup() {
     installIdPortenAuthMock {
         setAsDefault = false
         alwaysAuthenticated = true
-        staticLevelOfAssurance = LEVEL_4
+        staticLevelOfAssurance = HIGH
         staticUserPid = '123'
     }
 }

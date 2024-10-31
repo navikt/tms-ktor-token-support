@@ -2,9 +2,7 @@ package no.nav.tms.token.support.idporten.sidecar
 
 import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
-import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -12,7 +10,7 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
-import io.ktor.util.*
+import io.ktor.utils.io.*
 import io.mockk.*
 import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
 import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
@@ -101,7 +99,6 @@ class IdPortenPluginTest {
                 .let(objectMapper::readTree)
                 .let {
                     it["authenticated"]?.asBoolean() shouldBe true
-                    it["level"]?.asInt() shouldBe 4
                     it["levelOfAssurance"]?.asText() shouldBe IdPortenLevelOfAssurance.High.name
                 }
         }
