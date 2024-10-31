@@ -45,7 +45,7 @@ internal class TokenXAuthTest {
                     tokenXMock {
                         alwaysAuthenticated = true
                         staticUserPid = userPid
-                        staticLevelOfAssurance = LevelOfAssurance.LEVEL_4
+                        staticLevelOfAssurance = LevelOfAssurance.HIGH
                     }
                 }
             }

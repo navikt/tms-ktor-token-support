@@ -29,30 +29,17 @@ object TokenXUserFactory {
 
         val acrLoA = IdPortenLevelOfAssurance.fromAcr(token.getClaim("acr").asString())
 
-        val loginLevel = mapLoginLevel(acrLoA)
         val levelOfAssurance = mapLevelOfAssurance(acrLoA)
 
-        val expirationTime =
-            getTokenExpirationLocalDateTime(
-                token
-            )
+        val expirationTime = getTokenExpirationLocalDateTime(token)
 
-        return TokenXUser(ident, loginLevel, levelOfAssurance, expirationTime, token)
-    }
-
-    private fun mapLoginLevel(levelOfAssurance: IdPortenLevelOfAssurance): Int {
-
-        return when (levelOfAssurance) {
-            Level3, Substantial -> 3
-            Level4, High -> 4
-            Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
-        }
+        return TokenXUser(ident, levelOfAssurance, expirationTime, token)
     }
 
     private fun mapLevelOfAssurance(levelOfAssurance: IdPortenLevelOfAssurance): LevelOfAssurance {
         return when (levelOfAssurance) {
-            Level3, Substantial -> SUBSTANTIAL
-            Level4, High -> HIGH
+            Substantial -> SUBSTANTIAL
+            High -> HIGH
             Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
         }
     }

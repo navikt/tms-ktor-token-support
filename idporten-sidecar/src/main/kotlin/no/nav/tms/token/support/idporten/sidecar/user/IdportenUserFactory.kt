@@ -34,7 +34,6 @@ object IdportenUserFactory {
 
 
         val acrLoA = extractLevelOfAssurance(accessToken)
-        val loginLevel = mapLoginLevel(acrLoA)
         val levelOfAssurance = mapLevelOfAssurance(acrLoA)
 
         val expirationTime =
@@ -42,22 +41,13 @@ object IdportenUserFactory {
                 accessToken
             )
 
-        return IdportenUser(ident, loginLevel, levelOfAssurance, expirationTime, accessToken)
-    }
-
-    private fun mapLoginLevel(levelOfAssurance: IdPortenLevelOfAssurance): Int {
-
-        return when (levelOfAssurance) {
-            Level3, Substantial -> 3
-            Level4, High -> 4
-            Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
-        }
+        return IdportenUser(ident, levelOfAssurance, expirationTime, accessToken)
     }
 
     private fun mapLevelOfAssurance(levelOfAssurance: IdPortenLevelOfAssurance): LevelOfAssurance {
         return when (levelOfAssurance) {
-            Level3, Substantial -> SUBSTANTIAL
-            Level4, High -> HIGH
+            Substantial -> SUBSTANTIAL
+            High -> HIGH
             Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
         }
     }

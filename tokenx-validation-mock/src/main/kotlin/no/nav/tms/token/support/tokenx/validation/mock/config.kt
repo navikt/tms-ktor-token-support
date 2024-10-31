@@ -12,8 +12,6 @@ fun AuthenticationConfig.tokenXMock(configure: TokenXMockedAuthenticatorConfig.(
 }
 
 enum class LevelOfAssurance(val claim: String) {
-    LEVEL_3("Level3"),
-    LEVEL_4("Level4"),
     SUBSTANTIAL("idporten-loa-substantial"),
     HIGH("idporten-loa-high")
 }

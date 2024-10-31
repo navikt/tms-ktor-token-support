@@ -18,8 +18,6 @@ class IdportenAuthenticationConfig {
 
     var setAsDefault: Boolean = false
 
-    @Deprecated("Numbered login levels are deprecated as of Q4 2023. Set levelOfAssurance instead")
-    var loginLevel: LoginLevel? = null
     var levelOfAssurance: LevelOfAssurance = HIGH
 
     var enableDefaultProxy: Boolean = false
@@ -28,10 +26,6 @@ class IdportenAuthenticationConfig {
 enum class LevelOfAssurance {
     SUBSTANTIAL, // Equivalent to old Level3
     HIGH // Equivalent to old Level4
-}
-
-enum class LoginLevel {
-    LEVEL_3, LEVEL_4
 }
 
 // Name of token authenticator. See README for example of use
