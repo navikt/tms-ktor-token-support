@@ -18,14 +18,14 @@ object Caffeine : DependencyGroup {
 }
 
 object JacksonDatatype: DependencyGroup {
-    override val version get() = "2.18.0"
+    override val version get() = "2.18.1"
 
     val datatypeJsr310 get() = dependency("jackson-datatype-jsr310", groupId = "com.fasterxml.jackson.datatype")
     val moduleKotlin get() = dependency("jackson-module-kotlin", groupId = "com.fasterxml.jackson.module")
 }
 
 object Kotlin {
-     const val version = "1.9.0"
+     const val version = "2.0.21"
 }
 
 object Kotest : DependencyGroup {
