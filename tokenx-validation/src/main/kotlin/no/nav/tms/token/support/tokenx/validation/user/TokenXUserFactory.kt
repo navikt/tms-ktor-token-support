@@ -38,8 +38,8 @@ object TokenXUserFactory {
 
     private fun mapLevelOfAssurance(levelOfAssurance: IdPortenLevelOfAssurance): LevelOfAssurance {
         return when (levelOfAssurance) {
-            Substantial -> SUBSTANTIAL
-            High -> HIGH
+            Level3, Substantial -> SUBSTANTIAL
+            Level4, High -> HIGH
             Low -> throw RuntimeException("Level of assurance 'low' er ikke støttet.")
         }
     }
