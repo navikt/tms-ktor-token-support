@@ -14,6 +14,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.idporten.sidecar.IdPortenEnvironment
+import java.net.URI
 import java.net.URL
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit
@@ -104,9 +105,11 @@ private fun fetchMetadata(client: HttpClient, wellKnownUrl: String): OauthServer
     }.body()
 }
 
-private fun createJwkProvider(metadata: OauthServerConfigurationMetadata): JwkProvider = JwkProviderBuilder(URL(metadata.jwksUri))
-    .cached(10, 24, TimeUnit.HOURS)
-    .rateLimited(10, 1, TimeUnit.MINUTES)
-    .build()
+private fun createJwkProvider(metadata: OauthServerConfigurationMetadata): JwkProvider =
+    URI.create(metadata.jwksUri).toURL()
+        .let { JwkProviderBuilder(it) }
+        .cached(10, 24, TimeUnit.HOURS)
+        .rateLimited(10, 1, TimeUnit.MINUTES)
+        .build()
 
 

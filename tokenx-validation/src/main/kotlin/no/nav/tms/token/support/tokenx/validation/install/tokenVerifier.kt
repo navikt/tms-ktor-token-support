@@ -13,6 +13,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.tokenx.validation.TokenXEnvironment
+import java.net.URI
 import java.net.URL
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit
@@ -90,7 +91,7 @@ private fun fetchMetadata(httpClient: HttpClient, wellKnownUrl: String): OauthSe
 
 internal object JwkProviderBuilder {
     fun createJwkProvider(metadata: OauthServerConfigurationMetadata): JwkProvider =
-        com.auth0.jwk.JwkProviderBuilder(URL(metadata.jwksUri))
+        com.auth0.jwk.JwkProviderBuilder(URI.create(metadata.jwksUri).toURL())
             .cached(10, 24, TimeUnit.HOURS)
             .rateLimited(10, 1, TimeUnit.MINUTES)
             .build()

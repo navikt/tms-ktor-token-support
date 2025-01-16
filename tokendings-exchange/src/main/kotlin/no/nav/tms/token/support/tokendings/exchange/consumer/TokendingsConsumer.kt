@@ -7,13 +7,14 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.net.URI
 import java.net.URL
 
 internal class TokendingsConsumer(
         private val httpClient: HttpClient,
         tokendingsUrl: String
 ) {
-    private val endpoint = URL(tokendingsUrl)
+    private val endpoint = URI.create(tokendingsUrl).toURL()
 
     suspend fun exchangeToken(subjectToken: String, clientAssertion: String, audience: String): TokendingsTokenResponse {
 

@@ -7,6 +7,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.net.URI
 import java.net.URL
 
 internal class AzureConsumer(
@@ -15,7 +16,7 @@ internal class AzureConsumer(
         private val clientId: String,
         azureTokenUrl: String
 ) {
-    private val endpoint = URL(azureTokenUrl)
+    private val endpoint = URI.create(azureTokenUrl).toURL()
 
     suspend fun fetchToken(clientAssertion: String, targetApp: String): AzureTokenResponse {
 

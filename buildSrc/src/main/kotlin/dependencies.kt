@@ -18,14 +18,14 @@ object Caffeine : DependencyGroup {
 }
 
 object JacksonDatatype: DependencyGroup {
-    override val version get() = "2.18.1"
+    override val version get() = "2.18.2"
 
     val datatypeJsr310 get() = dependency("jackson-datatype-jsr310", groupId = "com.fasterxml.jackson.datatype")
     val moduleKotlin get() = dependency("jackson-module-kotlin", groupId = "com.fasterxml.jackson.module")
 }
 
 object Kotlin {
-     const val version = "2.0.21"
+     const val version = "2.1.0"
 }
 
 object Kotest : DependencyGroup {
@@ -38,7 +38,7 @@ object Kotest : DependencyGroup {
 }
 
 object Ktor : DependencyGroup {
-    override val version = "3.0.1"
+    override val version = "3.0.3"
     override val groupId = "io.ktor"
 
     val serverAuth = dependency("ktor-server-auth")
@@ -59,7 +59,7 @@ object Ktor : DependencyGroup {
 
 object KotlinLogging : DependencyGroup {
     override val groupId = "io.github.oshai"
-    override val version = "7.0.0"
+    override val version = "7.0.3"
 
     val logging = dependency("kotlin-logging")
 }
@@ -73,7 +73,7 @@ object Logback : DependencyGroup {
 }
 
 object Mockk : DependencyGroup {
-    override val version = "1.13.13"
+    override val version = "1.13.16"
     override val groupId = "io.mockk"
 
     val mockk = dependency("mockk")
