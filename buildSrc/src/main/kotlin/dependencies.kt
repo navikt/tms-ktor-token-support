@@ -38,7 +38,7 @@ object Kotest : DependencyGroup {
 }
 
 object Ktor : DependencyGroup {
-    override val version = "3.0.3"
+    override val version = "3.1.2"
     override val groupId = "io.ktor"
 
     val serverAuth = dependency("ktor-server-auth")
