@@ -8,7 +8,7 @@ plugins {
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
-    implementation(Logback.classic)
+    implementation(Logstash.logbackEncoder)
     implementation(JacksonDatatype.moduleKotlin)
     implementation(JacksonDatatype.datatypeJsr310)
     implementation(KotlinLogging.logging)
@@ -20,11 +20,12 @@ dependencies {
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.jackson)
     implementation(Nimbusds.joseJwt)
-    testImplementation(kotlin("test-junit5"))
+    testImplementation(JunitPlatform.launcher)
+    testImplementation(JunitJupiter.api)
+    testImplementation(JunitJupiter.params)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.runnerJunit)
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.extensions)
 }
