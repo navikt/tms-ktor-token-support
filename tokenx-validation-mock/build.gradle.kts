@@ -8,6 +8,7 @@ dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(project(":tokenx-validation"))
     implementation(Logstash.logbackEncoder)
+    implementation(Logback.classic)
     implementation(KotlinLogging.logging)
     implementation(Ktor.serverAuth)
     implementation(Ktor.serverAuthJwt)

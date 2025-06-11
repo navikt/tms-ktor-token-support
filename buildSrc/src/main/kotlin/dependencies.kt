@@ -86,6 +86,11 @@ object Logstash: DependencyGroup {
     val logbackEncoder get() = dependency("logstash-logback-encoder")
 }
 
+object Logback: DependencyGroup {
+    override val version = "1.5.18"
+    val classic = "ch.qos.logback:logback-classic:$version"
+}
+
 object Mockk: DependencyGroup {
     override val groupId get() = "io.mockk"
     override val version get() = "1.14.2"

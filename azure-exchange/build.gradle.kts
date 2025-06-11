@@ -7,6 +7,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logstash.logbackEncoder)
+    implementation(Logback.classic)
     implementation(KotlinLogging.logging)
     implementation(Caffeine.caffeine)
     implementation(Ktor.serverAuth)

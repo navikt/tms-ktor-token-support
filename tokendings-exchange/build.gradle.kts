@@ -16,6 +16,7 @@ dependencies {
     implementation(Ktor.serverAuthJwt)
     implementation(Ktor.serverNetty)
     implementation(Logstash.logbackEncoder)
+    implementation(Logback.classic)
     implementation(KotlinLogging.logging)
     implementation(Nimbusds.joseJwt)
     testImplementation(JunitPlatform.launcher)

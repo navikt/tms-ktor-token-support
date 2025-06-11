@@ -9,6 +9,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Logstash.logbackEncoder)
+    implementation(Logback.classic)
     implementation(JacksonDatatype.moduleKotlin)
     implementation(JacksonDatatype.datatypeJsr310)
     implementation(KotlinLogging.logging)
