@@ -63,10 +63,10 @@ internal class TokenVerifier(
 
 
 internal data class OauthServerConfigurationMetadata(
-    @JsonAlias("issuer") val issuer: String,
-    @JsonAlias("token_endpoint") val tokenEndpoint: String,
-    @JsonAlias("jwks_uri") val jwksUri: String,
-    @JsonAlias("authorization_endpoint") var authorizationEndpoint: String = ""
+    @param:JsonAlias("issuer") val issuer: String,
+    @param:JsonAlias("token_endpoint") val tokenEndpoint: String,
+    @param:JsonAlias("jwks_uri") val jwksUri: String,
+    @param:JsonAlias("authorization_endpoint") var authorizationEndpoint: String = ""
 )
 
 private fun fetchMetadata(client: HttpClient, wellKnownUrl: String): OauthServerConfigurationMetadata = runBlocking {

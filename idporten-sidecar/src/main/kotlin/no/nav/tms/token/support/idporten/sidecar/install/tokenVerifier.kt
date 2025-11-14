@@ -93,8 +93,8 @@ internal class TokenVerifier private constructor(
 }
 
 internal data class OauthServerConfigurationMetadata(
-    @JsonAlias("issuer") val issuer: String,
-    @JsonAlias("jwks_uri") val jwksUri: String,
+    @param:JsonAlias("issuer") val issuer: String,
+    @param:JsonAlias("jwks_uri") val jwksUri: String,
 )
 
 private fun fetchMetadata(client: HttpClient, wellKnownUrl: String): OauthServerConfigurationMetadata = runBlocking {

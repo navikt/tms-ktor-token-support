@@ -11,14 +11,14 @@ interface DependencyGroup {
 }
 
 object Caffeine : DependencyGroup {
-    override val version = "3.2.0"
+    override val version = "3.2.3"
     override val groupId = "com.github.ben-manes.caffeine"
 
     val caffeine = dependency("caffeine")
 }
 
 object JacksonDatatype: DependencyGroup {
-    override val version get() = "2.19.0"
+    override val version get() = "2.20.1"
 
     val datatypeJsr310 get() = dependency("jackson-datatype-jsr310", groupId = "com.fasterxml.jackson.datatype")
     val moduleKotlin get() = dependency("jackson-module-kotlin", groupId = "com.fasterxml.jackson.module")
@@ -26,7 +26,7 @@ object JacksonDatatype: DependencyGroup {
 
 object JunitJupiter: DependencyGroup {
     override val groupId get() = "org.junit.jupiter"
-    override val version get() = "5.13.0"
+    override val version get() = "6.0.1"
 
     val api get() = dependency("junit-jupiter-api")
     val params get() = dependency("junit-jupiter-params")
@@ -34,14 +34,14 @@ object JunitJupiter: DependencyGroup {
 
 object JunitPlatform: DependencyGroup {
     override val groupId get() = "org.junit.platform"
-    override val version get() = "1.13.0"
+    override val version get() = "6.0.1"
 
     val launcher get() = dependency("junit-platform-launcher")
 }
 
 object Kotest: DependencyGroup {
     override val groupId get() = "io.kotest"
-    override val version get() = "5.9.1"
+    override val version get() = "6.0.4"
 
     val assertionsCore get() = dependency("kotest-assertions-core")
     val extensions get() = dependency("kotest-extensions")
@@ -49,18 +49,18 @@ object Kotest: DependencyGroup {
 
 object Kotlin: DependencyGroup {
     override val groupId get() = "org.jetbrains.kotlin"
-    override val version get() = "2.1.21"
+    override val version get() = "2.2.21"
 }
 
 object KotlinLogging: DependencyGroup {
     override val groupId get() = "io.github.oshai"
-    override val version get() = "7.0.7"
+    override val version get() = "7.0.13"
 
     val logging get() = dependency("kotlin-logging")
 }
 
 object Ktor : DependencyGroup {
-    override val version = "3.1.3"
+    override val version = "3.3.2"
     override val groupId = "io.ktor"
 
     val clientApache = dependency("ktor-client-apache")
@@ -81,26 +81,26 @@ object Ktor : DependencyGroup {
 
 object Logstash: DependencyGroup {
     override val groupId get() = "net.logstash.logback"
-    override val version get() = "8.1"
+    override val version get() = "9.0"
 
     val logbackEncoder get() = dependency("logstash-logback-encoder")
 }
 
 object Logback: DependencyGroup {
-    override val version = "1.5.18"
+    override val version = "1.5.21"
     val classic = "ch.qos.logback:logback-classic:$version"
 }
 
 object Mockk: DependencyGroup {
     override val groupId get() = "io.mockk"
-    override val version get() = "1.14.2"
+    override val version get() = "1.14.6"
 
     val mockk get() = dependency("mockk")
 }
 
 
 object Nimbusds : DependencyGroup {
-    override val version = "10.3"
+    override val version = "10.6"
     override val groupId = "com.nimbusds"
 
     val joseJwt = dependency("nimbus-jose-jwt")
