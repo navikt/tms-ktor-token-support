@@ -1,7 +1,7 @@
-package no.nav.tms.token.support.idporten.sidecar
+package no.nav.tms.token.support.user.login.routes
 
 // Proxy for System environment which allows for mocking or overwriting default env
-object IdPortenEnvironment {
+object UserTokenVerificationEnvironment {
     private val baseEnv = System.getenv()
 
     private val env = mutableMapOf<String, String>()

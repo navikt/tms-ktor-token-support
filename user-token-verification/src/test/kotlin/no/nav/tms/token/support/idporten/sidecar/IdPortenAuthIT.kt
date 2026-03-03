@@ -38,7 +38,7 @@ internal class IdPortenAuthIT {
 
     @AfterEach
     fun cleanUp() {
-        IdPortenEnvironment.reset()
+        UserTokenVerificationEnvironment.reset()
         clearMocks(verifier)
         unmockkObject(HttpClientBuilder)
         unmockkObject(TokenVerifier)
@@ -104,7 +104,7 @@ internal class IdPortenAuthIT {
     @Test
     fun `Allows installing multiple authorizers in parallel`() = testApplication {
 
-        IdPortenEnvironment.extend(envVars)
+        UserTokenVerificationEnvironment.extend(envVars)
 
         application {
             authentication {
@@ -144,7 +144,7 @@ internal class IdPortenAuthIT {
 
     private fun Application.testApi() {
 
-        IdPortenEnvironment.extend(envVars)
+        UserTokenVerificationEnvironment.extend(envVars)
 
         authentication {
             idPorten { }
@@ -161,7 +161,7 @@ internal class IdPortenAuthIT {
 
     private fun Application.testApiWithDefault() {
 
-        IdPortenEnvironment.extend(envVars)
+        UserTokenVerificationEnvironment.extend(envVars)
 
         authentication {
             idPorten {

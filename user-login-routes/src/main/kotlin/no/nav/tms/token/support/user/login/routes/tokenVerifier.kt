@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten.sidecar.install
+package no.nav.tms.token.support.user.login.routes
 
 import com.auth0.jwk.Jwk
 import com.auth0.jwk.JwkProvider
@@ -13,7 +13,6 @@ import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.token.support.idporten.sidecar.UserTokenVerificationEnvironment
 import java.net.URI
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit

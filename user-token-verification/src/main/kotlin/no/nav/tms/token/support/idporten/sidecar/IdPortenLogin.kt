@@ -22,12 +22,10 @@ class IdPortenLogin {
 
             val config = IdPortenLoginConfig().also(configure)
 
-            val hello = pipeline.rootPath
-
             pipeline.routing {
                 idPortenLoginApi(
                     tokenVerifier = initializeTokenVerifier(config.enableDefaultProxy, null),
-                    rootpath = hello,
+                    rootpath = pipeline.rootPath,
                     routesPrefix = config.routesPrefix
                 )
             }

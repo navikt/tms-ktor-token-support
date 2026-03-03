@@ -140,6 +140,58 @@ fun Application.setup() {
 }
 ```
 
+## Login plugin
+
+Bilbioteket tilbyr en plugin `IdPortenLogin` for apper som har satt opp integrasjon mot idporten. 
+
+Denne legger til to endepunkt for å fasilitere innloggingsflyt:
+
+- `/login`: Setter i gang innlogging hos ID-porten via sidecar. 
+- `/login/status`: Viser status for innlogging - om bruker er innlogget og med hvilket nivå.
+
+Plugin har to variabler:
+
+- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Default 'false'.
+- `routesPrefix`: (Optional) Bestemmer en relativ path der endepunktene plasseres. Default 'null'.
+
+Eksempel på oppsett:
+
+```kotlin
+fun Application.setup() {
+    install(IdPortenLogin) {
+        routesPrefix = '/implicit/root/path'
+        enableDefaultProxy = false
+    }
+}
+```
+
+Eksempel på bruk:
+
+Installere Plugin:
+
+```kotlin
+fun Application.setup() {
+    install(IdPortenLogin)
+}
+```
+
+Initiere login på med 'substantial' level of assurance:
+
+`https://backend.nav.no/login?loa=substantial&redirect_uri=https://frontend.nav.no`
+
+Sjekke status etter innlogging
+
+`https://backend.nav.no/login/status`
+
+svarer med:
+```json
+{
+  "authenticated": true,
+  "level": 3,
+  "levelOfAssurance": "substantial"
+}
+```
+
 ## UserPrincipal
 
 Biblioteket tilbyr også en måte å pakke ut informasjon fra en autorisert brukers token.

@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten.sidecar
+package no.nav.tms.token.support.user.login.routes
 
 import com.auth0.jwt.interfaces.Claim
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -12,14 +12,11 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.mockk.*
-import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
-import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
-import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class IdPortenPluginTest {
+class UserLoginRoutesTest {
     private val envVars = listOf(
         "IDPORTEN_WELL_KNOWN_URL" to "http://mocked-issuer/config",
         "IDPORTEN_CLIENT_ID" to "123456",
@@ -68,7 +65,6 @@ class IdPortenPluginTest {
                 .let(objectMapper::readTree)
                 .let {
                     it["authenticated"]?.asBoolean() shouldBe false
-                    it["level"].isNull shouldBe true
                     it["levelOfAssurance"].isNull shouldBe true
                 }
         }
@@ -109,7 +105,7 @@ class IdPortenPluginTest {
         UserTokenVerificationEnvironment.extend(envVars)
 
         application {
-            install(IdPortenLogin)
+            install(UserLoginRoutes)
         }
 
         val client = createClient {
