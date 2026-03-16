@@ -1,16 +1,14 @@
-package no.nav.tms.token.support.idporten.sidecar.install
+package no.nav.tms.token.support.user.token.verification
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.auth.*
 import no.nav.tms.token.support.idporten.sidecar.IdportenAuthenticationConfig
-import no.nav.tms.token.support.idporten.sidecar.LevelOfAssurance
 
-internal object IdPortenInstaller {
+internal object UserTokenVerificationInstaller {
 
     // Register authenticator for id-porten tokens
     // This can apply to any number of endpoints.
     fun AuthenticationConfig.performIdPortenAuthenticatorInstallation(
-            config: IdportenAuthenticationConfig
+            config: UserTokenAuthenticationConfig
     ) {
         val tokenVerifier = initializeTokenVerifier(
             enableDefaultProxy = config.enableDefaultProxy,
@@ -27,7 +25,6 @@ internal object IdPortenInstaller {
         LevelOfAssurance.SUBSTANTIAL -> IdPortenLevelOfAssurance.Substantial
         LevelOfAssurance.HIGH -> IdPortenLevelOfAssurance.High
     }
-
 
     private fun getAuthenticatorName(config: IdportenAuthenticationConfig): String? {
         return if (config.setAsDefault) {

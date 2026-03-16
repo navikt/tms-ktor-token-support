@@ -10,8 +10,12 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
 import io.mockk.*
-import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
-import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
+import no.nav.tms.token.support.user.token.verification.UserTokenAuthenticator
+import no.nav.tms.token.support.user.token.verification.LevelOfAssurance
+import no.nav.tms.token.support.user.token.verification.UserTokenVerificationEnvironment
+import no.nav.tms.token.support.user.token.verification.userToken
+import no.nav.tms.token.support.user.token.verification.HttpClientBuilder
+import no.nav.tms.token.support.user.token.verification.idporten.IdPortenTokenVerifier
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,16 +27,16 @@ internal class IdPortenAuthIT {
             "IDPORTEN_CLIENT_ID" to "123456",
     ).toMap()
 
-    val verifier: TokenVerifier = mockk()
+    val verifier: IdPortenTokenVerifier = mockk()
     val dummyJwt: DecodedJWT = mockk()
 
     private val dummyToken = "token"
 
     @BeforeEach
     fun setupMock() {
-        mockkObject(TokenVerifier)
+        mockkObject(IdPortenTokenVerifier)
         mockkObject(HttpClientBuilder)
-        every { TokenVerifier.build(any(), any(), any()) } returns verifier
+        every { IdPortenTokenVerifier.build(any(), any(), any()) } returns verifier
         every { HttpClientBuilder.buildHttpClient(any()) } returns mockedClient
     }
 
@@ -41,7 +45,7 @@ internal class IdPortenAuthIT {
         UserTokenVerificationEnvironment.reset()
         clearMocks(verifier)
         unmockkObject(HttpClientBuilder)
-        unmockkObject(TokenVerifier)
+        unmockkObject(IdPortenTokenVerifier)
     }
 
     @Test
@@ -76,7 +80,7 @@ internal class IdPortenAuthIT {
             testApiWithDefault()
         }
 
-        every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
+        every { verifier.verify(dummyToken) } returns dummyJwt
 
         val status = client.get("/test"){
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
@@ -92,7 +96,7 @@ internal class IdPortenAuthIT {
             testApiWithDefault()
         }
 
-        every { verifier.verifyAccessToken(dummyToken) } throws RuntimeException()
+        every { verifier.verify(dummyToken) } throws RuntimeException()
 
         val status = client.get("/test"){
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
@@ -108,11 +112,11 @@ internal class IdPortenAuthIT {
 
         application {
             authentication {
-                idPorten {
+                userToken {
                     setAsDefault = true
                     levelOfAssurance = LevelOfAssurance.HIGH
                 }
-                idPorten {
+                userToken {
                     setAsDefault = false
                     authenticatorName = "other"
                 }
@@ -131,7 +135,7 @@ internal class IdPortenAuthIT {
             }
         }
 
-        every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
+        every { verifier.verify(dummyToken) } returns dummyJwt
 
         client.get("/test/one") {
             headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
@@ -147,11 +151,11 @@ internal class IdPortenAuthIT {
         UserTokenVerificationEnvironment.extend(envVars)
 
         authentication {
-            idPorten { }
+            userToken { }
         }
 
         routing {
-            authenticate(IdPortenAuthenticator.name) {
+            authenticate(UserTokenAuthenticator.name) {
                 get("/test") {
                     call.respond(HttpStatusCode.OK)
                 }
@@ -164,7 +168,7 @@ internal class IdPortenAuthIT {
         UserTokenVerificationEnvironment.extend(envVars)
 
         authentication {
-            idPorten {
+            userToken {
                 setAsDefault = true
             }
         }

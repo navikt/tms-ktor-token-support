@@ -10,6 +10,8 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.tms.token.support.idporten.sidecar.JwkBuilder
 import no.nav.tms.token.support.idporten.sidecar.JwtBuilder
+import no.nav.tms.token.support.user.token.verification.idporten.IdPortenLevelOfAssurance
+import no.nav.tms.token.support.user.token.verification.idporten.IdPortenTokenVerifier
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -34,7 +36,7 @@ internal class TokenVerifierTest {
 
     @Test
     fun `Should accept valid token`() {
-        val verifier = TokenVerifier.build(
+        val verifier = IdPortenTokenVerifier.build(
             jwkProvider = jwkProvider,
             issuer = issuer,
             minLevelOfAssurance = IdPortenLevelOfAssurance.High
@@ -51,13 +53,13 @@ internal class TokenVerifierTest {
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
         shouldNotThrow<Exception> {
-            verifier.verifyAccessToken(token)
+            verifier.verify(token)
         }
     }
 
     @Test
     fun `Should not accept token with invalid issuer`() {
-        val verifier = TokenVerifier.build(
+        val verifier = IdPortenTokenVerifier.build(
             jwkProvider = jwkProvider,
             issuer = issuer,
             minLevelOfAssurance = IdPortenLevelOfAssurance.High
@@ -75,13 +77,13 @@ internal class TokenVerifierTest {
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
         shouldThrow<Exception> {
-            verifier.verifyAccessToken(token)
+            verifier.verify(token)
         }
     }
 
     @Test
     fun `Should not accept expired token`() {
-        val verifier = TokenVerifier.build(
+        val verifier = IdPortenTokenVerifier.build(
             jwkProvider = jwkProvider,
             issuer = issuer,
             minLevelOfAssurance = IdPortenLevelOfAssurance.High
@@ -99,13 +101,13 @@ internal class TokenVerifierTest {
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
         shouldThrow<Exception> {
-            verifier.verifyAccessToken(token)
+            verifier.verify(token)
         }
     }
 
     @Test
     fun `Should not accept token with too low login level`() {
-        val verifier = TokenVerifier.build(
+        val verifier = IdPortenTokenVerifier.build(
             jwkProvider = jwkProvider,
             issuer = issuer,
             minLevelOfAssurance = IdPortenLevelOfAssurance.High
@@ -123,7 +125,7 @@ internal class TokenVerifierTest {
         every { jwkProvider.get(any()) } returns jwk.toJwk()
 
         shouldThrow<Exception> {
-            verifier.verifyAccessToken(token)
+            verifier.verify(token)
         }
     }
 }

@@ -28,7 +28,6 @@ internal object IdPortenInstaller {
         LevelOfAssurance.HIGH -> IdPortenLevelOfAssurance.High
     }
 
-
     private fun getAuthenticatorName(config: IdportenAuthenticationConfig): String? {
         return if (config.setAsDefault) {
             null

@@ -8,7 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.http.*
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.serialization.jackson.*
-import no.nav.tms.token.support.idporten.sidecar.install.OauthServerConfigurationMetadata
+import no.nav.tms.token.support.user.token.verification.idporten.OauthServerConfigurationMetadata
 
 
 val mockedClient = HttpClient(MockEngine) {

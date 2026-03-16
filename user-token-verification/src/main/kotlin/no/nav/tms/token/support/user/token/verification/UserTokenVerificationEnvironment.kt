@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten.sidecar
+package no.nav.tms.token.support.user.token.verification
 
 // Proxy for System environment which allows for mocking or overwriting default env
 object UserTokenVerificationEnvironment {

@@ -12,9 +12,11 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import io.ktor.utils.io.*
 import io.mockk.*
-import no.nav.tms.token.support.idporten.sidecar.install.HttpClientBuilder
-import no.nav.tms.token.support.idporten.sidecar.install.IdPortenLevelOfAssurance
-import no.nav.tms.token.support.idporten.sidecar.install.TokenVerifier
+import no.nav.tms.token.support.verification.IdPortenLogin
+import no.nav.tms.token.support.user.token.verification.UserTokenVerificationEnvironment
+import no.nav.tms.token.support.user.token.verification.HttpClientBuilder
+import no.nav.tms.token.support.user.token.verification.idporten.IdPortenLevelOfAssurance
+import no.nav.tms.token.support.user.token.verification.idporten.IdPortenTokenVerifier
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +27,7 @@ class IdPortenPluginTest {
         "IDPORTEN_CLIENT_ID" to "123456",
     ).toMap()
 
-    private val verifier: TokenVerifier = mockk()
+    private val verifier: IdPortenTokenVerifier = mockk()
     private val dummyJwt: DecodedJWT = mockk()
 
     private val dummyToken = "token"
@@ -34,9 +36,9 @@ class IdPortenPluginTest {
 
     @BeforeEach
     fun setupMock() {
-        mockkObject(TokenVerifier)
+        mockkObject(IdPortenTokenVerifier)
         mockkObject(HttpClientBuilder)
-        every { TokenVerifier.build(any(), any(), any()) } returns verifier
+        every { IdPortenTokenVerifier.build(any(), any(), any()) } returns verifier
         every { HttpClientBuilder.buildHttpClient(any()) } returns mockedClient
     }
 
@@ -45,7 +47,7 @@ class IdPortenPluginTest {
         UserTokenVerificationEnvironment.reset()
         clearMocks(verifier)
         unmockkObject(HttpClientBuilder)
-        unmockkObject(TokenVerifier)
+        unmockkObject(IdPortenTokenVerifier)
     }
 
     @Test
@@ -77,7 +79,7 @@ class IdPortenPluginTest {
     @Test
     fun `Status endpoint returns login status when authorized`() = loginApiTest { client ->
 
-        every { verifier.verifyAccessToken(dummyToken) } returns dummyJwt
+        every { verifier.verify(dummyToken) } returns dummyJwt
 
         val ident = "123"
 
