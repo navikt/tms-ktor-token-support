@@ -40,12 +40,6 @@ fun testClient(
                     "$idPortenUrl/config" -> {
                         respondJson(idportenMetadata)
                     }
-                    else -> error("Unhandled ${request.url.fullUrl}")
-                }
-            }
-
-            addHandler { request ->
-                when (request.url.fullUrl) {
                     "$tokenxUrl/config" -> {
                         respondJson(tokenxMetadata)
                     }

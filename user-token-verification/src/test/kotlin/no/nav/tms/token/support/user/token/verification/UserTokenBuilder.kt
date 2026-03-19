@@ -7,7 +7,7 @@ import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import com.nimbusds.oauth2.sdk.id.Audience
+import java.time.Duration
 import java.util.*
 
 internal class UserTokenBuilder(
@@ -15,15 +15,16 @@ internal class UserTokenBuilder(
     private val idPortenJwk: RSAKey,
     private val idPortenAud: String,
     private val tokenxUrl: String,
-    private val tokenxJwk: RSAKey
+    private val tokenxJwk: RSAKey,
+    private val tokenxClientId: String,
 ) {
 
-    fun idportenToken(
+    fun idPortenToken(
         ident: String,
         audience: String = idPortenAud,
-        acrClaim: String = IdPortenLoa.High.acr,
+        acrClaim: String = IdPortenLoa.High.acrValue,
         issueTime: Date = Date(),
-        expiryTime: Date = Date(Date().time + 3600000)
+        expiryTime: Date = Date() + Duration.ofHours(1)
     ): String {
         return JWTClaimsSet.Builder()
             .issuer(idPortenUrl)
@@ -40,10 +41,10 @@ internal class UserTokenBuilder(
 
     fun tokenxToken(
         ident: String,
-        target: String,
-        acrClaim: String = TokenxLoa.High.acr,
+        target: String = tokenxClientId,
+        acrClaim: String = TokenxLoa.High.acrValue,
         issueTime: Date = Date(),
-        expiryTime: Date = Date(Date().time + 3600000)
+        expiryTime: Date = Date() + Duration.ofHours(1)
     ): String {
         return JWTClaimsSet.Builder()
             .issuer(tokenxUrl)
@@ -58,13 +59,13 @@ internal class UserTokenBuilder(
             .serialize()
     }
 
-    enum class IdPortenLoa(val acr: String) {
+    enum class IdPortenLoa(val acrValue: String) {
         Low("idporten-loa-low"),
         Substantial("idporten-loa-substantial"),
         High("idporten-loa-high")
     }
 
-    enum class TokenxLoa(val acr: String) {
+    enum class TokenxLoa(val acrValue: String) {
         Substantial("Level3"),
         High("Level4")
     }
