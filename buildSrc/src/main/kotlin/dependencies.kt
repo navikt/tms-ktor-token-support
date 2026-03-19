@@ -71,6 +71,7 @@ object Ktor : DependencyGroup {
     val serverAuth = dependency("ktor-server-auth")
     val serverAuthJwt = dependency("ktor-server-auth-jwt")
     val serialization = dependency("ktor-serialization")
+    val serverContentNegotiation get() = dependency("ktor-server-content-negotiation")
     val serverNetty = dependency("ktor-server-netty")
     val serverTestHost = dependency("ktor-server-test-host")
     val serverForwardedHeaders = dependency("ktor-server-forwarded-header")

@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     api(kotlin("stdlib-jdk8"))
+    implementation(JacksonDatatype.datatypeJsr310)
+    implementation(JacksonDatatype.moduleKotlin)
     implementation(Logstash.logbackEncoder)
     implementation(Logback.classic)
     implementation(KotlinLogging.logging)
@@ -25,6 +27,7 @@ dependencies {
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
+    testImplementation(Ktor.serverContentNegotiation)
     testImplementation(Kotest.assertionsCore)
     testImplementation(Kotest.extensions)
     testImplementation(Nimbusds.joseJwt)

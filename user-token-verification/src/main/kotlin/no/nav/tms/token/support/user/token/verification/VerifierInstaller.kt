@@ -1,104 +1,130 @@
 package no.nav.tms.token.support.user.token.verification
 
-import com.auth0.jwt.interfaces.DecodedJWT
-import no.nav.tms.token.support.user.token.verification.idporten.IdPortenVerifierBuilder
-import no.nav.tms.token.support.user.token.verification.tokenx.TokenxVerifierBuilder
+internal object VerifierInstaller {
 
-internal interface TokenVerifier {
-    fun verify(accessToken: DecodedJWT): UserPrincipal
-}
+    private val tokenxConfig = VerifierConfig(
+        wellKnownUrlEnv = "TOKEN_X_WELL_KNOWN_URL",
+        audienceEnv = "TOKEN_X_CLIENT_ID"
+    )
 
-internal class InstalledVerifiers(
-    private val verifierByIssuer: Map<String, TokenVerifier>
-) {
-    fun verifyAccessToken(accessToken: DecodedJWT): UserPrincipal {
-        return verifierByIssuer[accessToken.issuer]?.let { verifier ->
-            verifier.verify(accessToken)
-        }?: throw VerifierNotFoundException(accessToken.issuer)
-    }
-}
+    private val idPortenConfig = VerifierConfig(
+        wellKnownUrlEnv = "IDPORTEN_WELL_KNOWN_URL",
+        audienceEnv = "IDPORTEN_AUDIENCE"
+    )
 
-internal class VerifierInstaller(
-    enableProxy: Boolean
-) {
-    private val tokenxVerifierBuilder: TokenxVerifierBuilder?
-    private val idPortenVerifierBuilder: IdPortenVerifierBuilder?
-
-    init {
-        val tokenxWellKnown = UserTokenVerificationEnvironment.get("TOKEN_X_WELL_KNOWN_URL")
-
-        tokenxVerifierBuilder = if (tokenxWellKnown != null) {
-            TokenxVerifierBuilder(tokenxWellKnown, enableProxy)
-        } else {
-            null
-        }
-
-        val idportenWellknown = UserTokenVerificationEnvironment.get("IDPORTEN_WELL_KNOWN_URL")
-
-        idPortenVerifierBuilder = if (idportenWellknown != null) {
-            IdPortenVerifierBuilder(idportenWellknown, enableProxy)
-        } else {
-            null
-        }
-    }
-
-    fun installVerifiers(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance): InstalledVerifiers {
+    fun installVerifiers(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
         return if (requiredIssuers.isEmpty()) {
-            installAllKnownVerifiers(minLevelOfAssurance)
+            installAllKnownVerifiers(minLevelOfAssurance, webProxy)
         } else {
-            installRequiredVerifiersOnly(requiredIssuers, minLevelOfAssurance)
+            installRequiredVerifiersOnly(requiredIssuers, minLevelOfAssurance, webProxy)
         }
     }
 
-    private fun installAllKnownVerifiers(minLevelOfAssurance: LevelOfAssurance): InstalledVerifiers {
-        if (tokenxVerifierBuilder == null && idPortenVerifierBuilder == null) {
+    private fun installAllKnownVerifiers(minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
+        if (!tokenxConfig.isPresent() && !idPortenConfig.isPresent()) {
             throw MissingVerifierConfigException("Fant ingen well-known variabler. Påse at nais.yaml er konfigurert riktig")
         }
 
         val verifiers = mutableMapOf<String, TokenVerifier>()
 
-        if (tokenxVerifierBuilder != null) {
-            val tokenxVerifier = tokenxVerifierBuilder.buildTokenVerifier(minLevelOfAssurance)
+        if (tokenxConfig.isPresent()) {
+            val tokenxVerifier = TokenVerifier.build(
+                wellKnownUrl = tokenxConfig.wellKnownUrl,
+                audience = tokenxConfig.audience,
+                acrMapper = ::mapTokenxAcr,
+                minLevelOfAssurance = minLevelOfAssurance,
+                webProxy = webProxy
+            )
 
             verifiers[tokenxVerifier.issuer] = tokenxVerifier
         }
 
-        if (idPortenVerifierBuilder != null) {
-            val idportenVerifier = idPortenVerifierBuilder.buildTokenVerifier(minLevelOfAssurance)
+        if (idPortenConfig.isPresent()) {
+            val idportenVerifier = TokenVerifier.build(
+                wellKnownUrl = idPortenConfig.wellKnownUrl,
+                audience = idPortenConfig.audience,
+                acrMapper = ::mapIdportenAcr,
+                minLevelOfAssurance = minLevelOfAssurance,
+                webProxy = webProxy
+            )
 
             verifiers[idportenVerifier.issuer] = idportenVerifier
         }
 
-        return InstalledVerifiers(verifiers)
+        return verifiers
     }
 
-    private fun installRequiredVerifiersOnly(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance): InstalledVerifiers {
+    private fun installRequiredVerifiersOnly(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
 
         val verifiers = mutableMapOf<String, TokenVerifier>()
 
         if (requiredIssuers.contains(Issuer.Tokenx)) {
-            if (tokenxVerifierBuilder == null) {
-                throw MissingVerifierConfigException("Klarte ikke installere tokenx-verifikator. Mangler env TOKEN_X_WELL_KNOWN_URL")
-            } else {
-                val tokenxVerifier = tokenxVerifierBuilder.buildTokenVerifier(minLevelOfAssurance)
+            if (tokenxConfig.isPresent()) {
+                val tokenxVerifier = TokenVerifier.build(
+                    wellKnownUrl = tokenxConfig.wellKnownUrl,
+                    audience = tokenxConfig.audience,
+                    acrMapper = ::mapTokenxAcr,
+                    minLevelOfAssurance = minLevelOfAssurance,
+                    webProxy = webProxy
+                )
 
                 verifiers[tokenxVerifier.issuer] = tokenxVerifier
+            } else {
+                throw MissingVerifierConfigException("Klarte ikke installere tokenx-verifikator. Mangler env TOKEN_X_WELL_KNOWN_URL")
             }
         }
 
         if (requiredIssuers.contains(Issuer.IdPorten)) {
-            if (idPortenVerifierBuilder == null) {
-                throw MissingVerifierConfigException("Klarte ikke installere idporten-verifikator. Mangler env IDPORTEN_WELL_KNOWN_URL")
-            } else {
-                val idportenVerifier = idPortenVerifierBuilder.buildTokenVerifier(minLevelOfAssurance)
+            if (idPortenConfig.isPresent()) {
+                val idportenVerifier = TokenVerifier.build(
+                    wellKnownUrl = idPortenConfig.wellKnownUrl,
+                    audience = idPortenConfig.audience,
+                    acrMapper = ::mapIdportenAcr,
+                    minLevelOfAssurance = minLevelOfAssurance,
+                    webProxy = webProxy
+                )
+
 
                 verifiers[idportenVerifier.issuer] = idportenVerifier
+            } else {
+                throw MissingVerifierConfigException("Klarte ikke installere idporten-verifikator. Mangler env IDPORTEN_WELL_KNOWN_URL")
             }
         }
 
-        return InstalledVerifiers(verifiers)
+        return verifiers
+    }
+
+    private fun mapTokenxAcr(acr: String): LevelOfAssurance {
+        return when(acr) {
+            "Level3", "level3", "idporten-loa-substantial" -> LevelOfAssurance.Substantial
+            "Level4", "level4", "idporten-loa-high" -> LevelOfAssurance.High
+            else -> throw AcrNotSupportedException("Fant ikke loa-mapping for tokenx acr-verdi '$acr'")
+        }
+    }
+
+    private fun mapIdportenAcr(acr: String): LevelOfAssurance {
+        return when(acr) {
+            "idporten-loa-low" -> throw AcrNotSupportedException("Støttet ikke idporten level of assurance 'low'")
+            "idporten-loa-substantial" -> LevelOfAssurance.Substantial
+            "idporten-loa-high" -> LevelOfAssurance.High
+            else -> throw AcrNotSupportedException("Fant ikke loa-mapping for idporten acr-verdi '$acr'")
+        }
+    }
+
+    private class VerifierConfig(
+        private val wellKnownUrlEnv: String,
+        private val audienceEnv: String
+    ) {
+        val wellKnownUrl get() = UserTokenVerificationEnvironment.get(wellKnownUrlEnv)!!
+        val audience get() = UserTokenVerificationEnvironment.get(audienceEnv)!!
+
+        fun isPresent(): Boolean {
+            return UserTokenVerificationEnvironment.get(wellKnownUrlEnv) != null &&
+                UserTokenVerificationEnvironment.get(audienceEnv) != null
+        }
     }
 }
 
+class AcrNotSupportedException(msg: String): IllegalArgumentException(msg)
 class MissingVerifierConfigException(msg: String): IllegalStateException(msg)
 class VerifierNotFoundException(issuer: String): IllegalArgumentException("Fant ikke verifikator for token med issuer [$issuer]")

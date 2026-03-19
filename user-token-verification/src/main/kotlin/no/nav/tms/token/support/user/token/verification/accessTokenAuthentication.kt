@@ -7,38 +7,44 @@ import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.request.ApplicationRequest
 import io.ktor.server.response.*
-import no.nav.tms.token.support.user.token.verification.idporten.IdPortenTokenVerifier
 import kotlin.text.split
 
 private val log = KotlinLogging.logger { }
 
 // This method configures an authenticator which checks if an end user has hit an authenticated endpoint
 // with a valid token. If the user is missing the token, or the provided token is invalid, we respond with http-code 401
-internal fun AuthenticationConfig.registerIdPortenValidationProvider(authenticatorName: String?, tokenVerifiers: InstalledVerifiers) =
+internal fun AuthenticationConfig.registerUserTokenAuthenticator(authenticatorName: String?, tokenVerifiers: Map<String, TokenVerifier>) =
     AccessTokenAuthenticationProvider.Configuration(authenticatorName)
         .let { config -> AccessTokenAuthenticationProvider(tokenVerifiers, config) }
         .let { provider -> register(provider) }
 
 private class AccessTokenAuthenticationProvider(
-    private val installedVerifiers: InstalledVerifiers,
+    private val installedVerifiers: Map<String, TokenVerifier>,
     config: Config
 ) : AuthenticationProvider(config) {
 
     override suspend fun onAuthenticate(context: AuthenticationContext) {
-        val call = context.call
 
-        val accessToken = fetchAccessToken(call.request)
+        val accessToken = fetchAccessToken(context.call.request)
 
-        if (accessToken != null) {
-            try {
-                val userPrincipal = installedVerifiers.verifyAccessToken(accessToken)
-                context.principal(userPrincipal)
-            } catch (e: Throwable) {
-                log.debug(e) { "Token verification failed" }
-                context.challengeAndRespondUnauthorized()
-            }
-        } else {
-            log.debug { "Token missing. No header or fallback cookie provided." }
+        if (accessToken == null) {
+            log.debug { "Mangler token - Authorization header er tom, eller ikke på bearer-format" }
+            context.challengeAndRespondUnauthorized()
+            return
+        }
+
+        val verifier = installedVerifiers[accessToken.issuer]
+
+        if (verifier == null) {
+            log.debug { "Fant ikke installert verifikator for issuer [${accessToken.issuer}]" }
+            context.challengeAndRespondUnauthorized()
+            return
+        }
+
+        try {
+            context.principal(verifier.verify(accessToken))
+        } catch (e: Throwable) {
+            log.debug(e) { "Verifisering av token feilet." }
             context.challengeAndRespondUnauthorized()
         }
     }
@@ -54,7 +60,9 @@ private fun fetchAccessToken(request: ApplicationRequest): DecodedJWT? {
         .headers[HttpHeaders.Authorization]
         ?.takeIf { bearerRegex.matches(it) }
         ?.let { it.split(" ")[1] }
-        ?.let { JWT.decode(it) }
+        ?.let {
+            JWT.decode(it)
+        }
 }
 
 private fun AuthenticationContext.challengeAndRespondUnauthorized() {

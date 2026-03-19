@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.user.token.verification
 
 import io.ktor.server.auth.*
-import no.nav.tms.token.support.user.token.verification.idporten.IdPortenInstaller.performIdPortenAuthenticatorInstallation
+import no.nav.tms.token.support.user.token.verification.UserTokenVerificationInstaller.performUserTokenAuthenticatorInstallation
 
 
 // This method is responsible for registering the authenticators.
@@ -9,12 +9,12 @@ import no.nav.tms.token.support.user.token.verification.idporten.IdPortenInstall
 fun AuthenticationConfig.userToken(configure: UserTokenAuthenticationConfig.() -> Unit) =
     UserTokenAuthenticationConfig()
         .apply(configure)
-        .let { performIdPortenAuthenticatorInstallation(it) }
+        .let { performUserTokenAuthenticatorInstallation(it) }
 
 // Configuration provided by library user. See readme for example of use
 class UserTokenAuthenticationConfig {
-    private val requiredIssuers = mutableSetOf<Issuer>()
-    fun acceptIssuer(vararg issuer: Issuer) {
+    internal val requiredIssuers = mutableSetOf<Issuer>()
+    fun requireIssuer(vararg issuer: Issuer) {
         requiredIssuers.addAll(requiredIssuers)
     }
 

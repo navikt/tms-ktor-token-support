@@ -1,32 +1,27 @@
 package no.nav.tms.token.support.user.token.verification
 
 import io.ktor.server.auth.*
-import no.nav.tms.token.support.idporten.sidecar.IdportenAuthenticationConfig
 
 internal object UserTokenVerificationInstaller {
 
     // Register authenticator for id-porten tokens
     // This can apply to any number of endpoints.
-    fun AuthenticationConfig.performIdPortenAuthenticatorInstallation(
-            config: UserTokenAuthenticationConfig
+    fun AuthenticationConfig.performUserTokenAuthenticatorInstallation(
+        config: UserTokenAuthenticationConfig
     ) {
-        val tokenVerifier = initializeTokenVerifier(
-            enableDefaultProxy = config.enableDefaultProxy,
-            minLevelOfAssurance = getMinLoa(config.levelOfAssurance)
+        val installedVerifiers = VerifierInstaller.installVerifiers(
+            requiredIssuers = config.requiredIssuers.toList(),
+            minLevelOfAssurance = config.levelOfAssurance,
+            webProxy = config.enableDefaultProxy
         )
 
-        registerIdPortenValidationProvider(
+        registerUserTokenAuthenticator(
             authenticatorName = getAuthenticatorName(config),
-            tokenVerifier = tokenVerifier
+            tokenVerifiers = installedVerifiers
         )
     }
 
-    private fun getMinLoa(loa: LevelOfAssurance) = when (loa) {
-        LevelOfAssurance.SUBSTANTIAL -> IdPortenLevelOfAssurance.Substantial
-        LevelOfAssurance.HIGH -> IdPortenLevelOfAssurance.High
-    }
-
-    private fun getAuthenticatorName(config: IdportenAuthenticationConfig): String? {
+    private fun getAuthenticatorName(config: UserTokenAuthenticationConfig): String? {
         return if (config.setAsDefault) {
             null
         } else {

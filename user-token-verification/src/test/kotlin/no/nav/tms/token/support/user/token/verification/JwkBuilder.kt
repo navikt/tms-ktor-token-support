@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.idporten.sidecar
+package no.nav.tms.token.support.user.token.verification
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.KeyUse
