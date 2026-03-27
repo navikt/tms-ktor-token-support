@@ -13,6 +13,4 @@ object JwkBuilder {
                 .keyID("KID")
                 .generate()
     }
-
-    fun generateJwkString(): String = generateJwk().toJSONString()
 }

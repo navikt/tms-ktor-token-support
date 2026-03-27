@@ -19,7 +19,7 @@ import java.net.URI
 import java.security.interfaces.RSAPublicKey
 import java.util.concurrent.TimeUnit
 
-internal class TokenVerifier private constructor(
+internal class TokenVerifier(
     val issuer: String,
     private val jwkProvider: JwkProvider,
     private val audience: String,

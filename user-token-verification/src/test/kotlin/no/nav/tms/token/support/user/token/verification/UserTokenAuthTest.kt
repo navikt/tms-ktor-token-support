@@ -229,8 +229,15 @@ internal class UserTokenAuthenticationFlowTest {
         }
 
         @Test
-        fun `godtar ikke tokens utstedt på vegne av andre enn nav`() = testApplication {
+        fun `setter godtatt audience til navs audience-id fra env`() = testApplication {
+            val audience = UUID.randomUUID().toString()
+
+            val environment = mapOf(
+                "IDPORTEN_AUDIENCE" to audience
+            )
+
             UserTokenVerificationEnvironment.extend(idPortenEnv)
+            UserTokenVerificationEnvironment.extend(environment)
 
             application {
                 authentication {
@@ -248,134 +255,79 @@ internal class UserTokenAuthenticationFlowTest {
                 }
             }
 
-            val token = userTokenBuilder.idPortenToken(
+            val tokenForNav = userTokenBuilder.tokenxToken(
                 testIdent,
-                audience = "annen audience"
+                target = audience
             )
 
-            val response = client.authorizedGet("/test", token)
+            val tokenForAnnetDomene = userTokenBuilder.tokenxToken(
+                testIdent,
+                target = UUID.randomUUID().toString()
+            )
 
-            response.status shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test", tokenForNav).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test", tokenForAnnetDomene).status shouldBe HttpStatusCode.Unauthorized
         }
 
         @Test
-        fun `godtar tokens med høyere level of assurance enn påkrevd`() = testApplication {
-            UserTokenVerificationEnvironment.extend(idPortenEnv)
+        fun `godtar kun kjente acr-verdier fra idporten og mapper om til LevelOfAssurance`() = testApplication {
+            UserTokenVerificationEnvironment.extend(tokenxEnv)
 
             application {
                 authentication {
-                    userToken {
+                    userToken("substantial") {
                         levelOfAssurance = LevelOfAssurance.Substantial
                     }
-                }
-
-                routing {
-                    authenticate {
-                        get("/test") {
-                            call.respond(HttpStatusCode.OK)
-                        }
-                    }
-                }
-            }
-
-            val token = userTokenBuilder.idPortenToken(
-                testIdent,
-                acrClaim = IdPortenLoa.High.acrValue
-            )
-
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.OK
-        }
-
-        @Test
-        fun `godtar ikke tokens med lavere level of assurance enn påkrevd`() = testApplication {
-            UserTokenVerificationEnvironment.extend(idPortenEnv)
-
-            application {
-                authentication {
-                    userToken {
+                    userToken("high") {
                         levelOfAssurance = LevelOfAssurance.High
                     }
                 }
 
                 routing {
-                    authenticate {
-                        get("/test") {
-                            call.respondText(call.principal<UserPrincipal>()?.ident ?: "null")
+                    authenticate("substantial") {
+                        get("/test/substantial") {
+                            call.respond(HttpStatusCode.OK)
                         }
                     }
-                }
-            }
-
-            val token = userTokenBuilder.idPortenToken(
-                testIdent,
-                acrClaim = IdPortenLoa.Substantial.acrValue
-            )
-
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.Unauthorized
-        }
-
-        @Test
-        fun `godtar ikke tokens med idporten loa low`() = testApplication {
-            UserTokenVerificationEnvironment.extend(idPortenEnv)
-
-            application {
-                authentication {
-                    userToken {
-                        levelOfAssurance = LevelOfAssurance.Substantial
-                    }
-                }
-
-                routing {
-                    authenticate {
-                        get("/test") {
+                    authenticate("high") {
+                        get("/test/high") {
                             call.respond(HttpStatusCode.OK)
                         }
                     }
                 }
             }
 
-            val token = userTokenBuilder.idPortenToken(
+            val lowToken = userTokenBuilder.tokenxToken(
                 testIdent,
-                acrClaim = IdPortenLoa.Low.acrValue
+                acrClaim = "idporten-loa-low"
             )
 
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.Unauthorized
-        }
-
-        @Test
-        fun `godtar ikke tokens med andre acr-verdier`() = testApplication {
-            UserTokenVerificationEnvironment.extend(idPortenEnv)
-
-            application {
-                authentication {
-                    userToken {
-                        levelOfAssurance = LevelOfAssurance.Substantial
-                    }
-                }
-
-                routing {
-                    authenticate {
-                        get("/test") {
-                            call.respond(HttpStatusCode.OK)
-                        }
-                    }
-                }
-            }
-
-            val token = userTokenBuilder.idPortenToken(
+            val substantialToken = userTokenBuilder.tokenxToken(
                 testIdent,
-                acrClaim = "annen-loa-verdi"
+                acrClaim = "idporten-loa-substantial"
             )
 
-            val response = client.authorizedGet("/test", token)
+            val highToken = userTokenBuilder.tokenxToken(
+                testIdent,
+                acrClaim = "idporten-loa-high"
+            )
 
-            response.status shouldBe HttpStatusCode.Unauthorized
+            val ukjentAcrToken = userTokenBuilder.tokenxToken(
+                testIdent,
+                acrClaim = "ukjent"
+            )
+
+            client.authorizedGet("/test/substantial", lowToken).status shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", lowToken) shouldBe HttpStatusCode.Unauthorized
+
+            client.authorizedGet("/test/substantial", substantialToken).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", substantialToken) shouldBe HttpStatusCode.Unauthorized
+
+            client.authorizedGet("/test/substantial", highToken).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", highToken) shouldBe HttpStatusCode.OK
+
+            client.authorizedGet("/test/substantial", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", ukjentAcrToken) shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -532,8 +484,15 @@ internal class UserTokenAuthenticationFlowTest {
         }
 
         @Test
-        fun `godtar ikke tokens utstedt på vegne av andre enn nav`() = testApplication {
+        fun `setter godtatt audience til applikasjonens clientId fra env`() = testApplication {
+            val clientId = "denne:appens:clientid"
+
+            val environment = mapOf(
+                "TOKEN_X_CLIENT_ID" to clientId
+            )
+
             UserTokenVerificationEnvironment.extend(tokenxEnv)
+            UserTokenVerificationEnvironment.extend(environment)
 
             application {
                 authentication {
@@ -551,104 +510,71 @@ internal class UserTokenAuthenticationFlowTest {
                 }
             }
 
-            val token = userTokenBuilder.tokenxToken(
+            val tokenForDenneAppen = userTokenBuilder.tokenxToken(
+                testIdent,
+                target = clientId
+            )
+
+            val tokenForAnnenApp = userTokenBuilder.tokenxToken(
                 testIdent,
                 target = "annen:app"
             )
 
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test", tokenForDenneAppen).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test", tokenForAnnenApp).status shouldBe HttpStatusCode.Unauthorized
         }
 
         @Test
-        fun `godtar tokens med høyere level of assurance enn påkrevd`() = testApplication {
+        fun `godtar kun kjente acr-verdier fra tokenx og mapper om til LevelOfAssurance`() = testApplication {
             UserTokenVerificationEnvironment.extend(tokenxEnv)
 
             application {
                 authentication {
-                    userToken {
+                    userToken("substantial") {
                         levelOfAssurance = LevelOfAssurance.Substantial
                     }
-                }
-
-                routing {
-                    authenticate {
-                        get("/test") {
-                            call.respond(HttpStatusCode.OK)
-                        }
-                    }
-                }
-            }
-
-            val token = userTokenBuilder.tokenxToken(
-                testIdent,
-                acrClaim = TokenxLoa.High.acrValue
-            )
-
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.OK
-        }
-
-        @Test
-        fun `godtar ikke tokens med lavere level of assurance enn påkrevd`() = testApplication {
-            UserTokenVerificationEnvironment.extend(tokenxEnv)
-
-            application {
-                authentication {
-                    userToken {
+                    userToken("high") {
                         levelOfAssurance = LevelOfAssurance.High
                     }
                 }
 
                 routing {
-                    authenticate {
-                        get("/test") {
-                            call.respondText(call.principal<UserPrincipal>()?.ident ?: "null")
+                    authenticate("substantial") {
+                        get("/test/substantial") {
+                            call.respond(HttpStatusCode.OK)
                         }
                     }
-                }
-            }
-
-            val token = userTokenBuilder.tokenxToken(
-                testIdent,
-                acrClaim = TokenxLoa.Substantial.acrValue
-            )
-
-            val response = client.authorizedGet("/test", token)
-
-            response.status shouldBe HttpStatusCode.Unauthorized
-        }
-
-        @Test
-        fun `godtar ikke tokens med andre acr-verdier`() = testApplication {
-            UserTokenVerificationEnvironment.extend(tokenxEnv)
-
-            application {
-                authentication {
-                    userToken {
-                        levelOfAssurance = LevelOfAssurance.Substantial
-                    }
-                }
-
-                routing {
-                    authenticate {
-                        get("/test") {
+                    authenticate("high") {
+                        get("/test/high") {
                             call.respond(HttpStatusCode.OK)
                         }
                     }
                 }
             }
 
-            val token = userTokenBuilder.tokenxToken(
+            val level3Token = userTokenBuilder.tokenxToken(
                 testIdent,
-                acrClaim = "annen-loa-verdi"
+                acrClaim = "Level3"
             )
 
-            val response = client.authorizedGet("/test", token)
+            val level4Token = userTokenBuilder.tokenxToken(
+                testIdent,
+                acrClaim = "Level4"
+            )
 
-            response.status shouldBe HttpStatusCode.Unauthorized
+            val ukjentAcrToken = userTokenBuilder.tokenxToken(
+                testIdent,
+                acrClaim = "ukjent"
+            )
+
+            client.authorizedGet("/test/substantial", level3Token).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", level3Token) shouldBe HttpStatusCode.Unauthorized
+
+            client.authorizedGet("/test/substantial", level4Token).status shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", level4Token) shouldBe HttpStatusCode.OK
+
+            client.authorizedGet("/test/substantial", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", ukjentAcrToken) shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -833,109 +759,29 @@ internal class UserTokenAuthenticationFlowTest {
             client.authorizedGet("/test/high", tokenxTokenSubstantial).status shouldBe HttpStatusCode.Unauthorized
             client.authorizedGet("/test/high", tokenxTokenHigh).status shouldBe HttpStatusCode.OK
         }
+
+        @Test
+        fun `feiler ved oppstart hvis ingen nødcendige env-variabler finnes`() = testApplication {
+            shouldThrow<Exception> {
+                application {
+                    authentication {
+                        userToken {
+
+                        }
+                    }
+
+                    routing {
+                        authenticate {
+                            get("/test") {
+                                call.respond(HttpStatusCode.OK)
+                            }
+                        }
+                    }
+                }
+                client.get("/test")
+            }
+        }
     }
-
-//    @Test
-//    fun `Should respond unauthorized when no valid token header provided`() = testApplication {
-//
-//        every { HttpClientBuilder.buildHttpClient(any()) } returns client
-//
-//        idpo
-//
-//        application {
-//            testApi()
-//        }
-//
-//        val status = client.get("/test")
-//            .status
-//
-//        status shouldBe HttpStatusCode.Unauthorized
-//    }
-
-//    @Test
-//    fun `Should respond unauthorized when no valid token headr provided and authenticator is default`() = testApplication {
-//
-//        application {
-//            testApiWithDefault()
-//        }
-//
-//        val status = client.get("/test").status
-//
-//        status shouldBe HttpStatusCode.Unauthorized
-//    }
-//
-//    @Test
-//    fun `Should return ok if token is valid`() = testApplication {
-//
-//        application {
-//            testApiWithDefault()
-//        }
-//
-//        every { verifier.verify(dummyToken) } returns dummyJwt
-//
-//        val status = client.get("/test"){
-//            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-//        }.status
-//
-//        status shouldBe HttpStatusCode.OK
-//    }
-//
-//    @Test
-//    fun `Should return unauthorized if token is invalid`() = testApplication {
-//
-//        application {
-//            testApiWithDefault()
-//        }
-//
-//        every { verifier.verify(dummyToken) } throws RuntimeException()
-//
-//        val status = client.get("/test"){
-//            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-//        }.status
-//
-//        status shouldBe HttpStatusCode.Unauthorized
-//    }
-//
-//    @Test
-//    fun `Allows installing multiple authorizers in parallel`() = testApplication {
-//
-//        UserTokenVerificationEnvironment.extend(idPortenEnv)
-//
-//        application {
-//            authentication {
-//                userToken {
-//                    setAsDefault = true
-//                    levelOfAssurance = LevelOfAssurance.HIGH
-//                }
-//                userToken {
-//                    setAsDefault = false
-//                    authenticatorName = "other"
-//                }
-//            }
-//            routing {
-//                authenticate {
-//                    get("/test/one") {
-//                        call.respond(HttpStatusCode.OK)
-//                    }
-//                }
-//                authenticate("other") {
-//                    get("test/two") {
-//                        call.respond(HttpStatusCode.OK)
-//                    }
-//                }
-//            }
-//        }
-//
-//        every { verifier.verify(dummyToken) } returns dummyJwt
-//
-//        client.get("/test/one") {
-//            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-//        }.status shouldBe HttpStatusCode.OK
-//
-//        client.get("/test/two") {
-//            headers.append(HttpHeaders.Authorization, "Bearer $dummyToken")
-//        }.status shouldBe HttpStatusCode.OK
-//    }
 
     internal fun createMockedJwkProvider(publicJwk: RSAKey) = { kid: String ->
         if (publicJwk.keyID == kid) {
