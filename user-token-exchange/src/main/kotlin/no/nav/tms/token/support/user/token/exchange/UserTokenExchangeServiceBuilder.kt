@@ -14,9 +14,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.token.support.user.token.exchange.service.CachingExchangeService
-import no.nav.tms.token.support.user.token.exchange.service.NonCachingExchangeService
-import no.nav.tms.token.support.user.token.exchange.service.TokenExchangeConsumer
+import no.nav.tms.token.support.user.token.exchange.impl.CachingExchangeService
+import no.nav.tms.token.support.user.token.exchange.impl.NonCachingExchangeService
+import no.nav.tms.token.support.user.token.exchange.impl.TokenExchangeConsumer
 
 object UserTokenExchangeServiceBuilder {
 
