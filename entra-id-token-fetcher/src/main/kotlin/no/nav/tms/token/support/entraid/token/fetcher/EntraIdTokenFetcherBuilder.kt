@@ -1,39 +1,40 @@
 package no.nav.tms.token.support.entraid.token.fetcher
 
-import no.nav.tms.token.support.entraid.token.fetcher.impl.EntraIdEnvironment
 import no.nav.tms.token.support.entraid.token.fetcher.impl.TokenIssuerConsumer
 import no.nav.tms.token.support.entraid.token.fetcher.impl.CachingEntraIdTokenFetcher
 import no.nav.tms.token.support.entraid.token.fetcher.impl.ClientAssertionService
+import no.nav.tms.token.support.entraid.token.fetcher.impl.HttpClientBuilder
 import no.nav.tms.token.support.entraid.token.fetcher.impl.NonCachingEntraIdTokenFetcher
 
 object EntraIdTokenFetcherBuilder {
 
-    private val environment =
-        _root_ide_package_.no.nav.tms.token.support.entraid.token.exchange.impl.EntraIdEnvironment()
+    private val clientId: String = getAzureEnvVar("AZURE_APP_CLIENT_ID")
+    private val tenantId: String = getAzureEnvVar("AZURE_APP_TENANT_ID")
+    private val privateJwk: String = getAzureEnvVar("AZURE_APP_JWK")
+    private val openidIssuer: String = getAzureEnvVar("AZURE_OPENID_CONFIG_ISSUER")
+    private val openidTokenEndpoint: String = getAzureEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
 
     fun buildFetcher(
         cachingEnabled: Boolean = true,
         maxCachedEntries: Long = 1000L,
         cacheExpiryMarginSeconds: Int = 5,
         enableDefaultProxy: Boolean = false
-    ): no.nav.tms.token.support.entraid.token.fetcher.EntraIdTokenFetcher {
+    ): EntraIdTokenFetcher {
 
-        val httpClient = _root_ide_package_.no.nav.tms.token.support.entraid.token.fetcher.impl.HttpClientBuilder.buildHttpClient(enableDefaultProxy)
+        val httpClient = HttpClientBuilder.buildHttpClient(enableDefaultProxy)
 
-        val tokenIssuerConsumer =
-            _root_ide_package_.no.nav.tms.token.support.entraid.token.exchange.impl.TokenIssuerConsumer(
-                httpClient,
-                environment.tenantId,
-                environment.clientId,
-                environment.openidTokenEndpoint
-            )
+        val tokenIssuerConsumer = TokenIssuerConsumer(
+            httpClient = httpClient,
+            tentantId = tenantId,
+            clientId = clientId,
+            openidTokenEndpoint
+        )
 
-        val clientAssertionService =
-            _root_ide_package_.no.nav.tms.token.support.entraid.token.exchange.impl.ClientAssertionService(
-                audience = environment.openidIssuer,
-                clientId = environment.clientId,
-                privateJwk = environment.privateJwk
-            )
+        val clientAssertionService = ClientAssertionService(
+            audience = openidIssuer,
+            clientId = clientId,
+            privateJwk = privateJwk
+        )
 
         if (cachingEnabled) {
             require(maxCachedEntries > 0) { "'maxCachedEntries' should be at least 1" }
@@ -54,4 +55,8 @@ object EntraIdTokenFetcherBuilder {
             )
         }
     }
+
+    private fun getAzureEnvVar(varName: String) = EntraIdEnvironment.get(varName)
+        ?: throw IllegalArgumentException("Fant ikke $varName for entra-id/azure. Påse at nais.yaml er konfigurert riktig.")
+
 }

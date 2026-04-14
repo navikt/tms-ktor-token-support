@@ -6,12 +6,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.token.support.entraid.exchange.impl.TokenIssuerConsumer
-import no.nav.tms.token.support.entraid.exchange.impl.EntraIdTokenException
-import no.nav.tms.token.support.entraid.exchange.impl.CachingEntraIdTokenFetcher
-import no.nav.tms.token.support.entraid.exchange.impl.ClientAssertionService
-import no.nav.tms.token.support.entraid.exchange.impl.NonCachingEntraIdTokenFetcher
-import no.nav.tms.token.support.entraid.exchange.impl.TokenResponse
+import no.nav.tms.token.support.entraid.token.fetcher.impl.CachingEntraIdTokenFetcher
+import no.nav.tms.token.support.entraid.token.fetcher.impl.ClientAssertionService
+import no.nav.tms.token.support.entraid.token.fetcher.impl.EntraIdTokenException
+import no.nav.tms.token.support.entraid.token.fetcher.impl.NonCachingEntraIdTokenFetcher
+import no.nav.tms.token.support.entraid.token.fetcher.impl.TokenIssuerConsumer
+import no.nav.tms.token.support.entraid.token.fetcher.impl.TokenResponse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -20,7 +20,7 @@ import java.net.SocketTimeoutException
 internal class EntraIdTokenFetcherTest {
 
     private val tokenIssuerConsumer: TokenIssuerConsumer = mockk()
-    private val jwtAudience = "https://azure.url/token"
+    private val jwtAudience = "https://azure/token"
     private val clientId = "cluster.namespace.thisApi"
     private val privateJwk = JwkBuilder.generateJwk()
 

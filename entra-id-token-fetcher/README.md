@@ -1,4 +1,4 @@
-# entra-id-exchange
+# entra-id-token-fetcher
 
 Dette biblioteket tilbyr en måte for en ktor app å hente entraid access tokens ment for autentisert kommunikasjon uten innbygger-token.
 

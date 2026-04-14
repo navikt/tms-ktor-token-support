@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.mock
+package no.nav.tms.token.support.entraid.token.verification.mock
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -8,7 +8,7 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.tms.token.support.entraid.validation.mock.install.JwkBuilder
+import no.nav.tms.token.support.entraid.verification.mock.install.JwkBuilder
 import java.time.Instant
 import java.util.*
 

@@ -1,7 +1,7 @@
-package no.nav.tms.token.support.entraid.token.validation
+package no.nav.tms.token.support.entraid.token.verification
 
 // Proxy for System environment which allows for mocking or overwriting default env
-object AzureEnvironment {
+object EntraIdEnvironment {
     private val baseEnv = System.getenv()
 
     private val env = mutableMapOf<String, String>()

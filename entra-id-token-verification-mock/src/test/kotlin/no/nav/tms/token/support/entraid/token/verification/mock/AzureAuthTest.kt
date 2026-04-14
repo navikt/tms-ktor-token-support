@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.mock
+package no.nav.tms.token.support.entraid.token.verification.mock
 
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.*
@@ -9,8 +9,8 @@ import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.testing.*
-import no.nav.tms.token.support.entraid.validation.AzureAuthenticator
-import no.nav.tms.token.support.entraid.validation.AzurePrincipal
+import no.nav.tms.token.support.entraid.verification.AzureAuthenticator
+import no.nav.tms.token.support.entraid.verification.AzurePrincipal
 import org.junit.jupiter.api.Test
 
 internal class AzureAuthTest {

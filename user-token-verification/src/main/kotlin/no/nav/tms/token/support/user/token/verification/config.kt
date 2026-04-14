@@ -12,7 +12,7 @@ fun AuthenticationConfig.userToken(
     val config = UserTokenAuthenticationConfig(authenticatorName)
         .apply(configure)
 
-    val installedVerifiers = VerifierInstaller.installVerifiers(
+    val installedVerifiers = VerifierBuilder.buildVerifiers(
         requiredIssuers = config.requiredIssuers.toList(),
         minLevelOfAssurance = config.levelOfAssurance,
         webProxy = config.enableDefaultProxy
@@ -43,9 +43,4 @@ class UserTokenAuthenticationConfig(
 // Name of obo issuers native to nais
 enum class Issuer {
     IdPorten, Tokenx
-}
-
-// Name of token authenticator. See README for example of use
-object UserTokenAuthenticator {
-    const val name = "user_access_token"
 }

@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.mock.install
+package no.nav.tms.token.support.entraid.token.verification.mock.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*

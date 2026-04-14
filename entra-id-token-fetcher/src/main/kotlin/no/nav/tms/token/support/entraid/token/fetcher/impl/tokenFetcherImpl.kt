@@ -1,7 +1,7 @@
 package no.nav.tms.token.support.entraid.token.fetcher.impl
 
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.token.support.entraid.exchange.EntraIdTokenFetcher
+import no.nav.tms.token.support.entraid.token.fetcher.EntraIdTokenFetcher
 
 class NonCachingEntraIdTokenFetcher internal constructor(
     private val tokenIssuerConsumer: TokenIssuerConsumer,

@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.mock.install
+package no.nav.tms.token.support.entraid.token.verification.mock.install
 
 import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.jwk.KeyUse

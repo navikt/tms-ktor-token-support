@@ -1,14 +1,12 @@
-package no.nav.tms.token.support.entraid.token.validation.install
+package no.nav.tms.token.support.entraid.token.verification.install
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
-import no.nav.tms.token.support.entraid.validation.AzureHeader
-import no.nav.tms.token.support.entraid.validation.AzurePrincipal
 
-internal fun AuthenticationConfig.registerAzureValidationProvider(authenticatorName: String?, tokenVerifier: TokenVerifier) {
+internal fun AuthenticationConfig.registerEntraIdVerificationProvider(authenticatorName: String?, tokenVerifier: TokenVerifier) {
 
     AccessTokenAuthenticationProvider.Configuration(authenticatorName)
         .let { config -> AccessTokenAuthenticationProvider(tokenVerifier, config) }
@@ -26,15 +24,18 @@ private class AccessTokenAuthenticationProvider(
         val accessToken = context.call.bearerToken
         if (accessToken != null) {
             try {
-                val decodedJWT = verifier.verify(accessToken)
-                context.principal(AzurePrincipal(decodedJWT))
+                val entraIdPrincipal = verifier.verify(accessToken)
+                context.principal(entraIdPrincipal)
+            } catch (e: TokenVerifier.EntraIdAccessException) {
+                log.debug(e) { "Tokenverifisering feilet: ${e.description}" }
+                context.respondUnauthorized("Ugyldig eller utgått token.")
             } catch (e: Exception) {
-                log.debug(e) { "Token verification failed" }
-                context.respondUnauthorized("Invalid or expired token.")
+                log.debug(e) { "Tokenverifisering feilet" }
+                context.respondUnauthorized("Ugyldig eller utgått token.")
             }
         } else {
-            log.debug { "No bearer token found." }
-            context.respondUnauthorized("No bearer token found.")
+            log.debug { "Fant ikke bearer-token." }
+            context.respondUnauthorized("Fant ikke bearer-token.")
         }
     }
 
@@ -51,17 +52,6 @@ private fun AuthenticationContext.respondUnauthorized(message: String) {
 private val bearerRegex = "Bearer .+".toRegex()
 
 private val ApplicationCall.bearerToken: String? get() {
-    return tokenFromAzureHeader()
-        ?: tokenFromAuthHeader()
-}
-
-private fun ApplicationCall.tokenFromAzureHeader(): String? {
-    return request.headers[AzureHeader.Authorization]
-        ?.takeIf { bearerRegex.matches(it) }
-        ?.let { it.split(" ")[1] }
-}
-
-private fun ApplicationCall.tokenFromAuthHeader(): String? {
     return request.headers[HttpHeaders.Authorization]
         ?.takeIf { bearerRegex.matches(it) }
         ?.let { it.split(" ")[1] }

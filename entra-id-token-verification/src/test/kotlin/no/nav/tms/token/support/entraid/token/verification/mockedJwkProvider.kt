@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation
+package no.nav.tms.token.support.entraid.token.verification
 
 import com.auth0.jwk.Jwk
 import com.auth0.jwk.SigningKeyNotFoundException

@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.install
+package no.nav.tms.token.support.entraid.token.verification.install
 
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import io.ktor.client.*

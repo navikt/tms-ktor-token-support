@@ -1,4 +1,4 @@
-package no.nav.tms.token.support.entraid.token.validation.mock.install
+package no.nav.tms.token.support.entraid.token.verification.mock.install
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.interfaces.DecodedJWT
@@ -8,7 +8,7 @@ import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.crypto.RSASSASigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import no.nav.tms.token.support.entraid.validation.AzurePrincipal
+import no.nav.tms.token.support.entraid.token.verification.EntraIdPrincipal
 import java.time.Instant
 import java.time.temporal.ChronoUnit.HOURS
 import java.util.*
@@ -17,14 +17,14 @@ internal object AzurePrincipalBuilder {
 
     private val privateJwk = JwkBuilder.generateJwk()
 
-    fun createPrincipal(authInfo: AuthInfo): AzurePrincipal {
+    fun createPrincipal(authInfo: AuthInfo): EntraIdPrincipal {
         val decodedJWT = if (authInfo.azureJwt != null) {
             JWT.decode(authInfo.azureJwt)
         } else {
             stubJwt()
         }
 
-        return AzurePrincipal(decodedJWT)
+        return EntraIdPrincipal(decodedJWT)
     }
 
     private fun stubJwt(): DecodedJWT {

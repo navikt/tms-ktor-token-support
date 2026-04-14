@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.user.token.verification
 
-internal object VerifierInstaller {
+internal object VerifierBuilder {
 
     private val tokenxConfig = VerifierConfig(
         wellKnownUrlEnv = "TOKEN_X_WELL_KNOWN_URL",
@@ -12,15 +12,15 @@ internal object VerifierInstaller {
         audienceEnv = "IDPORTEN_AUDIENCE"
     )
 
-    fun installVerifiers(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
+    fun buildVerifiers(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
         return if (requiredIssuers.isEmpty()) {
-            installAllKnownVerifiers(minLevelOfAssurance, webProxy)
+            buildAllKnownVerifiers(minLevelOfAssurance, webProxy)
         } else {
-            installRequiredVerifiersOnly(requiredIssuers, minLevelOfAssurance, webProxy)
+            buildRequiredVerifiersOnly(requiredIssuers, minLevelOfAssurance, webProxy)
         }
     }
 
-    private fun installAllKnownVerifiers(minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
+    private fun buildAllKnownVerifiers(minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
         if (!tokenxConfig.isPresent() && !idPortenConfig.isPresent()) {
             throw MissingVerifierConfigException("Fant ingen well-known variabler. Påse at nais.yaml er konfigurert riktig")
         }
@@ -54,7 +54,7 @@ internal object VerifierInstaller {
         return verifiers
     }
 
-    private fun installRequiredVerifiersOnly(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
+    private fun buildRequiredVerifiersOnly(requiredIssuers: List<Issuer>, minLevelOfAssurance: LevelOfAssurance, webProxy: Boolean): Map<String, TokenVerifier> {
 
         val verifiers = mutableMapOf<String, TokenVerifier>()
 
@@ -70,7 +70,7 @@ internal object VerifierInstaller {
 
                 verifiers[tokenxVerifier.issuer] = tokenxVerifier
             } else {
-                throw MissingVerifierConfigException("Klarte ikke installere tokenx-verifikator. Mangler env TOKEN_X_WELL_KNOWN_URL")
+                throw MissingVerifierConfigException("Klarte ikke bygge tokenx-verifikator. Mangler env TOKEN_X_WELL_KNOWN_URL")
             }
         }
 
@@ -87,7 +87,7 @@ internal object VerifierInstaller {
 
                 verifiers[idportenVerifier.issuer] = idportenVerifier
             } else {
-                throw MissingVerifierConfigException("Klarte ikke installere idporten-verifikator. Mangler env IDPORTEN_WELL_KNOWN_URL")
+                throw MissingVerifierConfigException("Klarte ikke bygge idporten-verifikator. Mangler env IDPORTEN_WELL_KNOWN_URL")
             }
         }
 
