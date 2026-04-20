@@ -98,33 +98,6 @@ class TokenVerifierTest {
     }
 
     @Test
-    fun `kan vurdere alle bruker-tokens som ugyldige`() {
-
-        val accessFilter = AccessFilter(
-            allowUserAccess = false,
-            cluster = null,
-            namespace = null,
-            app = null
-        )
-
-        val verifier = tokenVerifier(
-            accessFilter = accessFilter
-        )
-
-        val userToken = tokenBuilder.azureUserToken(
-            mockNavIdent
-        )
-
-        every { mockJwkProvider.get(any()) } returns mockJwk.toJwk()
-
-        shouldThrow<TokenVerifier.EntraIdAccessException> {
-            verifier.verify(userToken)
-        }.let { cause ->
-            cause.description shouldBe "Token ble utstedt på vegne av bruker, men endepunktet krever system-token"
-        }
-    }
-
-    @Test
     fun `kan vurdere om token er gyldig basert på app det tilhører`() {
 
         val allowedCluster = "allowedCluster"
@@ -132,7 +105,6 @@ class TokenVerifierTest {
         val allowedApp = "allowedApp"
 
         val filter = AccessFilter(
-            allowUserAccess = true,
             cluster = allowedCluster,
             namespace = allowedNamespace,
             app = allowedApp
@@ -180,6 +152,31 @@ class TokenVerifierTest {
             verifier.verify(invalidAppToken)
         }.let { cause ->
             cause.description shouldBe "Token ble utstedt til '$allowedCluster:$allowedNamespace:invalid', men påkrevd applikasjon er '$allowedApp'"
+        }
+    }
+
+    @Test
+    fun `tokens utstedt til denne applikasjonen med auto-login forbigår validering`() {
+
+        val accessFilter = AccessFilter(
+            cluster = "restricted",
+            namespace = "restricted",
+            app = "restricted"
+        )
+
+        val verifier = tokenVerifier(
+            accessFilter = accessFilter
+        )
+
+        val userToken = tokenBuilder.azureUserToken(
+            mockNavIdent,
+            issuedFor = mockLocalServer
+        )
+
+        every { mockJwkProvider.get(any()) } returns mockJwk.toJwk()
+
+        shouldNotThrow<TokenVerifier.EntraIdAccessException> {
+            verifier.verify(userToken)
         }
     }
 
@@ -246,12 +243,13 @@ class TokenVerifierTest {
         issuer: String = mockIssuer,
         jwkProvider: JwkProvider = mockJwkProvider,
         audience: String = mockAudience,
-        accessFilter: AccessFilter = AccessFilter(true, null, null, null)
+        accessFilter: AccessFilter = AccessFilter( null, null, null)
     ) = TokenVerifier(
         issuer = issuer,
         jwkProvider = jwkProvider,
         audience = audience,
-        accessFilter = accessFilter
+        accessFilter = accessFilter,
+        thisApplication = mockLocalServer
     )
 
     private fun RSAKey.toJwk() = toJSONObject()

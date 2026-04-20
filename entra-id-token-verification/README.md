@@ -15,42 +15,57 @@ spec:
 
 ## Oppsett
 
-For å kunne autentisere et endepunkt må man først installere autentikatoren.
-
-Denne har 2 variabler:
-
-- `authenticatorName`: Bestemmer navnet på autentikatoren. Default `AzureAuthenticator.name`
-- `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'
-- `enableDefaultProxy`: (Optional) Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
-
-Eksempel på konfigurasjon:
+For å kunne autentisere et endepunkt må man først installere autentikatoren:
 
 ```kotlin
 fun Application.setup() {
 
     authentication {
-        azure {
-            setAsDefault = false
+        entraId {
+            
         }
     }
 }
 ```
 
-Deretter kan man autentisere bestemte endepunkt som følger. Hvis ikke denne autentikatoren er satt som default, er det
-viktig å ha med navnet på autentikatoren.
+Den kan konfigureres ytterligere som følgende:
+
+- `enableDefaultProxy`: Bestemmer hvorvidt system-default proxy skal brukes ved kall mot andre tjenester. Nødvendig for on-prem apper med webproxy.
+- `filterClients { ... }`: Tillater filtrering på konsumenter av endepunktet basert på appnavn, eller i hvilket miljø de kjører
+
+Eksempel på tilfelle med to ulike konfigurasjoner:
 
 ```kotlin
 fun Application.setup() {
 
     authentication {
-        azure {
-            setAsDefault = false
+        entraId {
+            
+        }
+        
+        entraId("internal_api") {
+            filterClients {
+                namespace = "min-side"
+            }
         }
     }
+}
+```
+
+Deretter kan man autentisere bestemte endepunkt på følgende måte:
+
+```kotlin
+fun Application.setup() {
     
     routing {
-        authenticate(AzureAuthenticator.name) {
-            get("/sikret") {
+        authenticate {
+            get("/sikret/ekstern") {
+                call.respond(HttpStatusCode.OK)
+            }
+        }
+        
+        authenticate("internal_api") {
+            get("/sikret/intern") {
                 call.respond(HttpStatusCode.OK)
             }
         }
@@ -58,39 +73,43 @@ fun Application.setup() {
 }
 ```
 
-Typisk eksempel på bruk i miljø og dette er default authenticator:
+## EntraIdPrincipal
+
+Etter autentisering kan informasjon om konsumenten hentes fra context: 
 
 ```kotlin
 fun Application.setup() {
-
-    authentication {
-        azure {
-            setAsDefault = true
-        }
-    }
     
     routing {
         authenticate {
             get("/sikret") {
-                call.respond(HttpStatusCode.OK)
+                val principal = call.principal<EntraIdPrincipal>()
+                
+                ...
             }
         }
     }
 }
 ```
 
-Alle endepunkt som er sikret på denne måten vil kreve at http-kall sender et gyldig jwt som Bearer-token
-i Authorization headeren. Cookie støttes ikke. Ugyldige kall vil alltid svares med en 401-feilkode.
+Dersom token er tilstedt på vegne av bruker, kan en hente `EntraIdUserPrincipal` der det finnes noe mer informasjon:
 
-Validatoren sjekker egen header "entra-id-authorization" før vanlig Authorization-header. Dersom idporten-sidecar
-er aktivert i den autentiserte appen er det nødvendig å sende token i denne headeren.
-
-## AzurePrincipal
-
-Dette biblioteket er i utgangspunktet ment for bruk ved client-client kommunikasjon uten at en bruker er involvert. 
-Derfor er det ikke implementert en måte å bygge et "AzureUser" objekt, slik det er i andre moduler.
-
-Dersom det er behov for å hente ut bestemte claims fra mottatt access token, er AzurePrincipal eksponert til brukere av biblioteket.
+```kotlin
+fun Application.setup() {
+    
+    routing {
+        authenticate {
+            get("/sikret") {
+                val principal = call.principal<EntraIdUserPrincipal>()
+                
+                auditLog.persistAction(action = "API_CALL", user = principal.navIdent)
+                
+                ...
+            }
+        }
+    }
+}
+```
 
 ## Bruk av biblioteket ved lokal kjøring 
 
@@ -98,7 +117,10 @@ Dette biblioteket forventer at følgende miljøvariabler er satt:
 
 - AZURE_APP_WELL_KNOWN_URL
 - AZURE_APP_CLIENT_ID
+- NAIS_CLUSTER_NAME
+- NAIS_NAMESPACE
+- NAIS_APP_NAME
 
-Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt. 
+Når nais-yaml er konfigurert riktig settes disse av plattformen ved kjøring i miljø. Ved lokal kjøring må disse også være satt.
 
 Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/azure-ad/index.html#runtime-variables-credentials) for nærmere forklaring.

@@ -14,7 +14,8 @@ internal class TokenVerifier(
     private val jwkProvider: JwkProvider,
     private val audience: String,
     private val issuer: String,
-    private val accessFilter: AccessFilter
+    private val accessFilter: AccessFilter,
+    private val thisApplication: NaisApplication
 ) {
 
     fun verify(accessToken: String): EntraIdPrincipal {
@@ -23,19 +24,12 @@ internal class TokenVerifier(
             .run { azureAccessTokenVerifier(audience, issuer) }
             .run { verify(accessToken) }
 
-        if (EntraIdUserPrincipal.isUserPrincipal(decodedJwt)) {
-            if (!accessFilter.allowUserAccess) {
-                throw EntraIdAccessException(
-                    "Endepunkt er kun åpent for system-token",
-                    "Token ble utstedt på vegne av bruker, men endepunktet krever system-token"
-                )
-            }
+        validateSystemAccess(decodedJwt)
 
-            return EntraIdUserPrincipal(decodedJwt)
+        return if (EntraIdUserPrincipal.isUserPrincipal(decodedJwt)) {
+            EntraIdUserPrincipal(decodedJwt)
         } else {
-            validateSystemAccess(decodedJwt)
-
-            return EntraIdPrincipal(decodedJwt)
+            EntraIdPrincipal(decodedJwt)
         }
     }
 
@@ -53,6 +47,10 @@ internal class TokenVerifier(
         }
 
         val clientApplication = NaisApplication.fromClaims(decodedJWT)!!
+
+        if (clientApplication == thisApplication) {
+            return // Do not filter tokens issued generated from auto-login directly to this app
+        }
 
         if (accessFilter.cluster != null && clientApplication.cluster != accessFilter.cluster) {
             throw EntraIdAccessException(
@@ -83,7 +81,6 @@ internal class TokenVerifier(
 }
 
 internal data class AccessFilter(
-    val allowUserAccess: Boolean,
     val cluster: String?,
     val namespace: String?,
     val app: String?

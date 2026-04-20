@@ -8,6 +8,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.entraid.token.verification.EntraIdEnvironment
+import no.nav.tms.token.support.entraid.token.verification.NaisApplication
 import java.net.URI
 import java.util.concurrent.TimeUnit
 
@@ -21,6 +22,10 @@ internal object EntraIdVerifierBuilder {
         val audience = getAzureEnvVar("AZURE_APP_CLIENT_ID")
         val wellKnownUrl = getAzureEnvVar("AZURE_APP_WELL_KNOWN_URL")
 
+        val cluster = getAzureEnvVar("NAIS_CLUSTER_NAME")
+        val namespace = getAzureEnvVar("NAIS_NAMESPACE")
+        val appName = getAzureEnvVar("NAIS_APP_NAME")
+
         val metadata = fetchMetadata(wellKnownUrl, enableDefaultProxy)
 
         val jwkProvider = JwkProviderBuilderWrapper.createJwkProvider(metadata.jwksUri)
@@ -29,7 +34,12 @@ internal object EntraIdVerifierBuilder {
             jwkProvider = jwkProvider,
             issuer = metadata.issuer,
             audience = audience,
-            accessFilter = accessFilter
+            accessFilter = accessFilter,
+            thisApplication = NaisApplication(
+                 cluster = cluster,
+                 namespace = namespace,
+                 app = appName,
+            )
         )
     }
 

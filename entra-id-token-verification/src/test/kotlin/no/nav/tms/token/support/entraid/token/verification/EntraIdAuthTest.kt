@@ -39,7 +39,10 @@ internal class EntraIdAuthTest {
     )
     private val envVars = listOf(
         "AZURE_APP_CLIENT_ID" to azureAudience,
-        "AZURE_APP_WELL_KNOWN_URL" to "$azureUrl/config"
+        "AZURE_APP_WELL_KNOWN_URL" to "$azureUrl/config",
+        "NAIS_CLUSTER_NAME" to testServer.cluster,
+        "NAIS_NAMESPACE" to testServer.namespace,
+        "NAIS_APP_NAME" to testServer.app,
     ).toMap()
 
     private val mockedClient = createMockedMockedClient(azureUrl)
@@ -100,41 +103,48 @@ internal class EntraIdAuthTest {
 
         application {
             authentication {
-                entraId("system_only") {
-                    allowUserAccess = false
+                entraId("allow_all") {
+
                 }
 
-                entraId("allow_user") {
-                    allowUserAccess = true
+                entraId("restrict_cluster") {
+                    filterClients {
+                        cluster = "restricted"
+                    }
                 }
             }
 
             routing {
-                authenticate("system_only") {
-                    get("/system/test") {
+                authenticate("allow_all") {
+                    get("/test") {
                         call.respond(HttpStatusCode.OK)
                     }
                 }
-                authenticate("allow_user") {
-                    get("/user/test") {
+                authenticate("restrict_cluster") {
+                    get("/restricted/test") {
                         call.respond(HttpStatusCode.OK)
                     }
                 }
             }
         }
 
-        client.get("/system/test").status shouldBe HttpStatusCode.Unauthorized
-        client.get("/user/test").status shouldBe HttpStatusCode.Unauthorized
+        client.get("/test").status shouldBe HttpStatusCode.Unauthorized
+        client.get("/restricted/test").status shouldBe HttpStatusCode.Unauthorized
 
         val systemToken = tokenBuilder.azureSystemToken(testClient)
 
-        client.authorizedGet("/system/test", systemToken).status shouldBe HttpStatusCode.OK
-        client.authorizedGet("/user/test", systemToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/test", systemToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/restricted/test", systemToken).status shouldBe HttpStatusCode.Unauthorized
 
-        val userToken = tokenBuilder.azureUserToken("A012345")
+        val indirectUserToken = tokenBuilder.azureUserToken("A012345", issuedFor = testClient)
 
-        client.authorizedGet("/system/test", userToken).status shouldBe HttpStatusCode.Unauthorized
-        client.authorizedGet("/user/test", userToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/test", indirectUserToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/restricted/test", indirectUserToken).status shouldBe HttpStatusCode.Unauthorized
+
+        val directUserToken = tokenBuilder.azureUserToken("A012345", issuedFor = testServer)
+
+        client.authorizedGet("/test", directUserToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/restricted/test", directUserToken).status shouldBe HttpStatusCode.OK
     }
 
     @Test

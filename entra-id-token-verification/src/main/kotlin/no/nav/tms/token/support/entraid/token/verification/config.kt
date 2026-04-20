@@ -14,10 +14,9 @@ fun AuthenticationConfig.entraId(
         .also(configure)
 
     val accessFilter = AccessFilter(
-        allowUserAccess = config.allowUserAccess,
-        cluster = config.filterClientCluster,
-        namespace = config.filterClientNamespace,
-        app = config.filterClientAppName
+        cluster = config.clientFilterBuilder?.cluster,
+        namespace = config.clientFilterBuilder?.namespace,
+        app = config.clientFilterBuilder?.application
     )
 
     registerEntraIdVerificationProvider(
@@ -33,8 +32,15 @@ fun AuthenticationConfig.entraId(
 class AzureAuthenticatorConfig {
     var enableDefaultProxy: Boolean = false
 
-    var allowUserAccess: Boolean = true
-    var filterClientCluster: String? = null
-    var filterClientNamespace: String? = null
-    var filterClientAppName: String? = null
+    internal var clientFilterBuilder: ClientFilterBuilder? = null
+
+    fun filterClients(conf: ClientFilterBuilder.() -> Unit) {
+        clientFilterBuilder = ClientFilterBuilder().apply(conf)
+    }
+
+    class ClientFilterBuilder internal constructor() {
+        var cluster: String? = null
+        var namespace: String? = null
+        var application: String? = null
+    }
 }
