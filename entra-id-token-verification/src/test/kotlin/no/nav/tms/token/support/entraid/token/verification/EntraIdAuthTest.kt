@@ -32,10 +32,10 @@ internal class EntraIdAuthTest {
     private val azureJwk = JwkBuilder.generateJwk()
 
     private val tokenBuilder = EntraIdTokenBuilder(
-        azureUrl = azureUrl,
+        defaultIssuer = azureUrl,
         azureJwk = azureJwk,
-        azureAudience = azureAudience,
-        application = testServer
+        defaultAudience = azureAudience,
+        defaultIssuedFor = testServer
     )
     private val envVars = listOf(
         "AZURE_APP_CLIENT_ID" to azureAudience,
@@ -91,6 +91,50 @@ internal class EntraIdAuthTest {
         unauthorizedResponse.status shouldBe HttpStatusCode.Unauthorized
         systemAuthorizedResponse.status shouldBe HttpStatusCode.OK
         userAuthorizedResponse.status shouldBe HttpStatusCode.OK
+    }
+
+
+    @Test
+    fun `tillater sikring av ulike endepunkt med ulik konfigurasjon`() = testApplication {
+        EntraIdEnvironment.extend(envVars)
+
+        application {
+            authentication {
+                entraId("system_only") {
+                    allowUserAccess = false
+                }
+
+                entraId("allow_user") {
+                    allowUserAccess = true
+                }
+            }
+
+            routing {
+                authenticate("system_only") {
+                    get("/system/test") {
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
+                authenticate("allow_user") {
+                    get("/user/test") {
+                        call.respond(HttpStatusCode.OK)
+                    }
+                }
+            }
+        }
+
+        client.get("/system/test").status shouldBe HttpStatusCode.Unauthorized
+        client.get("/user/test").status shouldBe HttpStatusCode.Unauthorized
+
+        val systemToken = tokenBuilder.azureSystemToken(testClient)
+
+        client.authorizedGet("/system/test", systemToken).status shouldBe HttpStatusCode.OK
+        client.authorizedGet("/user/test", systemToken).status shouldBe HttpStatusCode.OK
+
+        val userToken = tokenBuilder.azureUserToken("A012345")
+
+        client.authorizedGet("/system/test", userToken).status shouldBe HttpStatusCode.Unauthorized
+        client.authorizedGet("/user/test", userToken).status shouldBe HttpStatusCode.OK
     }
 
     @Test

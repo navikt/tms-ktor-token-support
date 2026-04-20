@@ -12,20 +12,21 @@ import java.util.Date
 import java.util.UUID
 
 internal class EntraIdTokenBuilder(
-    private val azureUrl: String,
     private val azureJwk: RSAKey,
-    private val azureAudience: String,
-    private val application: NaisApplication,
+    private val defaultIssuer: String,
+    private val defaultAudience: String,
+    private val defaultIssuedFor: NaisApplication,
 ) {
 
     fun azureSystemToken(
         client: NaisApplication,
-        audience: String = azureAudience,
+        audience: String = defaultAudience,
+        issuer: String = defaultIssuer,
         issueTime: Date = Date(),
         expiryTime: Date = Date() + Duration.ofHours(1)
     ): String {
         return JWTClaimsSet.Builder()
-            .issuer(azureUrl)
+            .issuer(issuer)
             .issueTime(issueTime)
             .expirationTime(expiryTime)
             .audience(audience)
@@ -41,12 +42,14 @@ internal class EntraIdTokenBuilder(
         name: String? = null,
         email: String? = null,
         oid: String? = null,
-        audience: String = azureAudience,
+        audience: String = defaultAudience,
+        issuer: String = defaultIssuer,
+        issuedFor: NaisApplication = defaultIssuedFor,
         issueTime: Date = Date(),
         expiryTime: Date = Date() + Duration.ofHours(1)
     ): String {
         return JWTClaimsSet.Builder()
-            .issuer(azureUrl)
+            .issuer(issuer)
             .issueTime(issueTime)
             .expirationTime(expiryTime)
             .audience(audience)
@@ -54,7 +57,7 @@ internal class EntraIdTokenBuilder(
             .claim(EntraIdUserPrincipal.DISPLAY_NAME_CLAIM_NAME, name)
             .claim(EntraIdUserPrincipal.USERNAME_CLAIM_NAME, email)
             .claim(EntraIdUserPrincipal.OID_CLAIM_NAME, oid)
-            .azpName(application)
+            .azpName(issuedFor)
             .jwtID(UUID.randomUUID().toString())
             .build()
             .sign(azureJwk)

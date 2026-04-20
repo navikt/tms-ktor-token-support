@@ -48,7 +48,7 @@ internal class TokenVerifier(
     private fun Jwk.RSA256() = Algorithm.RSA256(publicKey as RSAPublicKey, null)
 
     private fun validateSystemAccess(decodedJWT: DecodedJWT) {
-        if (accessFilter.allowAllSystems()) {
+        if (accessFilter.allowsAllSystems()) {
             return
         }
 
@@ -57,21 +57,21 @@ internal class TokenVerifier(
         if (accessFilter.cluster != null && clientApplication.cluster != accessFilter.cluster) {
             throw EntraIdAccessException(
                 "Godtar ikke token fordi det er utstedt til en applikasjon som ikke ligger i påkrevd cluster",
-                "Token ble utstedt til $clientApplication, men påkrevd cluster er ${accessFilter.cluster}"
+                "Token ble utstedt til '$clientApplication', men påkrevd cluster er '${accessFilter.cluster}'"
             )
         }
 
         if (accessFilter.namespace != null && clientApplication.namespace != accessFilter.namespace) {
             throw EntraIdAccessException(
                 "Godtar ikke token fordi det er utstedt til en applikasjon som ikke ligger i påkrevd namespace",
-                "Token ble utstedt til $clientApplication, men påkrevd cluster er ${accessFilter.namespace}"
+                "Token ble utstedt til '$clientApplication', men påkrevd namespace er '${accessFilter.namespace}'"
             )
         }
 
         if (accessFilter.app != null && clientApplication.app != accessFilter.app) {
             throw EntraIdAccessException(
                 "Godtar ikke token fordi det er utstedt til annen enn påkred applikasjon",
-                "Token ble utstedt til $clientApplication, men påkrevd applikasjon er ${accessFilter.app}"
+                "Token ble utstedt til '$clientApplication', men påkrevd applikasjon er '${accessFilter.app}'"
             )
         }
     }
@@ -88,7 +88,7 @@ internal data class AccessFilter(
     val namespace: String?,
     val app: String?
 ) {
-    fun allowAllSystems() = cluster == null
+    fun allowsAllSystems() = cluster == null
         && namespace == null
         && app == null
 }

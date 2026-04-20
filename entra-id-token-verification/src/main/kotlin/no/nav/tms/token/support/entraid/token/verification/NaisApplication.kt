@@ -7,6 +7,10 @@ data class NaisApplication(
     val namespace: String,
     val app: String
 ) {
+    override fun toString(): String {
+        return "$cluster:$namespace:$app"
+    }
+
     companion object {
         internal const val AZP_CLAIM_NAME = "azp_name"
         private val azpPattern = "([^:]+):([^:]+):([^:]+)".toRegex()
