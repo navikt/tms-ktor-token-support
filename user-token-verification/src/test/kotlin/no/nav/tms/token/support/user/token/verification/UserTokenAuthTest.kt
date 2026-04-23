@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-internal class UserTokenAuthenticationFlowTest {
+internal class UserTokenAuthTest {
 
     private val testIdent = "01234567890"
 
@@ -255,14 +255,14 @@ internal class UserTokenAuthenticationFlowTest {
                 }
             }
 
-            val tokenForNav = userTokenBuilder.tokenxToken(
+            val tokenForNav = userTokenBuilder.idPortenToken(
                 testIdent,
-                target = audience
+                audience = audience
             )
 
-            val tokenForAnnetDomene = userTokenBuilder.tokenxToken(
+            val tokenForAnnetDomene = userTokenBuilder.idPortenToken(
                 testIdent,
-                target = UUID.randomUUID().toString()
+                audience = UUID.randomUUID().toString()
             )
 
             client.authorizedGet("/test", tokenForNav).status shouldBe HttpStatusCode.OK
@@ -271,7 +271,7 @@ internal class UserTokenAuthenticationFlowTest {
 
         @Test
         fun `godtar kun kjente acr-verdier fra idporten og mapper om til LevelOfAssurance`() = testApplication {
-            UserTokenVerificationEnvironment.extend(tokenxEnv)
+            UserTokenVerificationEnvironment.extend(idPortenEnv)
 
             application {
                 authentication {
@@ -297,37 +297,37 @@ internal class UserTokenAuthenticationFlowTest {
                 }
             }
 
-            val lowToken = userTokenBuilder.tokenxToken(
+            val lowToken = userTokenBuilder.idPortenToken(
                 testIdent,
                 acrClaim = "idporten-loa-low"
             )
 
-            val substantialToken = userTokenBuilder.tokenxToken(
+            val substantialToken = userTokenBuilder.idPortenToken(
                 testIdent,
                 acrClaim = "idporten-loa-substantial"
             )
 
-            val highToken = userTokenBuilder.tokenxToken(
+            val highToken = userTokenBuilder.idPortenToken(
                 testIdent,
                 acrClaim = "idporten-loa-high"
             )
 
-            val ukjentAcrToken = userTokenBuilder.tokenxToken(
+            val ukjentAcrToken = userTokenBuilder.idPortenToken(
                 testIdent,
                 acrClaim = "ukjent"
             )
 
             client.authorizedGet("/test/substantial", lowToken).status shouldBe HttpStatusCode.Unauthorized
-            client.authorizedGet("/test/high", lowToken) shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", lowToken).status shouldBe HttpStatusCode.Unauthorized
 
             client.authorizedGet("/test/substantial", substantialToken).status shouldBe HttpStatusCode.OK
-            client.authorizedGet("/test/high", substantialToken) shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", substantialToken).status shouldBe HttpStatusCode.Unauthorized
 
             client.authorizedGet("/test/substantial", highToken).status shouldBe HttpStatusCode.OK
-            client.authorizedGet("/test/high", highToken) shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", highToken).status shouldBe HttpStatusCode.OK
 
             client.authorizedGet("/test/substantial", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
-            client.authorizedGet("/test/high", ukjentAcrToken) shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -568,13 +568,13 @@ internal class UserTokenAuthenticationFlowTest {
             )
 
             client.authorizedGet("/test/substantial", level3Token).status shouldBe HttpStatusCode.OK
-            client.authorizedGet("/test/high", level3Token) shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", level3Token).status shouldBe HttpStatusCode.Unauthorized
 
             client.authorizedGet("/test/substantial", level4Token).status shouldBe HttpStatusCode.OK
-            client.authorizedGet("/test/high", level4Token) shouldBe HttpStatusCode.OK
+            client.authorizedGet("/test/high", level4Token).status shouldBe HttpStatusCode.OK
 
             client.authorizedGet("/test/substantial", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
-            client.authorizedGet("/test/high", ukjentAcrToken) shouldBe HttpStatusCode.Unauthorized
+            client.authorizedGet("/test/high", ukjentAcrToken).status shouldBe HttpStatusCode.Unauthorized
         }
     }
 

@@ -2,12 +2,11 @@ package no.nav.tms.token.support.user.login.routes
 
 internal enum class IdPortenLevelOfAssurance(
     val acr: String,
-    val relativeValue: Int,
-    val legacyValue: Int
+    val relativeValue: Int
 ) {
-    Low("idporten-loa-low", 1, -1),
-    Substantial("idporten-loa-substantial", 2, 3),
-    High("idporten-loa-high", 3, 4);
+    Low("idporten-loa-low", 1),
+    Substantial("idporten-loa-substantial", 2),
+    High("idporten-loa-high", 3);
 
     companion object {
         fun fromAcr(acr: String): IdPortenLevelOfAssurance {
