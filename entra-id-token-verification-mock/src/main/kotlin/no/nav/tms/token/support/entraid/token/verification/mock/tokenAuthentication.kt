@@ -1,42 +1,40 @@
-package no.nav.tms.token.support.user.token.verificaton.mock
+package no.nav.tms.token.support.entraid.token.verification.mock
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
-import io.ktor.server.auth.*
+import io.ktor.server.auth.AuthenticationConfig
+import io.ktor.server.auth.AuthenticationContext
+import io.ktor.server.auth.AuthenticationFailedCause
+import io.ktor.server.auth.AuthenticationProvider
+
 import io.ktor.server.response.*
-import no.nav.tms.token.support.user.token.verification.Issuer
-import no.nav.tms.token.support.user.token.verification.LevelOfAssurance
 
 internal const val MockAuthorizedHeader = "MockAuthorized"
 internal const val MockUnauthorizedHeader = "MockUnauthorized"
 
-internal const val IdPortenMockIssuer = "http://idporten-mock"
-internal const val TokenxMockIssuer = "http://tokenx-mock"
-
-internal const val MockLoaSubstantial = "test-loa-substantial"
-internal const val MockLoaHigh = "test-loa-high"
-
-internal fun AuthenticationConfig.registerUserTokenProviderMock(
+internal fun AuthenticationConfig.registerEntraIdProviderMock(
     authenticatorName: String?,
-    requiredIssuers: List<Issuer>,
-    minimumLoa: LevelOfAssurance,
     defaultAuthentication: Authentication?
 ) {
     AccessTokenAuthenticationProvider.Configuration(authenticatorName)
-        .let { config -> AccessTokenAuthenticationProvider(defaultAuthentication, requiredIssuers, minimumLoa, config) }
+        .let { config -> AccessTokenAuthenticationProvider(defaultAuthentication, config) }
         .let { provider -> register(provider) }
 }
 
-private class AccessTokenAuthenticationProvider (
-    private val defaultAuthentication: Authentication?,
-    private val requiredIssuers: List<Issuer>,
-    private val minimumLoa: LevelOfAssurance,
+private fun AuthenticationContext.respondUnauthorized(message: String) {
+
+    challenge("Unauthenticated", AuthenticationFailedCause.InvalidCredentials) { challenge, call ->
+        call.respond(HttpStatusCode.Unauthorized, message)
+        challenge.complete()
+    }
+}
+
+private class AccessTokenAuthenticationProvider(
+    val defaultAuthentication: Authentication?,
     config: Configuration
 ) : AuthenticationProvider(config) {
-
-    class Configuration(name: String?) : Config(name)
 
     private val log = KotlinLogging.logger { }
 
@@ -46,37 +44,21 @@ private class AccessTokenAuthenticationProvider (
         if (authHeader == null) {
             if (defaultAuthentication != null) {
                 log.debug { "Call is authorized due to default authentication config." }
-                context.principal(UserTokenPrincipalBuilder.createPrincipal(defaultAuthentication))
+                context.principal(EntraIdPrincipalBuilder.createPrincipal(defaultAuthentication))
             } else {
                 log.debug { "Call is unauthorized as no default authentication or header was provided" }
                 context.respondUnauthorized("Not authorized.")
             }
         } else if (authHeader.authorized) {
-            if (isValid(authHeader.authentication!!, requiredIssuers, minimumLoa)) {
-                log.debug { "Call is authorized as MockAuthorized header is provided with valid contents" }
-                context.principal(UserTokenPrincipalBuilder.createPrincipal(authHeader.authentication!!))
-            } else {
-                log.debug { "Call is unauthorized as contents of MockAuthorized were invalid with respect to config" }
-                context.respondUnauthorized("Not authorized due to header.")
-            }
+            log.debug { "Call is authorized as MockAuthorized header is provided" }
+            context.principal(EntraIdPrincipalBuilder.createPrincipal(authHeader.authentication!!))
         } else {
             log.debug { "Call is unauthorized as MockUnauthorized header is provided" }
             context.respondUnauthorized("Not authorized due to header.")
         }
     }
 
-    private fun isValid(authInfo: Authentication, requiredIssuers: List<Issuer>, minimumLoa: LevelOfAssurance): Boolean {
-        return authInfo.levelOfAssurance >= minimumLoa &&
-            (requiredIssuers.isEmpty() || requiredIssuers.contains(authInfo.issuer))
-    }
-
-    private fun AuthenticationContext.respondUnauthorized(message: String) {
-
-        challenge("Unauthenticated", AuthenticationFailedCause.InvalidCredentials) { challenge, call ->
-            call.respond(HttpStatusCode.Unauthorized, message)
-            challenge.complete()
-        }
-    }
+    class Configuration(name: String?) : Config(name)
 
     private val unauthorizedPattern = MockUnauthorizedHeader.toRegex()
     private val authorizedPattern = "$MockAuthorizedHeader (.*)".toRegex()

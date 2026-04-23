@@ -53,7 +53,7 @@ internal class UserTokenMockTest {
             testApi {
                 authentication {
                     userTokenMock {
-                        defaultAuthentication {
+                        enableDefaultAuthentication {
                             tokenIdent = userPid
                             tokenLoa = LevelOfAssurance.High
                             tokenIssuer = Issuer.IdPorten
@@ -110,7 +110,7 @@ internal class UserTokenMockTest {
                     userTokenMock {
                         levelOfAssurance = LevelOfAssurance.Substantial
 
-                        defaultAuthentication {
+                        enableDefaultAuthentication {
                             tokenIdent = userPid
                             tokenIssuer = Issuer.IdPorten
                         }
@@ -194,7 +194,7 @@ internal class UserTokenMockTest {
             testApi {
                 authentication {
                     userTokenMock {
-                        defaultAuthentication {
+                        enableDefaultAuthentication {
                             tokenIdent = userPid
                             tokenLoa = LevelOfAssurance.High
                             tokenIssuer = Issuer.IdPorten
@@ -223,7 +223,7 @@ internal class UserTokenMockTest {
                     configureIssuers(Issuer.IdPorten)
                     levelOfAssurance = LevelOfAssurance.Substantial
 
-                    defaultAuthentication {
+                    enableDefaultAuthentication {
                         tokenIdent = userPid
                     }
                 }
@@ -232,7 +232,7 @@ internal class UserTokenMockTest {
                     configureIssuers(Issuer.IdPorten)
                     levelOfAssurance = LevelOfAssurance.High
 
-                    defaultAuthentication {
+                    enableDefaultAuthentication {
                         tokenIdent = userPid
                     }
                 }
@@ -270,7 +270,7 @@ internal class UserTokenMockTest {
                     userTokenMock {
                         configureIssuers(Issuer.Tokenx)
 
-                        defaultAuthentication {
+                        enableDefaultAuthentication {
                             tokenIdent = userPid
                             tokenIssuer = Issuer.IdPorten
                         }
@@ -300,7 +300,7 @@ internal class UserTokenMockTest {
                     userTokenMock {
                         levelOfAssurance = LevelOfAssurance.High
 
-                        defaultAuthentication {
+                        enableDefaultAuthentication {
                             tokenIdent = userPid
                             tokenIssuer = Issuer.IdPorten
                             tokenLoa = LevelOfAssurance.Substantial

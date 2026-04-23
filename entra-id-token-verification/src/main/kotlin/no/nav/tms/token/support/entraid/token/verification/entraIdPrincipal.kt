@@ -13,10 +13,10 @@ class EntraIdUserPrincipal(decodedJWT: DecodedJWT): EntraIdPrincipal(decodedJWT)
     val userName: String? = decodedJWT.getClaim(USERNAME_CLAIM_NAME).asString()
 
     companion object {
-        internal const val NAV_IDENT_CLAIM_NAME = "NAVident"
-        internal const val OID_CLAIM_NAME = "oid"
-        internal const val DISPLAY_NAME_CLAIM_NAME = "name"
-        internal const val USERNAME_CLAIM_NAME = "preferred_username"
+        const val NAV_IDENT_CLAIM_NAME = "NAVident"
+        const val OID_CLAIM_NAME = "oid"
+        const val DISPLAY_NAME_CLAIM_NAME = "name"
+        const val USERNAME_CLAIM_NAME = "preferred_username"
 
         fun isUserPrincipal(decodedJWT: DecodedJWT): Boolean {
             val requiredClaim = decodedJWT.getClaim("NAVident")

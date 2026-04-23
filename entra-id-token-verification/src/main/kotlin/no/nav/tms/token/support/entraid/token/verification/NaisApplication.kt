@@ -12,7 +12,7 @@ data class NaisApplication(
     }
 
     companion object {
-        internal const val AZP_CLAIM_NAME = "azp_name"
+        const val AZP_CLAIM_NAME = "azp_name"
         private val azpPattern = "([^:]+):([^:]+):([^:]+)".toRegex()
 
         internal fun fromClaims(decodedJWT: DecodedJWT): NaisApplication? {

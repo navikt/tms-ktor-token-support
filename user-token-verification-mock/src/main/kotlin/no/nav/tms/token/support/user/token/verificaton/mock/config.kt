@@ -12,11 +12,11 @@ fun AuthenticationConfig.userTokenMock(
     val config = UserTokenMockedAuthenticatorConfig(configName)
         .also(configure)
 
-    registerIdPortenProviderMock(
+    registerUserTokenProviderMock(
         authenticatorName = config.configName,
         requiredIssuers = config.issuers.toList(),
         minimumLoa = config.levelOfAssurance,
-        defaultAuthentication = config.defaultAuthenticationOrNull()
+        defaultAuthentication = config.getDefaultAuthenticationOrNull()
     )
 }
 // Configuration provided by library user. See readme for example of use
@@ -31,7 +31,7 @@ class UserTokenMockedAuthenticatorConfig(
     var levelOfAssurance: LevelOfAssurance = LevelOfAssurance.High
 
     internal var defaultAuthenticationConfig: DefaultAuthenticationConfig? = null
-    fun defaultAuthentication(config: DefaultAuthenticationConfig.() -> Unit) {
+    fun enableDefaultAuthentication(config: DefaultAuthenticationConfig.() -> Unit) {
         val configuration = DefaultAuthenticationConfig().apply(config)
 
         requireNotNull(configuration.tokenIdent)
@@ -39,7 +39,7 @@ class UserTokenMockedAuthenticatorConfig(
         defaultAuthenticationConfig = configuration
     }
 
-    internal fun defaultAuthenticationOrNull(): Authentication?  {
+    internal fun getDefaultAuthenticationOrNull(): Authentication?  {
         val config = defaultAuthenticationConfig ?: return null
 
         if (config.tokenIssuer == null) {
@@ -68,5 +68,11 @@ class UserTokenMockedAuthenticatorConfig(
         var tokenIdent: String? = null,
     )
 }
+
+internal data class Authentication(
+    val issuer: Issuer,
+    val levelOfAssurance: LevelOfAssurance,
+    val ident: String,
+)
 
 
