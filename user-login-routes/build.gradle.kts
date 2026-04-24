@@ -52,7 +52,7 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             groupId = "no.nav.tms.token.support"
-            artifactId = "user-token-validation"
+            artifactId = "user-login-routes"
             version = libraryVersion
             from(components["java"])
 

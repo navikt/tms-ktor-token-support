@@ -50,7 +50,7 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             groupId = "no.nav.tms.token.support"
-            artifactId = "entra-id-validation-mock"
+            artifactId = "entra-id-token-verification-mock"
             version = libraryVersion
             from(components["java"])
 

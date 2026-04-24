@@ -56,7 +56,7 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             groupId = "no.nav.tms.token.support"
-            artifactId = "idporten-sidecar-mock"
+            artifactId = "user-token-verification-mock"
             version = libraryVersion
             from(components["java"])
 

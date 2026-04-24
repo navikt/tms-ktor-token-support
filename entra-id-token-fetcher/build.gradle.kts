@@ -51,7 +51,7 @@ publishing {
     publications {
         create<MavenPublication>("gpr") {
             groupId = "no.nav.tms.token.support"
-            artifactId = "entra-id-exchange"
+            artifactId = "entra-id-token-fetcher"
             version = libraryVersion
             from(components["java"])
 
