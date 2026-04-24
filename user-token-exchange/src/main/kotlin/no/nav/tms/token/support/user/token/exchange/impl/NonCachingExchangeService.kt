@@ -20,7 +20,7 @@ class NonCachingExchangeService internal constructor(
 
             return tokenExchangeConsumer.exchangeToken(token, jwt, targetApp).accessToken
         } catch (e: Exception) {
-            throw UserTokenExchangeException(e, clientId)
+            throw UserTokenExchangeException(e, targetApp)
         }
 
     }

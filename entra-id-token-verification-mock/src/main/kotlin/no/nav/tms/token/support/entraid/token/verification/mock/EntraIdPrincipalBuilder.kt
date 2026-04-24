@@ -33,8 +33,11 @@ internal object EntraIdPrincipalBuilder {
             .serialize()
             .let(JWT::decode)
 
-
-        return EntraIdPrincipal(decodedJWT)
+        return if (authentication.userInfo != null) {
+            EntraIdUserPrincipal(decodedJWT)
+        } else {
+            EntraIdPrincipal(decodedJWT)
+        }
     }
 
     private fun JWTClaimsSet.sign(): SignedJWT =

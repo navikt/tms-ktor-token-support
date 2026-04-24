@@ -242,23 +242,27 @@ internal class UserTokenMockTest {
             routing {
                 authenticate {
                     get("/test") {
-                        call.respond(HttpStatusCode.OK)
+                        val principal = call.principal<UserPrincipal>()!!
+
+                        call.respond(principal)
                     }
                 }
                 authenticate("idporten_high") {
                     get("/test/extra/secure") {
-                        call.respond(HttpStatusCode.OK)
+                        val principal = call.principal<UserPrincipal>()!!
+
+                        call.respond(principal)
                     }
                 }
             }
         }
 
         client.get("/test").checkBody { json ->
-            json["loa"].asText() shouldBe "substantial"
+            json["levelOfAssurance"].asText() shouldBe "Substantial"
         }
 
         client.get("/test/extra/secure").checkBody { json ->
-            json["loa"].asText() shouldBe "high"
+            json["levelOfAssurance"].asText() shouldBe "High"
         }
     }
 
@@ -323,7 +327,7 @@ internal class UserTokenMockTest {
         client.get("/test")
     }
 
-    private  fun HttpResponse.checkBody(function: (JsonNode) -> Unit) = suspend {
+    private suspend fun HttpResponse.checkBody(function: (JsonNode) -> Unit) {
         jacksonObjectMapper()
             .readTree(bodyAsText())
             .let(function)

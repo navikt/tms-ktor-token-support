@@ -39,7 +39,7 @@ fun Application.setup() {
 }
 ```
 
-Det finnes også finnes det en rekke konfigurasjonsmuligheter:
+Det finnes også en rekke konfigurasjonsmuligheter:
 
 - `authenticatorName`: Bestemmer navnet på autentikatoren. Default `UserTokenAuthenticator.name`
 - `setAsDefault`: (Optional) Setter denne autentikatoren som default. Default 'false'

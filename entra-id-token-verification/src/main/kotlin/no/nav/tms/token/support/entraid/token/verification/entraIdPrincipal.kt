@@ -2,7 +2,8 @@ package no.nav.tms.token.support.entraid.token.verification
 
 import com.auth0.jwt.interfaces.DecodedJWT
 
-open class EntraIdPrincipal(val decodedJWT: DecodedJWT) {
+open class EntraIdPrincipal(decodedJWT: DecodedJWT) {
+    val accessToken: String = decodedJWT.token
     val issuedFor: NaisApplication? = NaisApplication.fromClaims(decodedJWT)
 }
 

@@ -93,8 +93,8 @@ internal class EntraIdTokenVerificationMockTest {
             body["userInfo"].let { info ->
                 info["navIdent"].asText() shouldBe "A001122"
                 info["userId"].asText() shouldBe "111"
-                info["displayName"].asText() shouldBe "Navn "
-                info["userName"].asText() shouldBe "navn@nav.no "
+                info["displayName"].asText() shouldBe "Navn"
+                info["userName"].asText() shouldBe "navn@nav.no"
             }
         }
     }
@@ -231,13 +231,13 @@ internal class EntraIdTokenVerificationMockTest {
             body["userInfo"].let { info ->
                 info["navIdent"].asText() shouldBe "I000000"
                 info["userId"].asText() shouldBe "123"
-                info["displayName"].asText() shouldBe "Navn Navnesen "
-                info["userName"].asText() shouldBe "navn.navnesen@nav.no "
+                info["displayName"].asText() shouldBe "Navn Navnesen"
+                info["userName"].asText() shouldBe "navn.navnesen@nav.no"
             }
         }
     }
 
-    private  fun HttpResponse.checkBody(function: (JsonNode) -> Unit) = suspend {
+    private suspend fun HttpResponse.checkBody(function: (JsonNode) -> Unit) {
         jacksonObjectMapper()
             .readTree(bodyAsText())
             .let(function)
@@ -274,9 +274,9 @@ internal class EntraIdTokenVerificationMockTest {
                 userInfo = if (principal is EntraIdUserPrincipal) {
                     UserInfo(
                         navIdent = principal.navIdent,
-                        userId = principal.userId ?: "",
-                        displayName = principal.displayName ?: "",
-                        userName = principal.userName ?: "",
+                        userId = principal.userId,
+                        displayName = principal.displayName,
+                        userName = principal.userName,
                     )
                 } else {
                     null

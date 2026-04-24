@@ -39,9 +39,9 @@ internal class EntraIdTokenBuilder(
 
     fun azureUserToken(
         navIdent: String,
-        name: String? = null,
-        email: String? = null,
-        oid: String? = null,
+        name: String = "Navn Navnesen",
+        email: String = "navn.navnesen@nav.no",
+        oid: String? = "<uuid>",
         audience: String = defaultAudience,
         issuer: String = defaultIssuer,
         issuedFor: NaisApplication = defaultIssuedFor,

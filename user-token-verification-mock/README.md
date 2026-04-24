@@ -1,6 +1,6 @@
 # user-token-verification-mock
 
-Dette biblioteket kan installeres i stedet for `entra-id-token-verification` for å simulere innlogging.
+Dette biblioteket kan installeres i stedet for `user-token-verification` for å simulere innlogging.
 
 Kun ment å brukes i tester, og skal ikke havne i miljø.
 
@@ -179,7 +179,7 @@ fun Application.setup() {
 }
 ```
 
-Som med issuers vil dette valideres ved runtime. En kan ikke sette default lavere en påkrevd, og en vil få 401 dersom
+Som med issuers vil dette valideres ved runtime. En kan ikke sette default lavere enn påkrevd, og en vil få 401 dersom
 en supplerer autentisering med for lav loa i header.
 
 ### UserTokenPrincipal 
