@@ -2,6 +2,7 @@ package no.nav.tms.token.support.user.token.verification
 
 import com.auth0.jwk.Jwk
 import com.auth0.jwk.SigningKeyNotFoundException
+import com.auth0.jwt.JWT
 import com.nimbusds.jose.jwk.RSAKey
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -596,7 +597,12 @@ internal class UserTokenAuthTest {
                 routing {
                     authenticate {
                         get("/test") {
-                            call.respondText(call.principal<UserPrincipal>()?.accessToken?.issuer ?: "null")
+                            val issuer = call.principal<UserPrincipal>()
+                                ?.accessToken
+                                ?.let(JWT::decode)
+                                ?.issuer
+
+                            call.respondText(issuer ?: "null")
                         }
                     }
                 }

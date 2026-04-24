@@ -61,7 +61,7 @@ internal class TokenVerifier(
 
     private fun principalFromJwt(jwt: DecodedJWT): UserPrincipal {
         return UserPrincipal(
-            accessToken = jwt,
+            accessToken = jwt.token,
             ident = jwt.getClaim(identClaim).asString(),
             levelOfAssurance = acrMapper(jwt.getClaim(acrClaim).asString())
         )

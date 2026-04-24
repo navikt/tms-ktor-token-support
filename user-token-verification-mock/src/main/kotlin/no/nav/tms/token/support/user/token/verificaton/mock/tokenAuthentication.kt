@@ -54,7 +54,7 @@ private class AccessTokenAuthenticationProvider (
         } else if (authHeader.authorized) {
             if (isValid(authHeader.authentication!!, requiredIssuers, minimumLoa)) {
                 log.debug { "Call is authorized as MockAuthorized header is provided with valid contents" }
-                context.principal(UserTokenPrincipalBuilder.createPrincipal(authHeader.authentication!!))
+                context.principal(UserTokenPrincipalBuilder.createPrincipal(authHeader.authentication))
             } else {
                 log.debug { "Call is unauthorized as contents of MockAuthorized were invalid with respect to config" }
                 context.respondUnauthorized("Not authorized due to header.")

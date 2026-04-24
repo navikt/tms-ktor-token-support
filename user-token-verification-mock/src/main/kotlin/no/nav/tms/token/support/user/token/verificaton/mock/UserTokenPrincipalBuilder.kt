@@ -31,7 +31,7 @@ internal object UserTokenPrincipalBuilder {
             .serialize()
             .let(JWT::decode)
 
-        return UserPrincipal(authentication.ident, authentication.levelOfAssurance, decodedJWT)
+        return UserPrincipal(authentication.ident, authentication.levelOfAssurance, decodedJWT.token)
     }
 
     private fun JWTClaimsSet.sign(): SignedJWT =

@@ -8,9 +8,9 @@ open class EntraIdPrincipal(val decodedJWT: DecodedJWT) {
 
 class EntraIdUserPrincipal(decodedJWT: DecodedJWT): EntraIdPrincipal(decodedJWT) {
     val navIdent: String = decodedJWT.getClaim(NAV_IDENT_CLAIM_NAME).asString()
-    val userId: String? = decodedJWT.getClaim(OID_CLAIM_NAME).asString()
-    val displayName: String? = decodedJWT.getClaim(DISPLAY_NAME_CLAIM_NAME).asString()
-    val userName: String? = decodedJWT.getClaim(USERNAME_CLAIM_NAME).asString()
+    val userId: String = decodedJWT.getClaim(OID_CLAIM_NAME).asString()
+    val displayName: String = decodedJWT.getClaim(DISPLAY_NAME_CLAIM_NAME).asString()
+    val userName: String = decodedJWT.getClaim(USERNAME_CLAIM_NAME).asString()
 
     companion object {
         const val NAV_IDENT_CLAIM_NAME = "NAVident"

@@ -1,5 +1,6 @@
 package no.nav.tms.token.support.user.token.verification.mock
 
+import com.auth0.jwt.JWT
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
@@ -354,10 +355,12 @@ internal class UserTokenMockTest {
     ) {
         companion object {
             fun fromPrincipal(userPrincipal: UserPrincipal) = UserAuthInfo(
-                issuer = userPrincipal.accessToken.issuer,
+                issuer = issuer(userPrincipal.accessToken),
                 ident = userPrincipal.ident,
                 loa = userPrincipal.levelOfAssurance.name.lowercase()
             )
+
+            private fun issuer(token: String) = JWT.decode(token).issuer
         }
     }
 }
