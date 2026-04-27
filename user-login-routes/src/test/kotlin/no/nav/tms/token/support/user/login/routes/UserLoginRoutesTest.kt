@@ -100,7 +100,6 @@ class UserLoginRoutesTest {
         }
     }
 
-    @KtorDsl
     private fun loginApiTest(block: suspend TestApplicationBuilder.(HttpClient) -> Unit) = testApplication {
         UserTokenVerificationEnvironment.extend(envVars)
 

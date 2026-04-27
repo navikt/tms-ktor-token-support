@@ -18,7 +18,7 @@ dependencies {
     implementation(Nimbusds.joseJwt)
     testImplementation(JunitPlatform.launcher)
     testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.params)
+    testImplementation(JunitJupiter.engine)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.jackson)

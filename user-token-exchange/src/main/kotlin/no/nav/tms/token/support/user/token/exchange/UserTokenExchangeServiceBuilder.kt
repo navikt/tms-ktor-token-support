@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.apache.Apache
+import io.ktor.client.engine.apache5.Apache5
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.accept
@@ -68,7 +68,7 @@ object UserTokenExchangeServiceBuilder {
         ?: throw IllegalArgumentException("Fant ikke $varName for tokenx. Påse at nais.yaml er konfigurert riktig.")
 
     private fun buildHttpClient(): HttpClient {
-        return HttpClient(Apache) {
+        return HttpClient(Apache5) {
             install(ContentNegotiation) {
                 jackson {
                     configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)

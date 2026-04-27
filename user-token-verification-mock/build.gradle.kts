@@ -26,7 +26,7 @@ dependencies {
     testImplementation(JacksonDatatype.moduleKotlin)
     testImplementation(JunitPlatform.launcher)
     testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.params)
+    testImplementation(JunitJupiter.engine)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverContentNegotiation)
     testImplementation(Ktor.serverTestHost)

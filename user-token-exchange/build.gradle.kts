@@ -7,7 +7,7 @@ plugins {
 dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation(Caffeine.caffeine)
-    implementation(Ktor.clientApache)
+    implementation(Ktor.clientApache5)
     implementation(Ktor.clientContentNegotiation)
     implementation(Ktor.clientJson)
     implementation(Ktor.serialization)
@@ -21,7 +21,7 @@ dependencies {
     implementation(Nimbusds.joseJwt)
     testImplementation(JunitPlatform.launcher)
     testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.params)
+    testImplementation(JunitJupiter.engine)
     testImplementation(Mockk.mockk)
     testImplementation(Ktor.clientMock)
     testImplementation(Ktor.serverTestHost)
