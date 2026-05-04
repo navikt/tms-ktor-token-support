@@ -19,7 +19,7 @@ private val defaultIssuedFor =
 // Configuration provided by library user. See readme for example of use
 class EntraIdMockedAuthenticatorConfig {
     internal var defaultAuthenticationConfig: DefaultAuthenticationConfig? = null
-    fun enableDefaultAuthentication(config: DefaultAuthenticationConfig.() -> Unit) {
+    fun enableDefaultAuthentication(config: DefaultAuthenticationConfig.() -> Unit = {}) {
         val configuration = DefaultAuthenticationConfig().apply(config)
 
         if (configuration.tokenIssuedFor == null) {
