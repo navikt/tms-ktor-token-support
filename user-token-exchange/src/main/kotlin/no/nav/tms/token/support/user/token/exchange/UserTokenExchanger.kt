@@ -1,6 +1,6 @@
 package no.nav.tms.token.support.user.token.exchange
 
-interface UserTokenExchangeService {
+interface UserTokenExchanger {
     suspend fun exchangeToken(token: String, targetApp: String): String
 }
 

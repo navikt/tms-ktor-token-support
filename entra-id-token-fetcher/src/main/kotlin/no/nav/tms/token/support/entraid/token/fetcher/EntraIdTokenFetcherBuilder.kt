@@ -14,7 +14,7 @@ object EntraIdTokenFetcherBuilder {
     private val openidIssuer: String = getAzureEnvVar("AZURE_OPENID_CONFIG_ISSUER")
     private val openidTokenEndpoint: String = getAzureEnvVar("AZURE_OPENID_CONFIG_TOKEN_ENDPOINT")
 
-    fun buildFetcher(
+    fun build(
         cachingEnabled: Boolean = true,
         maxCachedEntries: Long = 1000L,
         cacheExpiryMarginSeconds: Int = 5,

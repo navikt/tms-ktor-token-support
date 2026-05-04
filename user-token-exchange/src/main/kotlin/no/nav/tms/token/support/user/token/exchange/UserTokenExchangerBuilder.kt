@@ -14,11 +14,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
-import no.nav.tms.token.support.user.token.exchange.impl.CachingExchangeService
-import no.nav.tms.token.support.user.token.exchange.impl.NonCachingExchangeService
+import no.nav.tms.token.support.user.token.exchange.impl.CachingExchanger
+import no.nav.tms.token.support.user.token.exchange.impl.NonCachingExchanger
 import no.nav.tms.token.support.user.token.exchange.impl.TokenExchangeConsumer
 
-object UserTokenExchangeServiceBuilder {
+object UserTokenExchangerBuilder {
 
     private val httpClient = buildHttpClient()
 
@@ -30,11 +30,11 @@ object UserTokenExchangeServiceBuilder {
 
     private val tokenExchangeConsumer = TokenExchangeConsumer(httpClient, metadata.tokenEndpoint)
 
-    fun buildService(
+    fun build(
         cachingEnabled: Boolean = true,
         maxCachedEntries: Long = 1000L,
         cacheExpiryMarginSeconds: Int = 5
-    ): UserTokenExchangeService {
+    ): UserTokenExchanger {
 
         if (cachingEnabled) {
             require(maxCachedEntries > 0) { "'maxCachedEntries' should be at least 1" }
@@ -42,20 +42,20 @@ object UserTokenExchangeServiceBuilder {
         }
 
         return if (cachingEnabled) {
-            createCachingService(maxCachedEntries, cacheExpiryMarginSeconds)
+            createCachingExchanger(maxCachedEntries, cacheExpiryMarginSeconds)
         } else {
-            createNonCachingService()
+            createNonCachingExchanger()
         }
     }
 
-    private fun createNonCachingService() = NonCachingExchangeService(
+    private fun createNonCachingExchanger() = NonCachingExchanger(
         tokenExchangeConsumer = tokenExchangeConsumer,
         jwtAudience = metadata.tokenEndpoint,
         clientId = tokenxClientId,
         privateJwk = tokenxClientJwk
     )
 
-    private fun createCachingService(maxCachedEntries: Long, cacheExpiryMarginSeconds: Int) = CachingExchangeService(
+    private fun createCachingExchanger(maxCachedEntries: Long, cacheExpiryMarginSeconds: Int) = CachingExchanger(
         tokenExchangeConsumer = tokenExchangeConsumer,
         jwtAudience = metadata.tokenEndpoint,
         clientId = tokenxClientId,

@@ -2,15 +2,15 @@ package no.nav.tms.token.support.user.token.exchange.impl
 
 import com.nimbusds.jose.jwk.RSAKey
 import no.nav.tms.token.support.user.token.exchange.UserTokenExchangeException
-import no.nav.tms.token.support.user.token.exchange.UserTokenExchangeService
+import no.nav.tms.token.support.user.token.exchange.UserTokenExchanger
 import no.nav.tms.token.support.user.token.exchange.impl.ClientAssertion.createSignedAssertion
 
-class NonCachingExchangeService internal constructor(
+class NonCachingExchanger internal constructor(
     private val tokenExchangeConsumer: TokenExchangeConsumer,
     private val jwtAudience: String,
     private val clientId: String,
     privateJwk: String
-) : UserTokenExchangeService {
+) : UserTokenExchanger {
 
     private val privateRsaKey = RSAKey.parse(privateJwk)
 

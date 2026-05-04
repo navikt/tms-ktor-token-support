@@ -4,17 +4,17 @@ import com.auth0.jwt.JWT
 import com.nimbusds.jose.jwk.RSAKey
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.user.token.exchange.UserTokenExchangeException
-import no.nav.tms.token.support.user.token.exchange.UserTokenExchangeService
+import no.nav.tms.token.support.user.token.exchange.UserTokenExchanger
 import no.nav.tms.token.support.user.token.exchange.impl.ClientAssertion.createSignedAssertion
 
-class CachingExchangeService internal constructor(
+class CachingExchanger internal constructor(
     private val tokenExchangeConsumer: TokenExchangeConsumer,
     private val jwtAudience: String,
     private val clientId: String,
     privateJwk: String,
     maxCacheEntries: Long,
     cacheExpiryMarginSeconds: Int,
-) : UserTokenExchangeService {
+) : UserTokenExchanger {
 
     private val cache = CacheBuilder.buildCache(maxCacheEntries, cacheExpiryMarginSeconds)
 

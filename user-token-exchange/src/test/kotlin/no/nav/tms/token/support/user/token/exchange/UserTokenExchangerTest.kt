@@ -7,8 +7,8 @@ import io.kotest.matchers.shouldNotBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import no.nav.tms.token.support.user.token.exchange.impl.AccessTokenKey
-import no.nav.tms.token.support.user.token.exchange.impl.CachingExchangeService
-import no.nav.tms.token.support.user.token.exchange.impl.NonCachingExchangeService
+import no.nav.tms.token.support.user.token.exchange.impl.CachingExchanger
+import no.nav.tms.token.support.user.token.exchange.impl.NonCachingExchanger
 import no.nav.tms.token.support.user.token.exchange.impl.TokenExchangeConsumer
 import no.nav.tms.token.support.user.token.exchange.impl.TokenExchangeResponse
 import no.nav.tms.token.support.user.token.exchange.impl.TokenStringUtil
@@ -17,17 +17,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import java.net.SocketTimeoutException
 
-internal class TokenExchangeServiceTest {
+internal class UserTokenExchangerTest {
 
     private val tokenExchangeConsumer = mockk<TokenExchangeConsumer>()
     private val jwtAudience = "https://token-exchange.url/token"
     private val clientId = "cluster:namespace:thisApi"
     private val privateJwk = JwkBuilder.generateJwk()
 
-    private val nonCachingTokenExchangeService =
-        NonCachingExchangeService(tokenExchangeConsumer, jwtAudience, clientId, privateJwk)
-    private val cachingTokenexchangeService =
-        CachingExchangeService(tokenExchangeConsumer, jwtAudience, clientId, privateJwk, 10, 5)
+    private val nonCachingTokenExchanger =
+        NonCachingExchanger(tokenExchangeConsumer, jwtAudience, clientId, privateJwk)
+    private val cachingTokenExchanger =
+        CachingExchanger(tokenExchangeConsumer, jwtAudience, clientId, privateJwk, 10, 5)
 
     @AfterEach
     fun cleanup() {
@@ -37,7 +37,7 @@ internal class TokenExchangeServiceTest {
 
 
     @Test
-    fun `Non-caching service should sign a jwt with correct claims and retrieve token from response`() {
+    fun `Non-caching exchanger should sign a jwt with correct claims and retrieve token from response`() {
         val assertion = slot<String>()
         val token = "<token>"
         val exchangedToken = "<exchanged token>"
@@ -48,7 +48,7 @@ internal class TokenExchangeServiceTest {
         } returns createTokenExchangeResponse(exchangedToken)
 
         val result = runBlocking {
-            nonCachingTokenExchangeService.exchangeToken(token, target)
+            nonCachingTokenExchanger.exchangeToken(token, target)
         }
 
         result shouldBe exchangedToken
@@ -62,7 +62,7 @@ internal class TokenExchangeServiceTest {
     }
 
     @Test
-    fun `Caching service should sign a jwt with correct claims and retrieve token from response`() {
+    fun `Caching exchanger should sign a jwt with correct claims and retrieve token from response`() {
         val assertion = slot<String>()
         val token = "<token>"
         val subject = "<subject>"
@@ -80,7 +80,7 @@ internal class TokenExchangeServiceTest {
         } returns createTokenExchangeResponse(exchangedToken)
 
         val result = runBlocking {
-            cachingTokenexchangeService.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
         }
 
         result shouldBe exchangedToken
@@ -94,7 +94,7 @@ internal class TokenExchangeServiceTest {
     }
 
     @Test
-    fun `CachingService should not make additional external calls while token is not yet expired`() {
+    fun `Caching exchanger should not make additional external calls while token is not yet expired`() {
         val assertion = slot<String>()
         val token = "<token>"
         val subject = "<subject>"
@@ -112,16 +112,16 @@ internal class TokenExchangeServiceTest {
         } returns createTokenExchangeResponse(exchangedToken)
 
         runBlocking {
-            cachingTokenexchangeService.exchangeToken(token, target)
-            cachingTokenexchangeService.exchangeToken(token, target)
-            cachingTokenexchangeService.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
         }
 
         coVerify(exactly = 1) { tokenExchangeConsumer.exchangeToken(any(), any(), target) }
     }
 
     @Test
-    fun `CachingService should make external calls when access token is missing or expired`() {
+    fun `Caching exchanger should make external calls when access token is missing or expired`() {
         val assertion = slot<String>()
         val token = "<token>"
         val subject = "<subject>"
@@ -139,16 +139,16 @@ internal class TokenExchangeServiceTest {
         } returns createTokenExchangeResponse(exchangedToken, expiresIn = 0)
 
         runBlocking {
-            cachingTokenexchangeService.exchangeToken(token, target)
-            cachingTokenexchangeService.exchangeToken(token, target)
-            cachingTokenexchangeService.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
+            cachingTokenExchanger.exchangeToken(token, target)
         }
 
         coVerify(exactly = 3) { tokenExchangeConsumer.exchangeToken(any(), any(), target) }
     }
 
     @Test
-    fun `CachingService should cache one unique token per target`() {
+    fun `Caching exchanger should cache one unique token per target`() {
         val assertion = slot<String>()
         val token = "<token>"
         val subject = "<subject>"
@@ -175,15 +175,15 @@ internal class TokenExchangeServiceTest {
             tokenExchangeConsumer.exchangeToken(any(), capture(assertion), target2)
         } returns createTokenExchangeResponse(exchangedToken2)
 
-        val result1 = runBlocking { cachingTokenexchangeService.exchangeToken(token, target1) }
-        val result2 = runBlocking { cachingTokenexchangeService.exchangeToken(token, target2) }
-        val result3 = runBlocking { cachingTokenexchangeService.exchangeToken(token, target1) }
-        val result4 = runBlocking { cachingTokenexchangeService.exchangeToken(token, target2) }
+        val result1 = runBlocking { cachingTokenExchanger.exchangeToken(token, target1) }
+        val result2 = runBlocking { cachingTokenExchanger.exchangeToken(token, target2) }
+        val result3 = runBlocking { cachingTokenExchanger.exchangeToken(token, target1) }
+        val result4 = runBlocking { cachingTokenExchanger.exchangeToken(token, target2) }
 
-        runBlocking { cachingTokenexchangeService.exchangeToken(token, target1) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token, target2) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token, target1) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token, target2) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token, target1) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token, target2) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token, target1) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token, target2) }
 
         coVerify(exactly = 1) { tokenExchangeConsumer.exchangeToken(any(), any(), target1) }
         coVerify(exactly = 1) { tokenExchangeConsumer.exchangeToken(any(), any(), target2) }
@@ -195,7 +195,7 @@ internal class TokenExchangeServiceTest {
     }
 
     @Test
-    fun `CachingService should cache one unique token per security level`() {
+    fun `Caching exchanger should cache one unique token per security level`() {
         val assertion = slot<String>()
         val token1 = "<token1>"
         val token2 = "<token2>"
@@ -224,15 +224,15 @@ internal class TokenExchangeServiceTest {
             tokenExchangeConsumer.exchangeToken(token2, capture(assertion), target)
         } returns createTokenExchangeResponse(exchangedToken2)
 
-        val result1 = runBlocking { cachingTokenexchangeService.exchangeToken(token1, target) }
-        val result2 = runBlocking { cachingTokenexchangeService.exchangeToken(token2, target) }
-        val result3 = runBlocking { cachingTokenexchangeService.exchangeToken(token1, target) }
-        val result4 = runBlocking { cachingTokenexchangeService.exchangeToken(token2, target) }
+        val result1 = runBlocking { cachingTokenExchanger.exchangeToken(token1, target) }
+        val result2 = runBlocking { cachingTokenExchanger.exchangeToken(token2, target) }
+        val result3 = runBlocking { cachingTokenExchanger.exchangeToken(token1, target) }
+        val result4 = runBlocking { cachingTokenExchanger.exchangeToken(token2, target) }
 
-        runBlocking { cachingTokenexchangeService.exchangeToken(token1, target) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token2, target) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token1, target) }
-        runBlocking { cachingTokenexchangeService.exchangeToken(token2, target) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token1, target) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token2, target) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token1, target) }
+        runBlocking { cachingTokenExchanger.exchangeToken(token2, target) }
 
         coVerify(exactly = 1) { tokenExchangeConsumer.exchangeToken(token1, any(), target) }
         coVerify(exactly = 1) { tokenExchangeConsumer.exchangeToken(token2, any(), target) }
@@ -245,17 +245,17 @@ internal class TokenExchangeServiceTest {
 
     @Test
     fun `Should throw UserTokenExchangeException if exchangeprocess fails`() {
-        assertNonCachingServiceThrows { IllegalArgumentException() }
-        assertNonCachingServiceThrows { SocketTimeoutException() }
-        assertNonCachingServiceThrows { Exception() }
-        assertCachingServiceThrows { IllegalArgumentException() }
-        assertCachingServiceThrows { SocketTimeoutException() }
-        assertCachingServiceThrows { Exception() }
+        assertNonCachingExchangerThrows { IllegalArgumentException() }
+        assertNonCachingExchangerThrows { SocketTimeoutException() }
+        assertNonCachingExchangerThrows { Exception() }
+        assertCachingExchangerThrows { IllegalArgumentException() }
+        assertCachingExchangerThrows { SocketTimeoutException() }
+        assertCachingExchangerThrows { Exception() }
 
     }
 
-    private fun assertNonCachingServiceThrows( throwable: () -> Throwable) = run {
-        NonCachingExchangeService(
+    private fun assertNonCachingExchangerThrows(throwable: () -> Throwable) = run {
+        NonCachingExchanger(
             tokenExchangeConsumer = mockk<TokenExchangeConsumer>().apply {
                 coEvery { exchangeToken(any(), any(), any()) } throws throwable()
             },
@@ -267,8 +267,8 @@ internal class TokenExchangeServiceTest {
         }
     }
 
-    private fun assertCachingServiceThrows( throwable: () -> Throwable) = run {
-        CachingExchangeService(
+    private fun assertCachingExchangerThrows(throwable: () -> Throwable) = run {
+        CachingExchanger(
             tokenExchangeConsumer = mockk<TokenExchangeConsumer>().apply {
                 coEvery { exchangeToken(any(), any(), any()) } throws throwable()
             },

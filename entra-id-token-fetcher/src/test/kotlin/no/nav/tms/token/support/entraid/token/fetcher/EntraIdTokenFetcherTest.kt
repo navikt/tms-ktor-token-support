@@ -35,7 +35,7 @@ internal class EntraIdTokenFetcherTest {
     }
 
     @Test
-    fun `Non-caching service should sign a jwt with correct claims and retrieve token from response`() {
+    fun `Non-caching fetcher should sign a jwt with correct claims and retrieve token from response`() {
         val assertion = slot<String>()
         val exchangedToken = "<exchanged token>"
         val target = "cluster.namespace.otherApi"
@@ -59,7 +59,7 @@ internal class EntraIdTokenFetcherTest {
     }
 
     @Test
-    fun `Caching service should sign a jwt with correct claims and retrieve token from response`() {
+    fun `Caching fetcher should sign a jwt with correct claims and retrieve token from response`() {
         val assertion = slot<String>()
         val exchangedToken = "<exchanged token>"
         val target = "cluster.namespace.otherApi"
@@ -83,7 +83,7 @@ internal class EntraIdTokenFetcherTest {
     }
 
     @Test
-    fun `CachingService should not make additional external calls while token is not yet expired`() {
+    fun `Caching fetcher should not make additional external calls while token is not yet expired`() {
         val assertion = slot<String>()
         val exchangedToken = "<exchanged token>"
         val target = "cluster.namespace.otherApi"
@@ -102,7 +102,7 @@ internal class EntraIdTokenFetcherTest {
     }
 
     @Test
-    fun `CachingService should make external calls when access token is missing or expired`() {
+    fun `Caching fetcher should make external calls when access token is missing or expired`() {
         val assertion = slot<String>()
         val exchangedToken = "<exchanged token>"
         val target = "cluster.namespace.otherApi"
@@ -121,7 +121,7 @@ internal class EntraIdTokenFetcherTest {
     }
 
     @Test
-    fun `CachingService should cache one unique token per target`() {
+    fun `Caching fetcher should cache one unique token per target`() {
         val assertion = slot<String>()
         val exchangedToken1 = "<exchanged token 1>"
         val exchangedToken2 = "<exchanged token 2>"
@@ -152,16 +152,16 @@ internal class EntraIdTokenFetcherTest {
 
     @Test
     fun `Should throw EntraIdTokenException if exchangeprocess fails`() {
-        assertNonCachingServiceThrows { IllegalArgumentException() }
-        assertNonCachingServiceThrows { SocketTimeoutException() }
-        assertNonCachingServiceThrows { Exception() }
-        assertCachingServiceThrows { IllegalArgumentException() }
-        assertCachingServiceThrows { SocketTimeoutException() }
-        assertCachingServiceThrows { Exception() }
+        assertNonCachingFetcherThrows { IllegalArgumentException() }
+        assertNonCachingFetcherThrows { SocketTimeoutException() }
+        assertNonCachingFetcherThrows { Exception() }
+        assertCachingFetcherThrows { IllegalArgumentException() }
+        assertCachingFetcherThrows { SocketTimeoutException() }
+        assertCachingFetcherThrows { Exception() }
 
     }
 
-    fun assertNonCachingServiceThrows(throwable: () -> Throwable) = run {
+    fun assertNonCachingFetcherThrows(throwable: () -> Throwable) = run {
         NonCachingEntraIdTokenFetcher(
             tokenIssuerConsumer = mockk<TokenIssuerConsumer>().apply {
                 coEvery { fetchToken(any(), any()) } throws throwable()
@@ -172,7 +172,7 @@ internal class EntraIdTokenFetcherTest {
         }
     }
 
-    fun assertCachingServiceThrows(throwable: () -> Throwable) = run {
+    fun assertCachingFetcherThrows(throwable: () -> Throwable) = run {
         CachingEntraIdTokenFetcher(
             tokenIssuerConsumer = mockk<TokenIssuerConsumer>().apply {
                 coEvery { fetchToken(any(), any()) } throws throwable()

@@ -29,19 +29,19 @@ Se [nais-dokumentasjonen](https://doc.nais.io/security/auth/tokenx/#access-polic
 
 ## Oppsett
 
-Biblioteket tilbyr ett interface `UserTokenExchangeService` med to implementasjoner, `CachingExchangeService` og `NonCachingExchangeService`.
+Biblioteket tilbyr ett interface `UserTokenExchanger` med to implementasjoner, `CachingTokenExchanger` og `NonCachingTokenExchanger`.
 Disse bygges ved hjelp av `UserTokenExchangeBuilder`: 
 
 ```kotlin
 fun Application.setup() {
 
-    val serviceWithCache = UserTokenExchangeBuilder.buildExchangeService(
+    val exchangerWithCache = UserTokenExchangerBuilder.build(
         cachingEnabled = true,
         maxCachedEntries = 100,
         cacheMarginSeconds = 10
     )
    
-    val serviceWithoutCache = TokendingsServiceBuilder.buildExchangeService(
+    val exchangerWithoutCache = UserTokenExchangerBuilder.build(
         cachingEnabled = false,
     )
 }
@@ -49,7 +49,7 @@ fun Application.setup() {
 
 ### Caching
 
-Grunnet potensiell høy trafikk mot tokendings anbefales det å ikke skru av caching av access tokens i `UserTokenExchangeService`.
+Grunnet potensiell høy trafikk mot tokendings anbefales det å ikke skru av caching av access tokens i `UserTokenExchanger`.
 
 Default instillinger i `UserTokenExchangeBuilder` er som følger: 
 ```kotlin
@@ -65,7 +65,7 @@ Caching gjøres med `sub` claim på original token som nøkkel.
 
 ## Bruk
 
-`UserTokenExchangeService` brukes til å veksle tokens med tokendings. For å gjøre dette må en først ha et bruker-token fra
+`UserTokenExchanger` brukes til å veksle tokens med tokendings. For å gjøre dette må en først ha et bruker-token fra
 ID-porten eller tokendings som en ønsker å veksle. En må spesifisere hvilken app vekslet token er ment for i formatet `<cluster>:<namespace>:<appnavn>`.
 
 Eksempel på tokenveksling for å nå en app i cluster `prod-gcp` og namespace `min-side`:

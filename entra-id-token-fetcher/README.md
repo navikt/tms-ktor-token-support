@@ -22,7 +22,7 @@ Disse bygges ved hjelp av `EntraIdTokenFetcherBuilder`:
 ```kotlin
 fun Application.setup() {
 
-    val fetcherWithCache = EntraIdTokenFetcherBuilder.buildFetcher(
+    val fetcherWithCache = EntraIdTokenFetcherBuilder.build(
         cachingEnabled = true,
         maxCachedEntries = 100,
         cacheMarginSeconds = 10,
@@ -30,7 +30,7 @@ fun Application.setup() {
 
     )
    
-    val serviceWithoutCache = EntraIdTokenFetcherBuilder.buildFetcher(
+    val fetcherWithoutCache = EntraIdTokenFetcherBuilder.build(
         cachingEnabled = false,
     )
 }
@@ -68,7 +68,7 @@ fun getTokenForOtherApi(): String {
 
     val tokenFetcher = EntraIdTokenFetcherBuilder.buildFetcher()
    
-    return azureService.exchangeToken(appName)
+    return tokenFetcher.fetchToken(appName)
 }
 ```
 
