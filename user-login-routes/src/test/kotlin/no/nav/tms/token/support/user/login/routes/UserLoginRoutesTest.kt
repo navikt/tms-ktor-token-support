@@ -5,6 +5,7 @@ import com.auth0.jwt.interfaces.DecodedJWT
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.matchers.shouldBe
 import io.ktor.client.*
+import io.ktor.client.plugins.cookies.get
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -50,7 +51,7 @@ class UserLoginRoutesTest {
 
         client.get("/login").let {
             it.status shouldBe HttpStatusCode.Found
-            it.headers["location"] shouldBe "/oauth2/login?redirect=/login/callback"
+            it.headers[HttpHeaders.Location] shouldBe "/oauth2/login?redirect=/login/callback"
         }
     }
 
@@ -97,6 +98,47 @@ class UserLoginRoutesTest {
                     it["authenticated"]?.asBoolean() shouldBe true
                     it["levelOfAssurance"]?.asText() shouldBe IdPortenLevelOfAssurance.High.name
                 }
+        }
+    }
+
+    @Test
+    fun `Allows client-defined redirect url to be stored in cookie on login-request`() = loginApiTest { client ->
+
+        val finalRedirect = "https://frontend.nav.no"
+
+        client.get("/login?redirect_uri=$finalRedirect").let {
+            it.setCookie()["redirect_uri"]?.value shouldBe finalRedirect
+        }
+    }
+
+    @Test
+    fun `Disallows client-defined redirect url from pointing to websites outside the nav (dot) no domain`() = loginApiTest { client ->
+
+        val finalRedirect = "https://frontend.nrk.no"
+
+        client.get("/login?redirect_uri=$finalRedirect").let {
+            it.status shouldBe HttpStatusCode.UnprocessableEntity
+        }
+    }
+
+    @Test
+    fun `Performs url-validation on redirect-cookie`() = loginApiTest { client ->
+
+        val validRedirect = "https://www.nav.no"
+        val invalidRedirect = "https://www.spk.no"
+
+        client.get("/login/callback") {
+            cookie("redirect_uri", validRedirect)
+        }.let {
+            it.status shouldBe HttpStatusCode.Found
+            it.headers[HttpHeaders.Location] shouldBe validRedirect
+        }
+
+        client.get("/login/callback") {
+            cookie("redirect_uri", invalidRedirect)
+        }.let {
+            it.status shouldBe HttpStatusCode.UnprocessableEntity
+            it.headers[HttpHeaders.Location] shouldBe null
         }
     }
 

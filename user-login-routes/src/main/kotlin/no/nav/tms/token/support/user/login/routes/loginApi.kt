@@ -25,7 +25,11 @@ private fun Route.loginEndPoints(tokenVerifier: TokenVerifier, rootpath: String,
 
     get("/login") {
         call.redirectUri?.let { redirectUri ->
-            call.response.cookies.append(postLoginRedirectCookie, redirectUri)
+            if (isValidCallbackUrl(redirectUri)) {
+                call.response.cookies.append(postLoginRedirectCookie, redirectUri)
+            } else {
+                call.respond(HttpStatusCode.UnprocessableEntity, "Erroneous callback-url. Must lead to 'nav.no' domain")
+            }
         }
 
         findRelativePath(rootpath, routesPrefix)
@@ -54,9 +58,15 @@ private fun Route.loginEndPoints(tokenVerifier: TokenVerifier, rootpath: String,
             expires = GMTDate.START
         )
 
-        call.request.cookies[postLoginRedirectCookie]
-            ?.let { call.respondRedirect(it) }
-            ?: call.respond(HttpStatusCode.OK, "Login successful")
+        val callbackUrl = call.request.cookies[postLoginRedirectCookie]
+
+        if (callbackUrl == null) {
+            call.respond(HttpStatusCode.OK, "Login successful")
+        } else if (isValidCallbackUrl(callbackUrl)) {
+            call.respondRedirect(callbackUrl)
+        } else {
+            call.respond(HttpStatusCode.UnprocessableEntity, "Erroneous url in callback-cookie")
+        }
     }
 }
 
@@ -89,6 +99,13 @@ private fun findRelativePath(rootpath: String, prefix: String?): String {
         rootPathPart.isBlank() -> "/$prefixPart"
         else -> "/$rootPathPart/$prefixPart"
     }
+}
+
+
+// Callback must lead to a nav.no-domain
+private val navDomainPattern = "https://(?:[a-z0-9-]{0,61}\\.)*nav\\.no(\\z|[/?])".toRegex()
+private fun isValidCallbackUrl(callbackUrl: String): Boolean {
+    return navDomainPattern.containsMatchIn(callbackUrl)
 }
 
 private fun String.isStub() = when(this) {
