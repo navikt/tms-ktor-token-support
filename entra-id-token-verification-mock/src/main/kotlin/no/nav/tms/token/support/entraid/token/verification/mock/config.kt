@@ -40,7 +40,7 @@ class EntraIdMockedAuthenticatorConfig {
 
     class DefaultAuthenticationConfig internal constructor(
         var tokenIssuedFor: NaisApplication? = null,
-        internal var tokenUserInfo: UserInfo? = null
+        var tokenUserInfo: UserInfo? = null
     )
 }
 
