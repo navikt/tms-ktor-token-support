@@ -5,29 +5,38 @@ plugins {
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.jackson)
-    implementation(Ktor.serverForwardedHeaders)
-    implementation(Ktor.serverNetty)
-    implementation(Nimbusds.oauth2OidcSdk)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
-    testImplementation(Nimbusds.joseJwt)
+    api(libs.ktor.client.core)
+    api(libs.ktor.server.core)
+    api(libs.ktor.utils)
+    implementation(libs.apache.httpclient5)
+    implementation(libs.auth0.javaJwt)
+    implementation(libs.auth0.jwksRsa)
+    implementation(libs.jackson.annotations)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.moduleKotlin)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.client.contentNegotiation)
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.serialization.jackson)
+    runtimeOnly(libs.logback.classic)
+
+
+    testImplementation(libs.junit.api)
+    testImplementation(libs.kotest.assertionsShared)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.common)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.ktor.io)
+    testImplementation(libs.ktor.test.clientMock)
+    testImplementation(libs.ktor.test.server)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockkCore)
+    testImplementation(libs.mockkDsl)
+    testImplementation(libs.nimbusds.oauth2OidcSdk)
+    testRuntimeOnly(libs.junit.engine)
+    testRuntimeOnly(libs.junit.launcher)
 }
 
 repositories {
@@ -35,7 +44,8 @@ repositories {
     mavenLocal()
 }
 
-val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+val libraryVersion: String = providers.gradleProperty("lib_version")
+    .orElse("latest-local").toString()
 
 publishing {
     repositories{
@@ -56,7 +66,7 @@ publishing {
             version = libraryVersion
             from(components["java"])
 
-            val sourcesJar by tasks.registering(Jar::class) {
+            val sourcesJar = tasks.register<Jar>("sources") {
                 archiveClassifier.set("sources")
                 from(sourceSets.main.get().allSource)
             }

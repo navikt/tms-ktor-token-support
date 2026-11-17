@@ -5,28 +5,28 @@ plugins {
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Caffeine.caffeine)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.jackson)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.serverNetty)
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Nimbusds.joseJwt)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    api(libs.jackson.annotations)
+    implementation(libs.auth0.javaJwt)
+    implementation(libs.jackson.databind)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.client.contentNegotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.ktor.utils)
+    implementation(libs.caffeine)
+    implementation(libs.nimbusds.jose)
+
+    testImplementation(libs.junit.api)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockkCore)
+    testImplementation(libs.mockkDsl)
+    testRuntimeOnly(libs.junit.engine)
+    testRuntimeOnly(libs.junit.launcher)
 }
 
 repositories {
@@ -34,7 +34,8 @@ repositories {
     mavenLocal()
 }
 
-val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+val libraryVersion: String = providers.gradleProperty("lib_version")
+    .orElse("latest-local").toString()
 
 publishing {
     repositories{
@@ -55,7 +56,7 @@ publishing {
             version = libraryVersion
             from(components["java"])
 
-            val sourcesJar by tasks.registering(Jar::class) {
+            val sourcesJar = tasks.register<Jar>("sources") {
                 archiveClassifier.set("sources")
                 from(sourceSets.main.get().allSource)
             }

@@ -5,41 +5,41 @@ plugins {
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(project(":user-token-verification"))
-    implementation(JacksonDatatype.datatypeJsr310)
-    implementation(JacksonDatatype.moduleKotlin)
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientJson)
-    implementation(Nimbusds.joseJwt)
-    implementation("io.ktor:ktor-server-content-negotiation:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    implementation("io.ktor:ktor-serialization-jackson:3.3.3")
-    implementation("io.ktor:ktor-server-content-negotiation:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    testImplementation(JacksonDatatype.datatypeJsr310)
-    testImplementation(JacksonDatatype.moduleKotlin)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverContentNegotiation)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    api(libs.ktor.client.core)
+    api(libs.ktor.server.auth)
+    api(project(":user-token-verification"))
+    implementation(libs.auth0.javaJwt)
+    implementation(libs.jackson.core)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.moduleKotlin)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.utils)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.kotlinLogging)
+    implementation(libs.nimbusds.oauth2OidcSdk)
+
+    testImplementation(libs.junit.api)
+    testImplementation(libs.kotest.assertionsShared)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.common)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.ktor.serialization)
+    testImplementation(libs.ktor.server.contentNegotiation)
+    testImplementation(libs.ktor.test.server)
+    testRuntimeOnly(libs.junit.engine)
+    testRuntimeOnly(libs.junit.launcher)
+
 }
 
 repositories {
     mavenCentral()
     mavenLocal()
 }
-
-val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+val libraryVersion: String = providers.gradleProperty("lib_version")
+    .orElse("latest-local").toString()
 
 publishing {
     repositories{
@@ -60,7 +60,7 @@ publishing {
             version = libraryVersion
             from(components["java"])
 
-            val sourcesJar by tasks.registering(Jar::class) {
+            val sourcesJar = tasks.register<Jar>("sources") {
                 archiveClassifier.set("sources")
                 from(sourceSets.main.get().allSource)
             }
