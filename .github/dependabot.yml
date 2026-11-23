@@ -40,6 +40,10 @@ updates:
           - "org.junit.jupiter:*"
           - "com.fasterxml.jackson*"
           - "com.github.ben-manes.caffeine:*"
+          - "com.auth0:*"
+          - "com.nimbusds:*"
+          - "io.netty:*"
+          - "tools.jackson.core:*"
         update-types:
           - "minor"
           - "patch"
