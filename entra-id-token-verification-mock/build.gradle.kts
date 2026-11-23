@@ -42,7 +42,8 @@ repositories {
 }
 
 val libraryVersion: String = providers.gradleProperty("lib_version")
-    .orElse("latest-local").toString()
+    .orElse("latest-local")
+    .get()
 
 publishing {
     repositories{

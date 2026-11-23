@@ -1,0 +1,70 @@
+version: 2
+
+registries:
+  nav-maven:
+    type: maven-repository
+    url: https://github-package-registry-mirror.gc.nav.no/cached/maven-release
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 3
+    labels:
+      - github-actions
+
+  - package-ecosystem: "gradle"
+    directory: "/"
+    registries:
+      - nav-maven
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "08:00"
+    groups:
+      runtime-libs:
+        patterns:
+          - "gradle-wrapper"
+          - "io.ktor:*"
+          - "org.jetbrains.kotlin:*"
+          - "io.github.oshai:*"
+          - "org.jetbrains.kotlinx*"
+          - "ch.qos.logback:*"
+          - "org.apache.*"
+          - "org.junit.jupiter:*"
+          - "com.fasterxml.jackson*"
+          - "com.github.ben-manes.caffeine:*"
+        update-types:
+          - "minor"
+          - "patch"
+
+      test-libs:
+        patterns:
+          - "io.kotest:*"
+          - "io.mockk:*"
+          - "org.junit.platform:*"
+
+      plugins-libs:
+        patterns:
+          - "org.jetbrains.kotlin.jvm*"
+          - "org.jetbrains.kotlin.plugin*"
+        update-types:
+          - "minor"
+          - "patch"
+      gradle-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+
+    labels:
+      - gradle
+      - dependencies
+    cooldown:
+      default-days: 7
