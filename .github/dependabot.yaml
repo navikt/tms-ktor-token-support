@@ -70,5 +70,6 @@ updates:
     labels:
       - gradle
       - dependencies
+      - tms-backend
     cooldown:
       default-days: 7
