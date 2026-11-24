@@ -1,33 +1,21 @@
 plugins {
     `maven-publish`
     `java-library`
-    kotlin("jvm")
+    alias(managed.plugins.kotlin)
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.jackson)
-    implementation(Ktor.serverForwardedHeaders)
-    implementation(Ktor.serverNetty)
-    implementation(Nimbusds.oauth2OidcSdk)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
-    testImplementation(Nimbusds.joseJwt)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.server.forwarded.header)
+    implementation(libs.nimbusds.oauth)
+
+    implementation(managed.ktor.client.apache5)
+    implementation(managed.ktor.client.contentNegotiation)
+    implementation(managed.ktor.serialization.jackson)
+    implementation(managed.ktor.server.netty)
+
+    testImplementation(managed.mockk)
+    testImplementation(libs.nimbusds.jose.jwt)
 }
 
 repositories {

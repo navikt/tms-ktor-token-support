@@ -3,32 +3,19 @@ import org.gradle.internal.impldep.com.amazonaws.util.json.Jackson
 plugins {
     `maven-publish`
     `java-library`
-    kotlin("jvm")
+    alias(managed.plugins.kotlin)
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(JacksonDatatype.moduleKotlin)
-    implementation(JacksonDatatype.datatypeJsr310)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.jackson)
-    implementation(Nimbusds.joseJwt)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    implementation(managed.jackson.moduleKotlin)
+    implementation(managed.jackson.datatypeJsr310)
+    implementation(managed.ktor.client.apache5)
+    implementation(libs.ktor.serialization)
+    implementation(managed.ktor.client.contentNegotiation)
+    implementation(managed.ktor.serialization.jackson)
+    implementation(libs.nimbusds.jose.jwt)
+
+    testImplementation(managed.mockk)
 }
 
 repositories {

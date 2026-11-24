@@ -1,32 +1,20 @@
 plugins {
     `maven-publish`
     `java-library`
-    kotlin("jvm")
+    alias(managed.plugins.kotlin)
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Caffeine.caffeine)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.jackson)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.serverNetty)
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Nimbusds.joseJwt)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    implementation(libs.nimbusds.jose.jwt)
+    implementation(libs.ktor.serialization)
+
+    implementation(managed.caffeine)
+    implementation(managed.ktor.client.apache5)
+    implementation(managed.ktor.client.contentNegotiation)
+    implementation(managed.ktor.serialization.jackson)
+    implementation(managed.ktor.server.netty)
+
+    testImplementation(managed.mockk)
 }
 
 repositories {

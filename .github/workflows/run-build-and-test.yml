@@ -1,0 +1,16 @@
+name: 'bygg og test'
+
+on:
+  push:
+    paths-ignore:
+      - .github/workflows/**
+      - README.md
+      - howto.md
+      - .github/dependabot.yml
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: navikt/tms-backend-deploy/.github/workflows/reusable-build-and-test.yml

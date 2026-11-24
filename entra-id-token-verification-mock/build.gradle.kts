@@ -1,31 +1,18 @@
 plugins {
     `maven-publish`
     `java-library`
-    kotlin("jvm")
+    alias(managed.plugins.kotlin)
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
     implementation(project(":entra-id-token-verification"))
-    implementation(JacksonDatatype.datatypeJsr310)
-    implementation(JacksonDatatype.moduleKotlin)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientJson)
-    implementation(Logback.classic)
-    implementation(Logstash.logbackEncoder)
-    implementation(Nimbusds.joseJwt)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.jackson)
-    testImplementation(Ktor.serverContentNegotiation)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    implementation(managed.jackson.datatypeJsr310)
+    implementation(managed.jackson.moduleKotlin)
+    implementation(libs.nimbusds.jose.jwt)
+
+    testImplementation(managed.mockk)
+    testImplementation(managed.ktor.serialization.jackson)
+    testImplementation(managed.ktor.server.contentNegotiation)
 }
 
 repositories {

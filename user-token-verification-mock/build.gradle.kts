@@ -1,37 +1,18 @@
 plugins {
     `maven-publish`
     `java-library`
-    kotlin("jvm")
+    alias(managed.plugins.kotlin)
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
     implementation(project(":user-token-verification"))
-    implementation(JacksonDatatype.datatypeJsr310)
-    implementation(JacksonDatatype.moduleKotlin)
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientJson)
-    implementation(Nimbusds.joseJwt)
-    implementation("io.ktor:ktor-server-content-negotiation:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    implementation("io.ktor:ktor-serialization-jackson:3.3.3")
-    implementation("io.ktor:ktor-server-content-negotiation:3.3.3")
-    implementation("io.ktor:ktor-server-core:3.3.3")
-    testImplementation(JacksonDatatype.datatypeJsr310)
-    testImplementation(JacksonDatatype.moduleKotlin)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverContentNegotiation)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    implementation(libs.nimbusds.jose.jwt)
+
+    implementation(managed.jackson.datatypeJsr310)
+    implementation(managed.jackson.moduleKotlin)
+    implementation(managed.ktor.server.contentNegotiation)
+    implementation(managed.ktor.server.core)
+    implementation(managed.ktor.serialization.jackson)
 }
 
 repositories {

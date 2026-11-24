@@ -1,0 +1,9 @@
+[versions]
+nimbusds = "10.9"
+
+[libraries]
+ktor-client-json = { group = "io.ktor", name = "ktor-client-json", version = "3.6.1" }
+ktor-serialization = { group = "io.ktor", name = "ktor-serialization", version = "3.6.1" }
+ktor-server-forwarded-header = { group = "io.ktor", name = "ktor-server-forwarded-header", version = "3.6.1" }
+nimbusds-jose-jwt = { group = "com.nimbusds", name = "nimbus-jose-jwt", version.ref = "nimbusds" }
+nimbusds-oauth = { group = "com.nimbusds", name = "oauth2-oidc-sdk", version.ref = "nimbusds" }
