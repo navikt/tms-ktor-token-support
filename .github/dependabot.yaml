@@ -30,7 +30,6 @@ updates:
           - "org.jetbrains.kotlinx*"
           - "ch.qos.logback:*"
           - "org.apache.*"
-          - "org.junit.jupiter:*"
           - "com.fasterxml.jackson*"
           - "com.github.ben-manes.caffeine:*"
           - "com.auth0:*"
@@ -46,6 +45,7 @@ updates:
           - "io.kotest:*"
           - "io.mockk:*"
           - "org.junit.platform:*"
+          - "org.junit.jupiter:*"
 
       plugins-libs:
         patterns:
