@@ -20,8 +20,8 @@ dependencies {
     implementation(libs.ktor.utils)
     implementation(libs.kotlinLogging)
     implementation(libs.nimbusds.jose)
-    runtimeOnly(libs.jackson.toolsCore)
-    runtimeOnly(libs.jackson.toolsDatabind)
+    runtimeOnly(libs.jackson3.core)
+    runtimeOnly(libs.jackson3.databind)
     runtimeOnly(libs.logback.classic)
 
 
