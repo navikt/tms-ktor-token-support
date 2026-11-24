@@ -1,0 +1,20 @@
+name: Bygg branch
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - main
+      - tms-dependency-admin_*
+    paths-ignore:
+      - .github/workflows/**
+      - README.md
+      - howto.md
+      - .github/dependabot.yml
+
+permissions:
+  contents: read
+
+jobs:
+  build-branch:
+    uses: navikt/tms-backend-deploy/.github/workflows/reusable-build-and-test.yml@main
