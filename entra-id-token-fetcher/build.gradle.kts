@@ -5,19 +5,18 @@ plugins {
 }
 
 dependencies {
-
     implementation(libs.apache.httpclient5)
+    implementation(libs.caffeine)
     implementation(libs.jackson.annotations)
     implementation(libs.jackson.databind)
     implementation(libs.kotlinx.coroutines)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.contentNegotiation)
     implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.client.contentNegotiation)
+    implementation(libs.ktor.client.core)
     implementation(libs.ktor.http)
     implementation(libs.ktor.serialization)
     implementation(libs.ktor.serialization.jackson)
     implementation(libs.ktor.utils)
-    implementation(libs.caffeine)
     implementation(libs.nimbusds.oauth2OidcSdk)
     runtimeOnly(libs.jackson.core)
     runtimeOnly(libs.logback.classic)
@@ -30,7 +29,6 @@ dependencies {
     testImplementation(libs.mockkDsl)
     testRuntimeOnly(libs.junit.engine)
     testRuntimeOnly(libs.junit.launcher)
-
 }
 
 repositories {

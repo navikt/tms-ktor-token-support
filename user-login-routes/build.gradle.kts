@@ -22,10 +22,9 @@ dependencies {
     implementation(libs.ktor.serialization.jackson)
     runtimeOnly(libs.logback.classic)
 
-
     testImplementation(libs.junit.api)
-    testImplementation(libs.kotest.assertionsShared)
     testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.assertionsShared)
     testImplementation(libs.kotest.common)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.ktor.io)

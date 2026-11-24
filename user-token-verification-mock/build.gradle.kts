@@ -12,18 +12,18 @@ dependencies {
     implementation(libs.jackson.core)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.moduleKotlin)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.apache5)
-    implementation(libs.ktor.http)
-    implementation(libs.ktor.utils)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.serialization.jackson)
     implementation(libs.kotlinLogging)
+    implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.utils)
     implementation(libs.nimbusds.oauth2OidcSdk)
 
     testImplementation(libs.junit.api)
-    testImplementation(libs.kotest.assertionsShared)
     testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.assertionsShared)
     testImplementation(libs.kotest.common)
     testImplementation(libs.kotest.runner)
     testImplementation(libs.ktor.serialization)
@@ -31,7 +31,6 @@ dependencies {
     testImplementation(libs.ktor.test.server)
     testRuntimeOnly(libs.junit.engine)
     testRuntimeOnly(libs.junit.launcher)
-
 }
 
 repositories {
