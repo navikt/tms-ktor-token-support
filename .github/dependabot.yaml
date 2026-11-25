@@ -13,6 +13,7 @@ updates:
       default-days: 3
     labels:
       - github-actions
+      - tms-backend
 
   - package-ecosystem: "gradle"
     directory: "/"
@@ -61,8 +62,7 @@ updates:
           - "major"
 
     labels:
-      - gradle
-      - dependencies
+      - gradle-dependency
       - tms-backend
     cooldown:
       default-days: 7
