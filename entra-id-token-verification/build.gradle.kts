@@ -1,5 +1,3 @@
-import org.gradle.internal.impldep.com.amazonaws.util.json.Jackson
-
 plugins {
     `maven-publish`
     `java-library`
@@ -7,28 +5,40 @@ plugins {
 }
 
 dependencies {
-    api(kotlin("stdlib-jdk8"))
-    implementation(Logstash.logbackEncoder)
-    implementation(Logback.classic)
-    implementation(JacksonDatatype.moduleKotlin)
-    implementation(JacksonDatatype.datatypeJsr310)
-    implementation(KotlinLogging.logging)
-    implementation(Ktor.serverAuth)
-    implementation(Ktor.serverAuthJwt)
-    implementation(Ktor.clientApache5)
-    implementation(Ktor.clientJson)
-    implementation(Ktor.serialization)
-    implementation(Ktor.clientContentNegotiation)
-    implementation(Ktor.jackson)
-    implementation(Nimbusds.joseJwt)
-    testImplementation(JunitPlatform.launcher)
-    testImplementation(JunitJupiter.api)
-    testImplementation(JunitJupiter.engine)
-    testImplementation(Mockk.mockk)
-    testImplementation(Ktor.clientMock)
-    testImplementation(Ktor.serverTestHost)
-    testImplementation(Kotest.assertionsCore)
-    testImplementation(Kotest.extensions)
+    api(libs.auth0.javaJwt)
+    api(libs.ktor.server.auth)
+    implementation(libs.apache.httpclient5)
+    implementation(libs.auth0.jwksRsa)
+    implementation(libs.jackson.annotations)
+    implementation(libs.jackson.databind)
+    implementation(libs.kotlinLogging)
+    implementation(libs.kotlinx.coroutines)
+    implementation(libs.ktor.client.apache5)
+    implementation(libs.ktor.client.contentNegotiation)
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.http)
+    implementation(libs.ktor.serialization)
+    implementation(libs.ktor.serialization.jackson)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.utils)
+    runtimeOnly(libs.jackson.core)
+    runtimeOnly(libs.logback.classic)
+    runtimeOnly(libs.netty.common)
+    runtimeOnly(libs.netty.handler)
+
+    testImplementation(libs.junit.api)
+    testImplementation(libs.kotest.assertionsCore)
+    testImplementation(libs.kotest.assertionsShared)
+    testImplementation(libs.kotest.common)
+    testImplementation(libs.kotest.runner)
+    testImplementation(libs.ktor.test.clientMock)
+    testImplementation(libs.ktor.test.server)
+    testImplementation(libs.mockk)
+    testImplementation(libs.mockkCore)
+    testImplementation(libs.mockkDsl)
+    testImplementation(libs.nimbusds.oauth2OidcSdk)
+    testRuntimeOnly(libs.junit.engine)
+    testRuntimeOnly(libs.junit.launcher)
 }
 
 repositories {
@@ -36,7 +46,9 @@ repositories {
     mavenLocal()
 }
 
-val libraryVersion: String = properties["lib_version"]?.toString() ?: "latest-local"
+val libraryVersion: String = providers.gradleProperty("lib_version")
+    .orElse("latest-local")
+    .get()
 
 publishing {
     repositories{
@@ -57,7 +69,7 @@ publishing {
             version = libraryVersion
             from(components["java"])
 
-            val sourcesJar by tasks.registering(Jar::class) {
+            val sourcesJar = tasks.register<Jar>("sources") {
                 archiveClassifier.set("sources")
                 from(sourceSets.main.get().allSource)
             }
@@ -78,4 +90,3 @@ tasks {
         useJUnitPlatform()
     }
 }
-
